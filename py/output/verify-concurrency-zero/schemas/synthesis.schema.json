@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "phase",
+    "summary",
+    "lane_insights",
+    "ranking",
+    "clusters",
+    "hybrid_ideas",
+    "portfolio_strategy",
+    "references",
+    "next_actions"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "lane_insights": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "direction_slug",
+          "direction_title",
+          "score",
+          "reason"
+        ],
+        "properties": {
+          "direction_slug": {
+            "type": "string"
+          },
+          "direction_title": {
+            "type": "string"
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "clusters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "member_slugs",
+          "thesis"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "member_slugs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "thesis": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hybrid_ideas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "why_now",
+          "based_on",
+          "mvp"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "why_now": {
+            "type": "string"
+          },
+          "based_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mvp": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "portfolio_strategy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "url",
+          "reason"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

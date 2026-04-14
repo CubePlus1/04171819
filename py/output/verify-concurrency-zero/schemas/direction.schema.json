@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "direction_slug",
+    "direction_title",
+    "source_key",
+    "phase",
+    "summary",
+    "track_fit",
+    "core_user_value",
+    "mvp_scope",
+    "data_plan",
+    "technical_plan",
+    "demo_flow",
+    "feasibility",
+    "risks",
+    "downgrade_plan",
+    "new_ideas",
+    "evolution_notes",
+    "references",
+    "next_actions"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "direction_slug": {
+      "type": "string"
+    },
+    "direction_title": {
+      "type": "string"
+    },
+    "source_key": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "track_fit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "best_track",
+        "alt_tracks",
+        "reason"
+      ],
+      "properties": {
+        "best_track": {
+          "type": "string"
+        },
+        "alt_tracks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "core_user_value": {
+      "type": "string"
+    },
+    "mvp_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "data_plan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "confidence",
+          "notes"
+        ],
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "technical_plan": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "demo_flow": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "feasibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delivery_40h",
+        "demo_wow",
+        "reuse_fit",
+        "data_availability",
+        "overall",
+        "rationale"
+      ],
+      "properties": {
+        "delivery_40h": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "demo_wow": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "reuse_fit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "data_availability": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "overall": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "rationale": {
+          "type": "string"
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "risk",
+          "severity",
+          "mitigation"
+        ],
+        "properties": {
+          "risk": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "mitigation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "downgrade_plan": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "new_ideas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evolution_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "url",
+          "reason"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

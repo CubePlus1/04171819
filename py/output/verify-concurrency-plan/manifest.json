@@ -1,0 +1,958 @@
+{
+  "workspace_root": "/Users/sevencolor/code/0BKHDD",
+  "docs": [
+    "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+    "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md"
+  ],
+  "run_dir": "/Users/sevencolor/code/0BKHDD/py/output/verify-concurrency-plan",
+  "calls": 100,
+  "max_concurrency": 3,
+  "heartbeat_seconds": 10.0,
+  "search": true,
+  "sandbox": "read-only",
+  "tasks": [
+    {
+      "task_id": "001-bytecamp-01-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 1,
+      "direction_slug": "bytecamp-01"
+    },
+    {
+      "task_id": "002-bytecamp-02-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 2,
+      "direction_slug": "bytecamp-02"
+    },
+    {
+      "task_id": "003-bytecamp-03-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 3,
+      "direction_slug": "bytecamp-03"
+    },
+    {
+      "task_id": "004-bytecamp-04-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 4,
+      "direction_slug": "bytecamp-04"
+    },
+    {
+      "task_id": "005-bytecamp-05-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 5,
+      "direction_slug": "bytecamp-05"
+    },
+    {
+      "task_id": "006-bytecamp-06-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 6,
+      "direction_slug": "bytecamp-06"
+    },
+    {
+      "task_id": "007-bytecamp-07-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 7,
+      "direction_slug": "bytecamp-07"
+    },
+    {
+      "task_id": "008-bytecamp-08-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 8,
+      "direction_slug": "bytecamp-08"
+    },
+    {
+      "task_id": "009-bytecamp-09-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 9,
+      "direction_slug": "bytecamp-09"
+    },
+    {
+      "task_id": "010-bytecamp-10-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 10,
+      "direction_slug": "bytecamp-10"
+    },
+    {
+      "task_id": "011-bytecamp-11-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 11,
+      "direction_slug": "bytecamp-11"
+    },
+    {
+      "task_id": "012-bytecamp-12-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 12,
+      "direction_slug": "bytecamp-12"
+    },
+    {
+      "task_id": "013-brainstorming-01-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 13,
+      "direction_slug": "brainstorming-01"
+    },
+    {
+      "task_id": "014-brainstorming-02-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 14,
+      "direction_slug": "brainstorming-02"
+    },
+    {
+      "task_id": "015-brainstorming-03-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 15,
+      "direction_slug": "brainstorming-03"
+    },
+    {
+      "task_id": "016-brainstorming-04-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 16,
+      "direction_slug": "brainstorming-04"
+    },
+    {
+      "task_id": "017-brainstorming-05-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 17,
+      "direction_slug": "brainstorming-05"
+    },
+    {
+      "task_id": "018-brainstorming-06-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 18,
+      "direction_slug": "brainstorming-06"
+    },
+    {
+      "task_id": "019-brainstorming-07-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 19,
+      "direction_slug": "brainstorming-07"
+    },
+    {
+      "task_id": "020-brainstorming-08-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 20,
+      "direction_slug": "brainstorming-08"
+    },
+    {
+      "task_id": "021-brainstorming-09-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 21,
+      "direction_slug": "brainstorming-09"
+    },
+    {
+      "task_id": "022-brainstorming-10-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 22,
+      "direction_slug": "brainstorming-10"
+    },
+    {
+      "task_id": "023-brainstorming-11-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 23,
+      "direction_slug": "brainstorming-11"
+    },
+    {
+      "task_id": "024-brainstorming-12-baseline_research",
+      "kind": "direction",
+      "phase": "baseline_research",
+      "sequence": 24,
+      "direction_slug": "brainstorming-12"
+    },
+    {
+      "task_id": "025-bytecamp-01-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 25,
+      "direction_slug": "bytecamp-01"
+    },
+    {
+      "task_id": "026-bytecamp-02-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 26,
+      "direction_slug": "bytecamp-02"
+    },
+    {
+      "task_id": "027-bytecamp-03-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 27,
+      "direction_slug": "bytecamp-03"
+    },
+    {
+      "task_id": "028-bytecamp-04-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 28,
+      "direction_slug": "bytecamp-04"
+    },
+    {
+      "task_id": "029-bytecamp-05-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 29,
+      "direction_slug": "bytecamp-05"
+    },
+    {
+      "task_id": "030-bytecamp-06-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 30,
+      "direction_slug": "bytecamp-06"
+    },
+    {
+      "task_id": "031-bytecamp-07-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 31,
+      "direction_slug": "bytecamp-07"
+    },
+    {
+      "task_id": "032-bytecamp-08-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 32,
+      "direction_slug": "bytecamp-08"
+    },
+    {
+      "task_id": "033-bytecamp-09-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 33,
+      "direction_slug": "bytecamp-09"
+    },
+    {
+      "task_id": "034-bytecamp-10-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 34,
+      "direction_slug": "bytecamp-10"
+    },
+    {
+      "task_id": "035-bytecamp-11-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 35,
+      "direction_slug": "bytecamp-11"
+    },
+    {
+      "task_id": "036-bytecamp-12-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 36,
+      "direction_slug": "bytecamp-12"
+    },
+    {
+      "task_id": "037-brainstorming-01-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 37,
+      "direction_slug": "brainstorming-01"
+    },
+    {
+      "task_id": "038-brainstorming-02-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 38,
+      "direction_slug": "brainstorming-02"
+    },
+    {
+      "task_id": "039-brainstorming-03-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 39,
+      "direction_slug": "brainstorming-03"
+    },
+    {
+      "task_id": "040-brainstorming-04-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 40,
+      "direction_slug": "brainstorming-04"
+    },
+    {
+      "task_id": "041-brainstorming-05-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 41,
+      "direction_slug": "brainstorming-05"
+    },
+    {
+      "task_id": "042-brainstorming-06-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 42,
+      "direction_slug": "brainstorming-06"
+    },
+    {
+      "task_id": "043-brainstorming-07-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 43,
+      "direction_slug": "brainstorming-07"
+    },
+    {
+      "task_id": "044-brainstorming-08-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 44,
+      "direction_slug": "brainstorming-08"
+    },
+    {
+      "task_id": "045-brainstorming-09-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 45,
+      "direction_slug": "brainstorming-09"
+    },
+    {
+      "task_id": "046-brainstorming-10-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 46,
+      "direction_slug": "brainstorming-10"
+    },
+    {
+      "task_id": "047-brainstorming-11-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 47,
+      "direction_slug": "brainstorming-11"
+    },
+    {
+      "task_id": "048-brainstorming-12-assumption_challenge",
+      "kind": "direction",
+      "phase": "assumption_challenge",
+      "sequence": 48,
+      "direction_slug": "brainstorming-12"
+    },
+    {
+      "task_id": "049-bytecamp-01-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 49,
+      "direction_slug": "bytecamp-01"
+    },
+    {
+      "task_id": "050-bytecamp-02-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 50,
+      "direction_slug": "bytecamp-02"
+    },
+    {
+      "task_id": "051-bytecamp-03-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 51,
+      "direction_slug": "bytecamp-03"
+    },
+    {
+      "task_id": "052-bytecamp-04-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 52,
+      "direction_slug": "bytecamp-04"
+    },
+    {
+      "task_id": "053-bytecamp-05-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 53,
+      "direction_slug": "bytecamp-05"
+    },
+    {
+      "task_id": "054-bytecamp-06-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 54,
+      "direction_slug": "bytecamp-06"
+    },
+    {
+      "task_id": "055-bytecamp-07-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 55,
+      "direction_slug": "bytecamp-07"
+    },
+    {
+      "task_id": "056-bytecamp-08-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 56,
+      "direction_slug": "bytecamp-08"
+    },
+    {
+      "task_id": "057-bytecamp-09-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 57,
+      "direction_slug": "bytecamp-09"
+    },
+    {
+      "task_id": "058-bytecamp-10-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 58,
+      "direction_slug": "bytecamp-10"
+    },
+    {
+      "task_id": "059-bytecamp-11-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 59,
+      "direction_slug": "bytecamp-11"
+    },
+    {
+      "task_id": "060-bytecamp-12-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 60,
+      "direction_slug": "bytecamp-12"
+    },
+    {
+      "task_id": "061-brainstorming-01-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 61,
+      "direction_slug": "brainstorming-01"
+    },
+    {
+      "task_id": "062-brainstorming-02-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 62,
+      "direction_slug": "brainstorming-02"
+    },
+    {
+      "task_id": "063-brainstorming-03-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 63,
+      "direction_slug": "brainstorming-03"
+    },
+    {
+      "task_id": "064-brainstorming-04-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 64,
+      "direction_slug": "brainstorming-04"
+    },
+    {
+      "task_id": "065-brainstorming-05-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 65,
+      "direction_slug": "brainstorming-05"
+    },
+    {
+      "task_id": "066-brainstorming-06-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 66,
+      "direction_slug": "brainstorming-06"
+    },
+    {
+      "task_id": "067-brainstorming-07-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 67,
+      "direction_slug": "brainstorming-07"
+    },
+    {
+      "task_id": "068-brainstorming-08-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 68,
+      "direction_slug": "brainstorming-08"
+    },
+    {
+      "task_id": "069-brainstorming-09-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 69,
+      "direction_slug": "brainstorming-09"
+    },
+    {
+      "task_id": "070-brainstorming-10-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 70,
+      "direction_slug": "brainstorming-10"
+    },
+    {
+      "task_id": "071-brainstorming-11-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 71,
+      "direction_slug": "brainstorming-11"
+    },
+    {
+      "task_id": "072-brainstorming-12-evolution",
+      "kind": "direction",
+      "phase": "evolution",
+      "sequence": 72,
+      "direction_slug": "brainstorming-12"
+    },
+    {
+      "task_id": "073-bytecamp-01-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 73,
+      "direction_slug": "bytecamp-01"
+    },
+    {
+      "task_id": "074-bytecamp-02-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 74,
+      "direction_slug": "bytecamp-02"
+    },
+    {
+      "task_id": "075-bytecamp-03-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 75,
+      "direction_slug": "bytecamp-03"
+    },
+    {
+      "task_id": "076-bytecamp-04-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 76,
+      "direction_slug": "bytecamp-04"
+    },
+    {
+      "task_id": "077-bytecamp-05-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 77,
+      "direction_slug": "bytecamp-05"
+    },
+    {
+      "task_id": "078-bytecamp-06-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 78,
+      "direction_slug": "bytecamp-06"
+    },
+    {
+      "task_id": "079-bytecamp-07-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 79,
+      "direction_slug": "bytecamp-07"
+    },
+    {
+      "task_id": "080-bytecamp-08-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 80,
+      "direction_slug": "bytecamp-08"
+    },
+    {
+      "task_id": "081-bytecamp-09-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 81,
+      "direction_slug": "bytecamp-09"
+    },
+    {
+      "task_id": "082-bytecamp-10-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 82,
+      "direction_slug": "bytecamp-10"
+    },
+    {
+      "task_id": "083-bytecamp-11-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 83,
+      "direction_slug": "bytecamp-11"
+    },
+    {
+      "task_id": "084-bytecamp-12-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 84,
+      "direction_slug": "bytecamp-12"
+    },
+    {
+      "task_id": "085-brainstorming-01-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 85,
+      "direction_slug": "brainstorming-01"
+    },
+    {
+      "task_id": "086-brainstorming-02-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 86,
+      "direction_slug": "brainstorming-02"
+    },
+    {
+      "task_id": "087-brainstorming-03-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 87,
+      "direction_slug": "brainstorming-03"
+    },
+    {
+      "task_id": "088-brainstorming-04-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 88,
+      "direction_slug": "brainstorming-04"
+    },
+    {
+      "task_id": "089-brainstorming-05-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 89,
+      "direction_slug": "brainstorming-05"
+    },
+    {
+      "task_id": "090-brainstorming-06-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 90,
+      "direction_slug": "brainstorming-06"
+    },
+    {
+      "task_id": "091-brainstorming-07-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 91,
+      "direction_slug": "brainstorming-07"
+    },
+    {
+      "task_id": "092-brainstorming-08-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 92,
+      "direction_slug": "brainstorming-08"
+    },
+    {
+      "task_id": "093-brainstorming-09-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 93,
+      "direction_slug": "brainstorming-09"
+    },
+    {
+      "task_id": "094-brainstorming-10-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 94,
+      "direction_slug": "brainstorming-10"
+    },
+    {
+      "task_id": "095-brainstorming-11-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 95,
+      "direction_slug": "brainstorming-11"
+    },
+    {
+      "task_id": "096-brainstorming-12-final_pack",
+      "kind": "direction",
+      "phase": "final_pack",
+      "sequence": 96,
+      "direction_slug": "brainstorming-12"
+    },
+    {
+      "task_id": "097-synthesis-track_landscape",
+      "kind": "synthesis",
+      "phase": "track_landscape",
+      "sequence": 97,
+      "direction_slug": null
+    },
+    {
+      "task_id": "098-synthesis-cross_direction_compare",
+      "kind": "synthesis",
+      "phase": "cross_direction_compare",
+      "sequence": 98,
+      "direction_slug": null
+    },
+    {
+      "task_id": "099-synthesis-hybrid_generation",
+      "kind": "synthesis",
+      "phase": "hybrid_generation",
+      "sequence": 99,
+      "direction_slug": null
+    },
+    {
+      "task_id": "100-synthesis-final_recommendation",
+      "kind": "synthesis",
+      "phase": "final_recommendation",
+      "sequence": 100,
+      "direction_slug": null
+    }
+  ],
+  "directions": [
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 1,
+      "heading": "1. 精选视频 -> 未来的你学习搭子",
+      "title": "精选视频 -> 未来的你学习搭子",
+      "body": "- 适合赛道：赛道二｜抖音精选-内容重构\n- 方向：把 AI / 科技 / 职场 / 课程类视频转成“给当前这个大学生”的学习摘要、知识地图、3 天行动计划、1 题小测。\n- 可复用项目：`Eoove-demo` 的画像与顾问，`nightowl` 的 ETL/RAG，`taidy` 的引用和图表，`allin` 的学生画像展示。\n\n继续调查可行性的 prompt：\n\n```text\n请围绕“精选视频 -> 未来的你学习搭子”做参赛可行性调研，背景是字节跳动举办的大学生活动，要求纯软件、40小时内做完、适合展览。请输出：\n1. 这个方向与赛道二的契合点\n2. 最小可行 MVP 功能，只保留 1 个垂类（如 AI 学习、实习求职、考研）\n3. 数据获取方案，按“官方 API / 官方导出或开放能力 / 公开网页可采集字段 / 人工采样”四级列出；明确是否能合法稳定拿到视频标题、简介、字幕、封面、标签\n4. 如果拿不到抖音精选官方内容 API，如何用 30~100 条公开视频样本或人工整理字幕完成 ETL + RAG\n5. 现有本地项目中哪些模块可直接复用，分别对应画像、知识库、问答、引用、前端展示\n6. 40 小时开发拆解\n7. 展台 demo 流程\n8. 最大风险与降级方案\n```",
+      "research_prompt": "请围绕“精选视频 -> 未来的你学习搭子”做参赛可行性调研，背景是字节跳动举办的大学生活动，要求纯软件、40小时内做完、适合展览。请输出：\n1. 这个方向与赛道二的契合点\n2. 最小可行 MVP 功能，只保留 1 个垂类（如 AI 学习、实习求职、考研）\n3. 数据获取方案，按“官方 API / 官方导出或开放能力 / 公开网页可采集字段 / 人工采样”四级列出；明确是否能合法稳定拿到视频标题、简介、字幕、封面、标签\n4. 如果拿不到抖音精选官方内容 API，如何用 30~100 条公开视频样本或人工整理字幕完成 ETL + RAG\n5. 现有本地项目中哪些模块可直接复用，分别对应画像、知识库、问答、引用、前端展示\n6. 40 小时开发拆解\n7. 展台 demo 流程\n8. 最大风险与降级方案",
+      "slug": "bytecamp-01"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 2,
+      "heading": "2. 实习求职视频 -> 你的岗位决策卡",
+      "title": "实习求职视频 -> 你的岗位决策卡",
+      "body": "- 适合赛道：赛道二 / 赛道三\n- 方向：用户输入专业、年级、城市、期望薪资后，把求职类视频和岗位信息重组为“一刷即懂”的岗位卡：适合度、关键词、避坑点、下一步投递建议。\n- 可复用项目：`allin` 的岗位库、画像和匹配，`taidy` 的问数/图表，`Eoove-demo` 的 persona 和 advisor。\n\n继续调查可行性的 prompt：\n\n```text\n请调研“实习求职视频 -> 你的岗位决策卡”是否适合字节大学生活动参赛，要求纯软件、40小时内能做完。请重点分析：\n1. 用 allin 的岗位数据 + 视频内容重构是否能形成清晰故事线\n2. 数据侧需要哪些字段：岗位标题、城市、薪资、技能、视频摘要、用户画像字段\n3. 这些字段分别可以从哪里获得：现有 allin 数据库、公开视频页面、手工标注、校园招聘公开信息、官方 API\n4. 是否有必要接入实时招聘 API；如果没有稳定 API，如何用静态岗位库做出可信 demo\n5. RAG 和用户画像在这里分别扮演什么角色，怎么避免只是普通聊天框\n6. 40 小时 MVP 的技术拆解与最省时间的架构\n7. 展台上 30 秒内让观众看懂的交互脚本\n8. 风险：数据时效性、版权、平台接口、推荐真实性\n```",
+      "research_prompt": "请调研“实习求职视频 -> 你的岗位决策卡”是否适合字节大学生活动参赛，要求纯软件、40小时内能做完。请重点分析：\n1. 用 allin 的岗位数据 + 视频内容重构是否能形成清晰故事线\n2. 数据侧需要哪些字段：岗位标题、城市、薪资、技能、视频摘要、用户画像字段\n3. 这些字段分别可以从哪里获得：现有 allin 数据库、公开视频页面、手工标注、校园招聘公开信息、官方 API\n4. 是否有必要接入实时招聘 API；如果没有稳定 API，如何用静态岗位库做出可信 demo\n5. RAG 和用户画像在这里分别扮演什么角色，怎么避免只是普通聊天框\n6. 40 小时 MVP 的技术拆解与最省时间的架构\n7. 展台上 30 秒内让观众看懂的交互脚本\n8. 风险：数据时效性、版权、平台接口、推荐真实性",
+      "slug": "bytecamp-02"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 3,
+      "heading": "3. 选课 / 竞赛 / 考研内容 -> 个性化成长路线图",
+      "title": "选课 / 竞赛 / 考研内容 -> 个性化成长路线图",
+      "body": "- 适合赛道：赛道二\n- 方向：把选课、竞赛、考研、技能成长相关内容，按“大一 / 大二 / 大三 / 跨专业 / 保研 / 找工”画像重组为路线图，不是推荐视频，而是直接给行动路径。\n- 可复用项目：`allin` 的路径规划和图谱，`Eoove-demo` 的人格与长期记忆，`nightowl` 的轻量知识库。\n\n继续调查可行性的 prompt：\n\n```text\n请调研“选课/竞赛/考研内容 -> 个性化成长路线图”这个方向的参赛可行性。输出时重点回答：\n1. 它更适合赛道二还是赛道三，为什么\n2. 若复用 allin 的 GraphRAG 和路径规划思想，如何把“职业路径”改造为“大学生成长路径”\n3. 数据从哪里来最稳：学校公开培养方案、课程介绍页、竞赛官网、公开视频字幕、手工整理资料、用户输入\n4. 哪些数据可以直接抓取或下载，哪些需要人工录入\n5. 是否存在可用的官方 API；如果没有，MVP 应该如何规避 API 依赖\n6. 40 小时内建议保留的功能上限\n7. 展示层是否适合用桑基图、路线图、雷达图，哪个最容易打动展台观众\n8. 风险和降级策略\n```",
+      "research_prompt": "请调研“选课/竞赛/考研内容 -> 个性化成长路线图”这个方向的参赛可行性。输出时重点回答：\n1. 它更适合赛道二还是赛道三，为什么\n2. 若复用 allin 的 GraphRAG 和路径规划思想，如何把“职业路径”改造为“大学生成长路径”\n3. 数据从哪里来最稳：学校公开培养方案、课程介绍页、竞赛官网、公开视频字幕、手工整理资料、用户输入\n4. 哪些数据可以直接抓取或下载，哪些需要人工录入\n5. 是否存在可用的官方 API；如果没有，MVP 应该如何规避 API 依赖\n6. 40 小时内建议保留的功能上限\n7. 展示层是否适合用桑基图、路线图、雷达图，哪个最容易打动展台观众\n8. 风险和降级策略",
+      "slug": "bytecamp-03"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 4,
+      "heading": "4. 你刷过什么，就长成什么：内容消费人格镜像",
+      "title": "你刷过什么，就长成什么：内容消费人格镜像",
+      "body": "- 适合赛道：赛道二 / 赛道三\n- 方向：把用户最近看过的一组内容，转成“兴趣偏好 + 行动倾向 + 学习风格”的数字镜像，再反向生成更懂你的内容解释和建议。\n- 可复用项目：`Eoove-demo` 的 PersonVec/记忆块/报告，`nightowl` 的 ETL，`taidy` 的归因面板。\n\n继续调查可行性的 prompt：\n\n```text\n请评估“内容消费人格镜像”作为字节大学生活动作品的可行性，要求和数字个体、ETL、RAG、用户画像强相关。请输出：\n1. 这个方向如何避免变成泛人格测试，而是与内容消费场景强绑定\n2. 数据来源方案：是否可以通过用户上传观看记录截图、收藏夹导出、手填近10条内容、公开视频样本来构建画像\n3. Eoove-demo 的问卷、memo、diary、reading、connector 中哪些能力可以直接复用\n4. 用户画像如何设计成“看得懂、愿意玩、不会觉得玄”\n5. 是否需要真实抖音行为数据；如果没有平台接口，如何用替代输入完成 demo\n6. 40 小时 MVP 功能和页面清单\n7. 展台效果最强的展示方式\n8. 风险：隐私、数据噪声、人格标签过强\n```",
+      "research_prompt": "请评估“内容消费人格镜像”作为字节大学生活动作品的可行性，要求和数字个体、ETL、RAG、用户画像强相关。请输出：\n1. 这个方向如何避免变成泛人格测试，而是与内容消费场景强绑定\n2. 数据来源方案：是否可以通过用户上传观看记录截图、收藏夹导出、手填近10条内容、公开视频样本来构建画像\n3. Eoove-demo 的问卷、memo、diary、reading、connector 中哪些能力可以直接复用\n4. 用户画像如何设计成“看得懂、愿意玩、不会觉得玄”\n5. 是否需要真实抖音行为数据；如果没有平台接口，如何用替代输入完成 demo\n6. 40 小时 MVP 功能和页面清单\n7. 展台效果最强的展示方式\n8. 风险：隐私、数据噪声、人格标签过强",
+      "slug": "bytecamp-04"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 5,
+      "heading": "5. 懂你的一刷：今晚吃什么 / 周末去哪卡片流",
+      "title": "懂你的一刷：今晚吃什么 / 周末去哪卡片流",
+      "body": "- 适合赛道：赛道三｜AI体验\n- 方向：做一个“刷到就能直接决定”的信息卡单元。用户先给预算、人数、口味、距离、情绪，接着连续刷到已经帮他排好的选择卡。\n- 可复用项目：`Eoove-demo` 的顾问、画像、决策记录，`taidy` 的卡片式结果与归因，`nightowl` 的轻量知识库。\n\n继续调查可行性的 prompt：\n\n```text\n请围绕“懂你的一刷：今晚吃什么 / 周末去哪卡片流”做参赛可行性调研，要求偏赛道三、大学生展览友好、40小时可完成。请重点调查：\n1. 这个方向为什么适合“刷到懂你的瞬间”\n2. 数据来源最稳的方案：大众点评/小红书等第三方 API 是否现实；如果不现实，是否可以用校园周边公开商家信息 + 人工整理菜单/地点/价格\n3. 用户画像最小集合需要哪些字段，怎样 15 秒内采集完\n4. 结果卡片里最应该展示哪些内容，才能在展台现场一眼懂\n5. 是否需要地图 API、路线 API、天气 API，哪些是必须，哪些可砍\n6. 如何用现有本地项目快速搭出“画像 + 决策 + RAG + 卡片流”\n7. 40 小时 MVP 方案\n8. 法律和平台风险\n```",
+      "research_prompt": "请围绕“懂你的一刷：今晚吃什么 / 周末去哪卡片流”做参赛可行性调研，要求偏赛道三、大学生展览友好、40小时可完成。请重点调查：\n1. 这个方向为什么适合“刷到懂你的瞬间”\n2. 数据来源最稳的方案：大众点评/小红书等第三方 API 是否现实；如果不现实，是否可以用校园周边公开商家信息 + 人工整理菜单/地点/价格\n3. 用户画像最小集合需要哪些字段，怎样 15 秒内采集完\n4. 结果卡片里最应该展示哪些内容，才能在展台现场一眼懂\n5. 是否需要地图 API、路线 API、天气 API，哪些是必须，哪些可砍\n6. 如何用现有本地项目快速搭出“画像 + 决策 + RAG + 卡片流”\n7. 40 小时 MVP 方案\n8. 法律和平台风险",
+      "slug": "bytecamp-05"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 6,
+      "heading": "6. 校园活动 / 社团 / 讲座 / 宣讲会智能信息流",
+      "title": "校园活动 / 社团 / 讲座 / 宣讲会智能信息流",
+      "body": "- 适合赛道：赛道三\n- 方向：把校园活动、宣讲会、比赛报名、社团招新重组成“你今天该去什么”的信息流单元，不是列表，而是带理由、冲突分析、报名建议的卡。\n- 可复用项目：`allin` 的匹配思路，`Eoove-demo` 的 advisor 和 schedule，`taidy` 的多意图规划。\n\n继续调查可行性的 prompt：\n\n```text\n请调研“校园活动/社团/讲座/宣讲会智能信息流”是否适合本次字节活动。请输出：\n1. 赛道匹配分析\n2. 可用数据源：学校官网、学院通知、公众号文章、报名表单、海报 OCR、日历 ICS、公开 RSS 等\n3. 哪些数据能自动拿到，哪些需要人工整理\n4. 是否需要 OCR、爬虫、日历 API、地图 API；优先级怎么排\n5. 如何把活动信息流做成“刚好懂你”，而不是普通公告聚合\n6. 现有四个项目各能贡献什么\n7. 40 小时 MVP 的数据规模建议\n8. 风险：数据更新、校内源格式混乱、权限问题\n```",
+      "research_prompt": "请调研“校园活动/社团/讲座/宣讲会智能信息流”是否适合本次字节活动。请输出：\n1. 赛道匹配分析\n2. 可用数据源：学校官网、学院通知、公众号文章、报名表单、海报 OCR、日历 ICS、公开 RSS 等\n3. 哪些数据能自动拿到，哪些需要人工整理\n4. 是否需要 OCR、爬虫、日历 API、地图 API；优先级怎么排\n5. 如何把活动信息流做成“刚好懂你”，而不是普通公告聚合\n6. 现有四个项目各能贡献什么\n7. 40 小时 MVP 的数据规模建议\n8. 风险：数据更新、校内源格式混乱、权限问题",
+      "slug": "bytecamp-06"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 7,
+      "heading": "7. 平行人格互动剧场",
+      "title": "平行人格互动剧场",
+      "body": "- 适合赛道：赛道一｜互动空间\n- 方向：用户先快速生成一个数字分身，然后进入 3 个大学生活场景分支，例如选课、社交、实习、旅行。不同画像走出不同剧情。\n- 可复用项目：`Eoove-demo` 的数字个体和 memory，`allin` 的画像维度，`nightowl` 的轻量记忆检索。\n\n继续调查可行性的 prompt：\n\n```text\n请评估“平行人格互动剧场”作为赛道一作品的可行性，要求和数字个体、用户画像强关联，40小时内可做。请重点回答：\n1. 赛道一强调可直接玩到，这个方向的最小玩法是什么\n2. 是否必须接入抖音互动空间官方能力，还是可以先做网页/小程序式原型再迁移\n3. 现有 Eoove-demo 的数字个体、问卷、顾问能力如何最少改造就能进入剧情互动\n4. 剧情数据如何准备：手工写 20~30 个节点、从公开视频/帖子里抽校园案例、还是从问卷模板生成\n5. RAG 在这里的价值是什么，如何避免剧情只是模板拼接\n6. 展台上最抓人的 1 分钟体验路径\n7. 40 小时内的美术/UI/交互边界\n8. 最大风险与最稳降级版本\n```",
+      "research_prompt": "请评估“平行人格互动剧场”作为赛道一作品的可行性，要求和数字个体、用户画像强关联，40小时内可做。请重点回答：\n1. 赛道一强调可直接玩到，这个方向的最小玩法是什么\n2. 是否必须接入抖音互动空间官方能力，还是可以先做网页/小程序式原型再迁移\n3. 现有 Eoove-demo 的数字个体、问卷、顾问能力如何最少改造就能进入剧情互动\n4. 剧情数据如何准备：手工写 20~30 个节点、从公开视频/帖子里抽校园案例、还是从问卷模板生成\n5. RAG 在这里的价值是什么，如何避免剧情只是模板拼接\n6. 展台上最抓人的 1 分钟体验路径\n7. 40 小时内的美术/UI/交互边界\n8. 最大风险与最稳降级版本",
+      "slug": "bytecamp-07"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 8,
+      "heading": "8. 未来职业分身闯关",
+      "title": "未来职业分身闯关",
+      "body": "- 适合赛道：赛道一 / 赛道二\n- 方向：把 `allin` 的职业路径规划改造成“可玩”的闯关体验。用户的分身从当前状态出发，选择不同技能和决策，走向不同职业结局。\n- 可复用项目：`allin` 的岗位图谱、路径规划、技能差距，`Eoove-demo` 的画像报告。\n\n继续调查可行性的 prompt：\n\n```text\n请调研“未来职业分身闯关”是否适合本次字节活动，目标是纯软件、40小时 MVP、大学生展览好看。请输出：\n1. 它更偏赛道一还是赛道二，参赛叙事怎么写更顺\n2. 如何把 allin 中的岗位图谱、路径规划、技能差距，改造成带反馈的互动玩法\n3. 数据是否可以完全复用现有岗位数据和画像模型，是否需要外部 API\n4. 如果需要补数据，最少补哪些：岗位标签、技能标签、剧情文本、结局卡片\n5. 如何把复杂的职业图谱压缩成展台 2 分钟能体验完的流程\n6. 最推荐的展示形式：闯关地图、桑基图、剧情卡牌、聊天式决策\n7. 40 小时技术拆解\n8. 风险：玩法太重、教育味太强、展示不够直观\n```",
+      "research_prompt": "请调研“未来职业分身闯关”是否适合本次字节活动，目标是纯软件、40小时 MVP、大学生展览好看。请输出：\n1. 它更偏赛道一还是赛道二，参赛叙事怎么写更顺\n2. 如何把 allin 中的岗位图谱、路径规划、技能差距，改造成带反馈的互动玩法\n3. 数据是否可以完全复用现有岗位数据和画像模型，是否需要外部 API\n4. 如果需要补数据，最少补哪些：岗位标签、技能标签、剧情文本、结局卡片\n5. 如何把复杂的职业图谱压缩成展台 2 分钟能体验完的流程\n6. 最推荐的展示形式：闯关地图、桑基图、剧情卡牌、聊天式决策\n7. 40 小时技术拆解\n8. 风险：玩法太重、教育味太强、展示不够直观",
+      "slug": "bytecamp-08"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 9,
+      "heading": "9. 暂停、圈选、追问：视频知识点即时学习卡",
+      "title": "暂停、圈选、追问：视频知识点即时学习卡",
+      "body": "- 适合赛道：赛道四｜视觉搜索\n- 方向：在视频帧里圈选一个公式、单词、概念、图示，系统结合语音提问和用户画像，生成“适合你当前水平”的解释、例题和后续推荐。\n- 可复用项目：`taidy` 的问答+归因，`Eoove-demo` 的用户画像，`nightowl` 的轻量 RAG。\n\n继续调查可行性的 prompt：\n\n```text\n请评估“暂停、圈选、追问：视频知识点即时学习卡”作为赛道四作品的可行性，要求纯软件、40小时内能做。请重点调查：\n1. 这个方向最小闭环是什么：截图上传 + 框选 + OCR + 追问，还是只做静态图像上传\n2. 哪些能力需要官方 API，哪些可以用通用 OCR、视觉模型、语音转文本 API 完成\n3. 如果不能直接接抖音视频帧接口，是否可以通过用户上传截图或现场准备样本视频替代\n4. 数据层是否需要单独知识库，还是只靠通用模型 + 小型课程资料库即可\n5. 用户画像如何影响解释深度、术语难度、后续推荐\n6. 展台演示最稳的交互路径\n7. 40 小时 MVP 拆解\n8. 风险：延迟、OCR 准确率、多模态接口成本\n```",
+      "research_prompt": "请评估“暂停、圈选、追问：视频知识点即时学习卡”作为赛道四作品的可行性，要求纯软件、40小时内能做。请重点调查：\n1. 这个方向最小闭环是什么：截图上传 + 框选 + OCR + 追问，还是只做静态图像上传\n2. 哪些能力需要官方 API，哪些可以用通用 OCR、视觉模型、语音转文本 API 完成\n3. 如果不能直接接抖音视频帧接口，是否可以通过用户上传截图或现场准备样本视频替代\n4. 数据层是否需要单独知识库，还是只靠通用模型 + 小型课程资料库即可\n5. 用户画像如何影响解释深度、术语难度、后续推荐\n6. 展台演示最稳的交互路径\n7. 40 小时 MVP 拆解\n8. 风险：延迟、OCR 准确率、多模态接口成本",
+      "slug": "bytecamp-09"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 10,
+      "heading": "10. 看见穿搭 / 好物 / 宿舍桌搭，就知道适不适合我",
+      "title": "看见穿搭 / 好物 / 宿舍桌搭，就知道适不适合我",
+      "body": "- 适合赛道：赛道四\n- 方向：用户拍一张图或圈选视频中的物件，用语音问“这适合我吗”“预算 150 内怎么搭”，系统结合画像直接给答案。\n- 可复用项目：`Eoove-demo` 的 persona 和偏好，`taidy` 的归因式结果卡，`nightowl` 的轻量记忆。\n\n继续调查可行性的 prompt：\n\n```text\n请调研“看见穿搭/好物/宿舍桌搭，就知道适不适合我”这个赛道四方向的可行性。请输出：\n1. 大学生展览场景下，穿搭、宿舍桌搭、数码好物三个子场景哪个最适合 40 小时 MVP\n2. 每个子场景需要什么数据：商品信息、价格区间、风格标签、空间条件、预算、用户偏好\n3. 这些数据能否通过官方开放平台、公开电商页、人工样本库、图片素材库获取\n4. 如果没有稳定商品 API，如何用少量样本库做出“像真的”体验\n5. 视觉理解 + 语音输入 + 画像推荐最小技术栈\n6. 展示层如何做得有冲击力\n7. 风险：图片版权、商品价格时效、视觉识别不稳定\n8. 最低可用版本怎么做\n```",
+      "research_prompt": "请调研“看见穿搭/好物/宿舍桌搭，就知道适不适合我”这个赛道四方向的可行性。请输出：\n1. 大学生展览场景下，穿搭、宿舍桌搭、数码好物三个子场景哪个最适合 40 小时 MVP\n2. 每个子场景需要什么数据：商品信息、价格区间、风格标签、空间条件、预算、用户偏好\n3. 这些数据能否通过官方开放平台、公开电商页、人工样本库、图片素材库获取\n4. 如果没有稳定商品 API，如何用少量样本库做出“像真的”体验\n5. 视觉理解 + 语音输入 + 画像推荐最小技术栈\n6. 展示层如何做得有冲击力\n7. 风险：图片版权、商品价格时效、视觉识别不稳定\n8. 最低可用版本怎么做",
+      "slug": "bytecamp-10"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 11,
+      "heading": "11. 拍课程表 / 简历 / 讲义，分身立刻帮你拆计划",
+      "title": "拍课程表 / 简历 / 讲义，分身立刻帮你拆计划",
+      "body": "- 适合赛道：赛道四 / 赛道三\n- 方向：用户拍课程表、简历、讲义或任务清单，系统自动提取信息，结合用户画像生成本周学习/求职计划。\n- 可复用项目：`allin` 的简历与职业分析，`Eoove-demo` 的 advisor，`taidy` 的结构化抽取和计划化输出。\n\n继续调查可行性的 prompt：\n\n```text\n请调研“拍课程表/简历/讲义，分身立刻帮你拆计划”作为本次字节活动作品的可行性。请重点回答：\n1. 这个方向更适合赛道四还是赛道三\n2. 输入物的优先级怎么排：课程表、简历、讲义、待办清单，哪个最容易做出稳定效果\n3. OCR / 文档解析 / 结构化抽取可以直接复用哪些现有仓库能力\n4. 是否需要外部 API（OCR、日历、邮件、网盘）才能成立；若没有 API 如何降级\n5. 计划生成如何和“数字个体”关联，而不是普通 schedule 工具\n6. 展台 1 分钟 demo 流程\n7. 40 小时开发边界\n8. 风险：输入格式太杂、识别错误、计划看起来太通用\n```",
+      "research_prompt": "请调研“拍课程表/简历/讲义，分身立刻帮你拆计划”作为本次字节活动作品的可行性。请重点回答：\n1. 这个方向更适合赛道四还是赛道三\n2. 输入物的优先级怎么排：课程表、简历、讲义、待办清单，哪个最容易做出稳定效果\n3. OCR / 文档解析 / 结构化抽取可以直接复用哪些现有仓库能力\n4. 是否需要外部 API（OCR、日历、邮件、网盘）才能成立；若没有 API 如何降级\n5. 计划生成如何和“数字个体”关联，而不是普通 schedule 工具\n6. 展台 1 分钟 demo 流程\n7. 40 小时开发边界\n8. 风险：输入格式太杂、识别错误、计划看起来太通用",
+      "slug": "bytecamp-11"
+    },
+    {
+      "source_key": "bytecamp",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/2026-04-15-bytecamp-directions.md",
+      "index": 12,
+      "heading": "12. 你的内容分身问数台",
+      "title": "你的内容分身问数台",
+      "body": "- 适合赛道：赛道二 / 赛道三\n- 方向：把“内容消费 + 用户画像 + 知识库”做成一个展台大屏。观众问“我最近适合补什么”“为什么我总刷到这类内容”，系统给出带引用、带图表、带画像解释的回答。\n- 可复用项目：四个项目都能拼上，尤其是 `taidy` 的问数和可视化、`Eoove-demo` 的画像与记忆、`nightowl` 的 ETL、`allin` 的雷达图报告。\n\n继续调查可行性的 prompt：\n\n```text\n请评估“你的内容分身问数台”作为展台型作品的可行性，要求和数字个体、ETL、RAG、用户画像都能讲清楚，同时 40 小时内可完成。请输出：\n1. 这个方向最适合归到哪个赛道，或者如何包装成两个赛道的不同版本\n2. 它相对前面几个方向的优势是什么：更适合展台、复用现有仓库更多、讲技术亮点更完整，还是别的原因\n3. 数据要如何准备才最省时：固定样本内容库 + 现场问卷 + 少量上传记录，还是别的组合\n4. taidy 的 NL2SQL/归因/图表模块如何改造成“内容问数”而不是“财报问数”\n5. 是否需要实时外部 API；如果不需要，如何保证回答仍然有说服力\n6. 最佳大屏交互方案\n7. 40 小时 MVP 拆解\n8. 风险：概念太大、容易做成普通聊天机器人\n```\n\n---",
+      "research_prompt": "请评估“你的内容分身问数台”作为展台型作品的可行性，要求和数字个体、ETL、RAG、用户画像都能讲清楚，同时 40 小时内可完成。请输出：\n1. 这个方向最适合归到哪个赛道，或者如何包装成两个赛道的不同版本\n2. 它相对前面几个方向的优势是什么：更适合展台、复用现有仓库更多、讲技术亮点更完整，还是别的原因\n3. 数据要如何准备才最省时：固定样本内容库 + 现场问卷 + 少量上传记录，还是别的组合\n4. taidy 的 NL2SQL/归因/图表模块如何改造成“内容问数”而不是“财报问数”\n5. 是否需要实时外部 API；如果不需要，如何保证回答仍然有说服力\n6. 最佳大屏交互方案\n7. 40 小时 MVP 拆解\n8. 风险：概念太大、容易做成普通聊天机器人",
+      "slug": "bytecamp-12"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 1,
+      "heading": "方向 1：数字学伴 — 视频变私教（赛道二）",
+      "title": "数字学伴 — 视频变私教(赛道二)",
+      "body": "**概念**：用户选择感兴趣领域，系统从抖音精选视频中 ETL 提取知识 → 构建个人知识图谱 → 根据用户画像生成个性化学习路径 + 互动测验。\n\n**复用**：nightowl 的 ETL 管线 + Eoove 的画像融合 + 知识图谱可视化\n\n**展示亮点**：现场输入一个视频 → 30秒后生成交互式课程卡片 + 知识图谱\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"数字学伴\"项目的技术可行性：\n\n1. **视频转文字 API**：\n   - 字节跳动火山引擎 ASR API 是否开放？价格？免费额度？\n   - 搜索 \"火山引擎 语音识别 API 开发者 免费额度 2025 2026\"\n   - 备选：Whisper API / 讯飞开放平台的免费额度\n\n2. **抖音视频内容获取**：\n   - 抖音精选是否有开放 API 获取视频内容/字幕？\n   - 搜索 \"抖音开放平台 API 视频内容 字幕 开发者\"\n   - 抖音精选与普通抖音的 API 区别？\n   - 是否可以用抖音小程序 SDK 获取当前播放视频信息？\n\n3. **字节跳动 Coze 平台**：\n   - Coze 是否支持 RAG 知识库 + 自定义 Agent？\n   - 搜索 \"Coze 扣子 知识库 RAG API 2025 2026 hackathon\"\n   - Coze 的免费额度和 API 调用限制？\n\n4. **知识图谱前端可视化**：\n   - D3.js / ECharts / AntV G6 哪个更适合 40 小时内做出好看的知识图谱？\n   - 是否有现成的交互式知识图谱模板可以直接用？\n\n5. **竞品分析**：\n   - 搜索 \"抖音 知识学习 AI 课程生成\" 看是否已有类似产品\n   - 搜索之前字节跳动 hackathon 获奖项目中是否有类似方向\n```\n\n---",
+      "research_prompt": "帮我调查\"数字学伴\"项目的技术可行性：\n\n1. **视频转文字 API**：\n   - 字节跳动火山引擎 ASR API 是否开放？价格？免费额度？\n   - 搜索 \"火山引擎 语音识别 API 开发者 免费额度 2025 2026\"\n   - 备选：Whisper API / 讯飞开放平台的免费额度\n\n2. **抖音视频内容获取**：\n   - 抖音精选是否有开放 API 获取视频内容/字幕？\n   - 搜索 \"抖音开放平台 API 视频内容 字幕 开发者\"\n   - 抖音精选与普通抖音的 API 区别？\n   - 是否可以用抖音小程序 SDK 获取当前播放视频信息？\n\n3. **字节跳动 Coze 平台**：\n   - Coze 是否支持 RAG 知识库 + 自定义 Agent？\n   - 搜索 \"Coze 扣子 知识库 RAG API 2025 2026 hackathon\"\n   - Coze 的免费额度和 API 调用限制？\n\n4. **知识图谱前端可视化**：\n   - D3.js / ECharts / AntV G6 哪个更适合 40 小时内做出好看的知识图谱？\n   - 是否有现成的交互式知识图谱模板可以直接用？\n\n5. **竞品分析**：\n   - 搜索 \"抖音 知识学习 AI 课程生成\" 看是否已有类似产品\n   - 搜索之前字节跳动 hackathon 获奖项目中是否有类似方向",
+      "slug": "brainstorming-01"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 2,
+      "heading": "方向 2：数字分身信息流 — 三个人刷到三种答案（赛道三）",
+      "title": "数字分身信息流 — 三个人刷到三种答案(赛道三)",
+      "body": "**概念**：同一个需求（如\"今晚吃什么\"），不同 PersonVec 用户画像刷到完全不同的 AI 卡片。健身党看到低卡方案，学生党看到平价选择，美食博主看到摆盘创意。\n\n**复用**：Eoove 的 PersonVec 画像系统 + nightowl 的 RAG 检索\n\n**展示亮点**：现场演示 3 个预设人格，同一问题实时生成 3 张完全不同的卡片，对比冲击力极强\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"数字分身信息流\"项目的技术可行性：\n\n1. **信息流卡片渲染**：\n   - 抖音信息流内容单元的技术规范是什么？是 H5/小程序/WebView？\n   - 搜索 \"抖音 信息流 内容单元 开发 SDK 小程序\"\n   - 是否可以用纯前端 mock 一个抖音风格的信息流界面？\n\n2. **用户画像快速构建**：\n   - 最少需要多少交互（问题/选择）就能构建有意义的初始画像？\n   - 搜索 \"cold start user profiling minimal questions research\"\n   - Eoove 的 30 题问卷能否精简到 5-10 题仍然有效？\n\n3. **LLM 个性化内容生成**：\n   - 豆包（Doubao）API 是否开放？免费额度？\n   - 搜索 \"豆包 大模型 API 开发者 免费 2025 2026\"\n   - 火山方舟（Ark）平台的 LLM API 情况？\n   - 40 小时内用 LLM 生成个性化卡片内容的 latency 是否可接受（<3秒）？\n\n4. **抖音开放平台集成**：\n   - 抖音小程序是否支持调用外部 API？\n   - 搜索 \"抖音小程序 开发 外部API 网络请求 限制\"\n   - 是否可以在抖音虚拟创作平台上线？\n\n5. **评委视角**：\n   - 搜索 \"字节跳动 hackathon 评分标准 获奖 展示 demo\"\n   - 这个方向是否符合赛道三\"刷到懂你的瞬间\"的定位？\n```\n\n---",
+      "research_prompt": "帮我调查\"数字分身信息流\"项目的技术可行性：\n\n1. **信息流卡片渲染**：\n   - 抖音信息流内容单元的技术规范是什么？是 H5/小程序/WebView？\n   - 搜索 \"抖音 信息流 内容单元 开发 SDK 小程序\"\n   - 是否可以用纯前端 mock 一个抖音风格的信息流界面？\n\n2. **用户画像快速构建**：\n   - 最少需要多少交互（问题/选择）就能构建有意义的初始画像？\n   - 搜索 \"cold start user profiling minimal questions research\"\n   - Eoove 的 30 题问卷能否精简到 5-10 题仍然有效？\n\n3. **LLM 个性化内容生成**：\n   - 豆包（Doubao）API 是否开放？免费额度？\n   - 搜索 \"豆包 大模型 API 开发者 免费 2025 2026\"\n   - 火山方舟（Ark）平台的 LLM API 情况？\n   - 40 小时内用 LLM 生成个性化卡片内容的 latency 是否可接受（<3秒）？\n\n4. **抖音开放平台集成**：\n   - 抖音小程序是否支持调用外部 API？\n   - 搜索 \"抖音小程序 开发 外部API 网络请求 限制\"\n   - 是否可以在抖音虚拟创作平台上线？\n\n5. **评委视角**：\n   - 搜索 \"字节跳动 hackathon 评分标准 获奖 展示 demo\"\n   - 这个方向是否符合赛道三\"刷到懂你的瞬间\"的定位？",
+      "slug": "brainstorming-02"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 3,
+      "heading": "方向 3：简历秒懂 — 拍照生成就业画像（赛道四 + allin）",
+      "title": "简历秒懂 — 拍照生成就业画像(赛道四 + allin)",
+      "body": "**概念**：用手机对准简历/招聘海报拍照 → 视觉识别 + 语音交互 → 实时生成就业匹配分析、能力雷达图、改进建议。面向大学生求职场景。\n\n**复用**：allin 的简历解析 + 画像生成 + 人岗匹配全链路\n\n**展示亮点**：现场拍一张简历照片，10 秒出雷达图 + 匹配分析\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"简历秒懂\"项目的技术可行性：\n\n1. **视觉识别 API**：\n   - 火山引擎 OCR API 是否支持简历/文档识别？免费额度？\n   - 搜索 \"火山引擎 OCR 文字识别 API 开发者 价格\"\n   - 豆包视觉大模型（多模态）是否可以直接理解简历图片？\n   - 搜索 \"doubao vision API multimodal 图片理解\"\n\n2. **语音交互**：\n   - 火山引擎 TTS/ASR 的实时性如何？是否支持流式？\n   - 搜索 \"火山引擎 语音合成 语音识别 实时 流式 API\"\n\n3. **前端相机调用**：\n   - 抖音小程序的相机 API 能力？是否支持实时取帧？\n   - 纯 Web 端 getUserMedia 在手机浏览器的兼容性？\n   - 搜索 \"抖音小程序 相机 API 拍照 实时预览\"\n\n4. **allin 项目适配**：\n   - allin 现有的简历解析是从文本输入的，改成图片输入需要多少工作量？\n   - 画像生成和雷达图组件是否可以直接复用？\n\n5. **大学生场景验证**：\n   - 搜索 \"大学生 AI 简历分析 工具\" 看竞品情况\n   - 这个方向对大学生展览的吸引力如何？\n```\n\n---",
+      "research_prompt": "帮我调查\"简历秒懂\"项目的技术可行性：\n\n1. **视觉识别 API**：\n   - 火山引擎 OCR API 是否支持简历/文档识别？免费额度？\n   - 搜索 \"火山引擎 OCR 文字识别 API 开发者 价格\"\n   - 豆包视觉大模型（多模态）是否可以直接理解简历图片？\n   - 搜索 \"doubao vision API multimodal 图片理解\"\n\n2. **语音交互**：\n   - 火山引擎 TTS/ASR 的实时性如何？是否支持流式？\n   - 搜索 \"火山引擎 语音合成 语音识别 实时 流式 API\"\n\n3. **前端相机调用**：\n   - 抖音小程序的相机 API 能力？是否支持实时取帧？\n   - 纯 Web 端 getUserMedia 在手机浏览器的兼容性？\n   - 搜索 \"抖音小程序 相机 API 拍照 实时预览\"\n\n4. **allin 项目适配**：\n   - allin 现有的简历解析是从文本输入的，改成图片输入需要多少工作量？\n   - 画像生成和雷达图组件是否可以直接复用？\n\n5. **大学生场景验证**：\n   - 搜索 \"大学生 AI 简历分析 工具\" 看竞品情况\n   - 这个方向对大学生展览的吸引力如何？",
+      "slug": "brainstorming-03"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 4,
+      "heading": "方向 4：人格冒险 — 玩着玩着就认识自己了（赛道一）",
+      "title": "人格冒险 — 玩着玩着就认识自己了(赛道一)",
+      "body": "**概念**：一个互动叙事游戏，用户做选择推进剧情，每个选择暗中记录性格维度。最终生成 PersonVec 人格画像 + 可视化报告 + 数字分身。\n\n**复用**：Eoove 的人格评测 + PersonVec 融合 + 画像可视化\n\n**展示亮点**：5 分钟互动体验 → 弹出你的人格雷达图 + 数字分身描述，社交传播力强\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"人格冒险\"项目的技术可行性：\n\n1. **抖音互动空间/虚拟创作平台**：\n   - 抖音虚拟创作平台的开发文档在哪里？支持什么技术栈？\n   - 搜索 \"抖音 虚拟创作平台 开发 文档 SDK 2025 2026\"\n   - 互动空间赛道的作品是以什么形式在抖音内体验？小程序？H5？\n   - 搜索 \"抖音 互动空间 hackathon 作品形式 技术要求\"\n\n2. **LLM 驱动的叙事生成**：\n   - 用 LLM 实时生成分支剧情的 latency 是否可接受？\n   - Coze 的 Bot 是否支持有状态的多轮对话 + 自定义变量追踪？\n   - 搜索 \"Coze bot stateful conversation variables workflow\"\n\n3. **人格评测有效性**：\n   - 情景选择式人格评测（非量表）的心理学有效性如何？\n   - 搜索 \"situational judgment test personality assessment validity\"\n   - Eoove 的场景选择题模块能否直接改造成游戏选项？\n\n4. **前端游戏框架**：\n   - 纯前端互动叙事框架推荐？Ink.js / Twine / 自研？\n   - 40 小时内能做出什么级别的视觉效果？\n   - 搜索 \"interactive fiction web framework lightweight 2025\"\n\n5. **社交传播**：\n   - 生成的人格报告是否可以一键分享到抖音？\n   - 搜索 \"抖音小程序 分享 生成图片 海报\"\n```\n\n---",
+      "research_prompt": "帮我调查\"人格冒险\"项目的技术可行性：\n\n1. **抖音互动空间/虚拟创作平台**：\n   - 抖音虚拟创作平台的开发文档在哪里？支持什么技术栈？\n   - 搜索 \"抖音 虚拟创作平台 开发 文档 SDK 2025 2026\"\n   - 互动空间赛道的作品是以什么形式在抖音内体验？小程序？H5？\n   - 搜索 \"抖音 互动空间 hackathon 作品形式 技术要求\"\n\n2. **LLM 驱动的叙事生成**：\n   - 用 LLM 实时生成分支剧情的 latency 是否可接受？\n   - Coze 的 Bot 是否支持有状态的多轮对话 + 自定义变量追踪？\n   - 搜索 \"Coze bot stateful conversation variables workflow\"\n\n3. **人格评测有效性**：\n   - 情景选择式人格评测（非量表）的心理学有效性如何？\n   - 搜索 \"situational judgment test personality assessment validity\"\n   - Eoove 的场景选择题模块能否直接改造成游戏选项？\n\n4. **前端游戏框架**：\n   - 纯前端互动叙事框架推荐？Ink.js / Twine / 自研？\n   - 40 小时内能做出什么级别的视觉效果？\n   - 搜索 \"interactive fiction web framework lightweight 2025\"\n\n5. **社交传播**：\n   - 生成的人格报告是否可以一键分享到抖音？\n   - 搜索 \"抖音小程序 分享 生成图片 海报\"",
+      "slug": "brainstorming-04"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 5,
+      "heading": "方向 5：知识追踪器 — 你的学习 DNA（赛道二）",
+      "title": "知识追踪器 — 你的学习 DNA(赛道二)",
+      "body": "**概念**：ETL 抓取用户在抖音精选的观看历史 → 构建个人知识图谱 → RAG 检测知识盲点 → 自动推荐下一个要看的视频 + 生成复习测验。\n\n**复用**：nightowl 的 ETL+RAG 管线 + Eoove 的知识图谱\n\n**展示亮点**：输入一个用户的观看历史 → 生成炫酷的 3D 知识星图 + \"你离精通还差这 3 个视频\"\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"知识追踪器\"项目的技术可行性：\n\n1. **抖音用户观看历史获取**：\n   - 抖音开放平台是否有获取用户观看历史的 API？\n   - 搜索 \"抖音开放平台 用户 观看记录 API 授权 scope\"\n   - 如果没有 API，是否可以让用户手动导出/截图？\n   - 抖音精选是否有独立的开放 API？\n\n2. **知识图谱自动构建**：\n   - 从视频标题+标签+字幕自动构建知识图谱的技术方案？\n   - 搜索 \"automatic knowledge graph construction from video metadata LLM\"\n   - 需要多少视频数据才能构建有意义的图谱？\n\n3. **知识追踪算法**：\n   - BKT / DKT 等知识追踪模型是否有轻量级 Python 实现？\n   - 搜索 \"knowledge tracing python library lightweight BKT DKT\"\n   - 40 小时内能否实现一个简化版？\n\n4. **3D 可视化**：\n   - Three.js / Babylon.js 做知识星图的可行性？\n   - 搜索 \"3D knowledge graph visualization threejs template\"\n   - 是否有开源的 3D 力导向图组件可以直接用？\n\n5. **数据冷启动**：\n   - 如果拿不到真实抖音数据，如何准备 demo 数据？\n   - 是否可以用公开的在线课程结构（如 B站/Coursera）模拟？\n```\n\n---",
+      "research_prompt": "帮我调查\"知识追踪器\"项目的技术可行性：\n\n1. **抖音用户观看历史获取**：\n   - 抖音开放平台是否有获取用户观看历史的 API？\n   - 搜索 \"抖音开放平台 用户 观看记录 API 授权 scope\"\n   - 如果没有 API，是否可以让用户手动导出/截图？\n   - 抖音精选是否有独立的开放 API？\n\n2. **知识图谱自动构建**：\n   - 从视频标题+标签+字幕自动构建知识图谱的技术方案？\n   - 搜索 \"automatic knowledge graph construction from video metadata LLM\"\n   - 需要多少视频数据才能构建有意义的图谱？\n\n3. **知识追踪算法**：\n   - BKT / DKT 等知识追踪模型是否有轻量级 Python 实现？\n   - 搜索 \"knowledge tracing python library lightweight BKT DKT\"\n   - 40 小时内能否实现一个简化版？\n\n4. **3D 可视化**：\n   - Three.js / Babylon.js 做知识星图的可行性？\n   - 搜索 \"3D knowledge graph visualization threejs template\"\n   - 是否有开源的 3D 力导向图组件可以直接用？\n\n5. **数据冷启动**：\n   - 如果拿不到真实抖音数据，如何准备 demo 数据？\n   - 是否可以用公开的在线课程结构（如 B站/Coursera）模拟？",
+      "slug": "brainstorming-05"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 6,
+      "heading": "方向 6：财经秒问 — 刷到财报直接问（赛道三 + taidy）",
+      "title": "财经秒问 — 刷到财报直接问(赛道三 + taidy)",
+      "body": "**概念**：在刷抖音财经视频时，AI 卡片自动提取视频中提到的公司 → 拉取真实财报数据 → 用户可以直接用自然语言追问\"这家公司去年利润多少？\"。\n\n**复用**：taidy 的 NL-to-SQL + 财报数据库 + 可视化图表\n\n**展示亮点**：刷到一个财经视频 → 卡片弹出关键数据 + 可视化图表 → 语音追问生成新图表\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"财经秒问\"项目的技术可行性：\n\n1. **财报数据源**：\n   - taidy 项目的财报数据库是否可以直接复用？数据覆盖范围？\n   - 公开的上市公司财报 API（如 Tushare / AKShare / 东方财富）是否免费？\n   - 搜索 \"tushare akshare 上市公司财报 API 免费 2025 2026\"\n   - 实时获取财报数据的延迟是否可接受？\n\n2. **视频内容中的公司识别**：\n   - NER（命名实体识别）识别视频字幕中的上市公司名称，有哪些工具？\n   - 搜索 \"chinese NER company name extraction model huggingface\"\n   - 豆包/火山引擎是否有现成的 NER API？\n\n3. **NL-to-SQL 适配**：\n   - taidy 的 NL-to-SQL 模块复用到新场景需要多少改动？\n   - 搜索 \"text-to-sql benchmark accuracy chinese financial\"\n\n4. **信息流卡片形式**：\n   - 赛道三要求的\"信息流内容单元\"如何呈现财报数据？\n   - 参考同花顺/雪球的财报卡片 UI 设计\n\n5. **合规性**：\n   - 展示上市公司财报数据是否有合规要求？\n   - 搜索 \"上市公司财报数据 展示 合规 要求\"\n```\n\n---",
+      "research_prompt": "帮我调查\"财经秒问\"项目的技术可行性：\n\n1. **财报数据源**：\n   - taidy 项目的财报数据库是否可以直接复用？数据覆盖范围？\n   - 公开的上市公司财报 API（如 Tushare / AKShare / 东方财富）是否免费？\n   - 搜索 \"tushare akshare 上市公司财报 API 免费 2025 2026\"\n   - 实时获取财报数据的延迟是否可接受？\n\n2. **视频内容中的公司识别**：\n   - NER（命名实体识别）识别视频字幕中的上市公司名称，有哪些工具？\n   - 搜索 \"chinese NER company name extraction model huggingface\"\n   - 豆包/火山引擎是否有现成的 NER API？\n\n3. **NL-to-SQL 适配**：\n   - taidy 的 NL-to-SQL 模块复用到新场景需要多少改动？\n   - 搜索 \"text-to-sql benchmark accuracy chinese financial\"\n\n4. **信息流卡片形式**：\n   - 赛道三要求的\"信息流内容单元\"如何呈现财报数据？\n   - 参考同花顺/雪球的财报卡片 UI 设计\n\n5. **合规性**：\n   - 展示上市公司财报数据是否有合规要求？\n   - 搜索 \"上市公司财报数据 展示 合规 要求\"",
+      "slug": "brainstorming-06"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 7,
+      "heading": "方向 7：话题同温层探测器 — 看见你的信息茧房（赛道三）",
+      "title": "话题同温层探测器 — 看见你的信息茧房(赛道三)",
+      "body": "**概念**：分析用户的抖音浏览偏好 → 用 PersonVec 建模用户的\"信息茧房\" → 可视化展示你的内容偏好分布 → 推荐打破茧房的内容。\n\n**复用**：Eoove 的 PersonVec + 维度分析 + nightowl 的 ETL\n\n**展示亮点**：生成一个\"信息茧房气泡图\"，气泡越大代表越偏好 → 点击茧房外区域获得新推荐\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"信息茧房探测器\"项目的技术可行性：\n\n1. **用户内容偏好数据**：\n   - 抖音开放平台是否有用户兴趣标签 API？\n   - 搜索 \"抖音开放平台 用户画像 兴趣标签 API\"\n   - 是否可以通过 Coze 插件获取用户在抖音的行为数据？\n   - 如果没有 API，是否可以让用户手动输入/选择兴趣？\n\n2. **信息茧房研究**：\n   - 搜索 \"filter bubble detection algorithm visualization research 2024 2025\"\n   - 信息茧房的量化指标有哪些？\n   - 是否有学术论文提出了可实现的茧房检测方法？\n\n3. **气泡图/星图可视化**：\n   - D3.js bubble chart / pack layout 是否适合展示？\n   - 搜索 \"d3 bubble chart interactive content category visualization\"\n   - 是否有好看的开源信息分布可视化模板？\n\n4. **打破茧房的推荐逻辑**：\n   - 如何用 RAG 从知识库中检索\"茧房外\"的优质内容？\n   - 这个功能是否符合字节跳动的价值观？（可能是加分项）\n\n5. **社会价值**：\n   - 搜索 \"信息茧房 大学生 社会影响 研究\"\n   - 这个概念在大学生群体中是否有共鸣？\n```\n\n---",
+      "research_prompt": "帮我调查\"信息茧房探测器\"项目的技术可行性：\n\n1. **用户内容偏好数据**：\n   - 抖音开放平台是否有用户兴趣标签 API？\n   - 搜索 \"抖音开放平台 用户画像 兴趣标签 API\"\n   - 是否可以通过 Coze 插件获取用户在抖音的行为数据？\n   - 如果没有 API，是否可以让用户手动输入/选择兴趣？\n\n2. **信息茧房研究**：\n   - 搜索 \"filter bubble detection algorithm visualization research 2024 2025\"\n   - 信息茧房的量化指标有哪些？\n   - 是否有学术论文提出了可实现的茧房检测方法？\n\n3. **气泡图/星图可视化**：\n   - D3.js bubble chart / pack layout 是否适合展示？\n   - 搜索 \"d3 bubble chart interactive content category visualization\"\n   - 是否有好看的开源信息分布可视化模板？\n\n4. **打破茧房的推荐逻辑**：\n   - 如何用 RAG 从知识库中检索\"茧房外\"的优质内容？\n   - 这个功能是否符合字节跳动的价值观？（可能是加分项）\n\n5. **社会价值**：\n   - 搜索 \"信息茧房 大学生 社会影响 研究\"\n   - 这个概念在大学生群体中是否有共鸣？",
+      "slug": "brainstorming-07"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 8,
+      "heading": "方向 8：Vibe 简历工坊 — 边聊边生成求职全套（赛道一 + allin）",
+      "title": "Vibe 简历工坊 — 边聊边生成求职全套(赛道一 + allin)",
+      "body": "**概念**：一个对话式互动体验：AI 以轻松方式和你聊天 → 自动从对话中提取技能/经历 → 实时生成简历 + 求职画像 + 面试模拟。全程不填表。\n\n**复用**：allin 的简历解析+画像系统 + Eoove 的对话提取维度能力\n\n**展示亮点**：和 AI 聊 5 分钟 → 屏幕实时浮现你的简历卡片，大学生展览互动性极强\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"Vibe 简历工坊\"项目的技术可行性：\n\n1. **对话式信息提取**：\n   - Eoove 的 extract_dimensions() 是否可以改造成提取简历字段？\n   - 搜索 \"conversational resume builder AI chatbot 2025\"\n   - LLM function calling 提取结构化简历数据的准确率如何？\n\n2. **实时简历渲染**：\n   - 是否有好看的前端简历模板库（React/Vue）？\n   - 搜索 \"resume template react component library open source\"\n   - 如何实现边聊天边实时更新简历的动态效果？\n\n3. **抖音互动空间集成**：\n   - 这种对话+实时生成的体验是否适合抖音虚拟创作平台？\n   - 搜索 \"抖音 虚拟创作平台 对话类 互动体验 案例\"\n\n4. **面试模拟**：\n   - LLM 驱动的面试模拟，latency 和体验是否可接受？\n   - 搜索 \"AI mock interview LLM voice real-time\"\n   - 是否需要语音交互还是文字就够？\n\n5. **大学生吸引力**：\n   - 求职是大学生刚需，但这个方向是否太\"工具化\"缺乏创意？\n   - 如何加入游戏化元素让它更有趣？\n```\n\n---",
+      "research_prompt": "帮我调查\"Vibe 简历工坊\"项目的技术可行性：\n\n1. **对话式信息提取**：\n   - Eoove 的 extract_dimensions() 是否可以改造成提取简历字段？\n   - 搜索 \"conversational resume builder AI chatbot 2025\"\n   - LLM function calling 提取结构化简历数据的准确率如何？\n\n2. **实时简历渲染**：\n   - 是否有好看的前端简历模板库（React/Vue）？\n   - 搜索 \"resume template react component library open source\"\n   - 如何实现边聊天边实时更新简历的动态效果？\n\n3. **抖音互动空间集成**：\n   - 这种对话+实时生成的体验是否适合抖音虚拟创作平台？\n   - 搜索 \"抖音 虚拟创作平台 对话类 互动体验 案例\"\n\n4. **面试模拟**：\n   - LLM 驱动的面试模拟，latency 和体验是否可接受？\n   - 搜索 \"AI mock interview LLM voice real-time\"\n   - 是否需要语音交互还是文字就够？\n\n5. **大学生吸引力**：\n   - 求职是大学生刚需，但这个方向是否太\"工具化\"缺乏创意？\n   - 如何加入游戏化元素让它更有趣？",
+      "slug": "brainstorming-08"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 9,
+      "heading": "方向 9：视频寻宝 — 圈一圈就能深挖（赛道四）",
+      "title": "视频寻宝 — 圈一圈就能深挖(赛道四)",
+      "body": "**概念**：在抖音视频中暂停 → 圈选画面中的任意物体 → AI 识别并展开：商品比价、菜谱教程、景点攻略、知识延伸。用 RAG 从知识库检索深度内容。\n\n**复用**：nightowl 的 RAG 检索 + taidy 的结构化查询能力\n\n**展示亮点**：暂停一个美食视频 → 圈选一道菜 → 弹出做法+热量+购买链接\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"视频寻宝\"项目的技术可行性：\n\n1. **图像区域识别**：\n   - 用户圈选后，如何识别圈选区域内的物体？\n   - 搜索 \"interactive image segmentation web browser SAM 2 API\"\n   - 火山引擎是否有物体识别/图像理解 API？\n   - 搜索 \"火山引擎 图像识别 物体检测 API 开发者\"\n\n2. **多模态大模型**：\n   - 豆包视觉大模型是否支持 region-based 问答（给定裁剪区域）？\n   - 搜索 \"doubao vision model region crop image understanding API\"\n   - GPT-4o / Claude 的视觉能力是否可以作为备选？\n\n3. **RAG 知识库构建**：\n   - 针对美食/旅行/商品等场景，公开数据源有哪些？\n   - 搜索 \"中文美食数据集 API\" \"旅游景点 API 免费\" \"商品比价 API\"\n   - 40 小时内能构建多大的知识库？\n\n4. **前端圈选交互**：\n   - Canvas 实现圈选框/套索工具的复杂度？\n   - 搜索 \"html5 canvas lasso selection tool library\"\n   - 是否有现成的图片标注组件可以复用？\n\n5. **抖音视频帧获取**：\n   - 抖音小程序内是否可以截取当前播放视频的帧？\n   - 搜索 \"抖音小程序 视频 截图 帧 API\"\n```\n\n---",
+      "research_prompt": "帮我调查\"视频寻宝\"项目的技术可行性：\n\n1. **图像区域识别**：\n   - 用户圈选后，如何识别圈选区域内的物体？\n   - 搜索 \"interactive image segmentation web browser SAM 2 API\"\n   - 火山引擎是否有物体识别/图像理解 API？\n   - 搜索 \"火山引擎 图像识别 物体检测 API 开发者\"\n\n2. **多模态大模型**：\n   - 豆包视觉大模型是否支持 region-based 问答（给定裁剪区域）？\n   - 搜索 \"doubao vision model region crop image understanding API\"\n   - GPT-4o / Claude 的视觉能力是否可以作为备选？\n\n3. **RAG 知识库构建**：\n   - 针对美食/旅行/商品等场景，公开数据源有哪些？\n   - 搜索 \"中文美食数据集 API\" \"旅游景点 API 免费\" \"商品比价 API\"\n   - 40 小时内能构建多大的知识库？\n\n4. **前端圈选交互**：\n   - Canvas 实现圈选框/套索工具的复杂度？\n   - 搜索 \"html5 canvas lasso selection tool library\"\n   - 是否有现成的图片标注组件可以复用？\n\n5. **抖音视频帧获取**：\n   - 抖音小程序内是否可以截取当前播放视频的帧？\n   - 搜索 \"抖音小程序 视频 截图 帧 API\"",
+      "slug": "brainstorming-09"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 10,
+      "heading": "方向 10：数字个体实验室 — 从数据到灵魂（赛道一 或 赛道三）",
+      "title": "数字个体实验室 — 从数据到灵魂(赛道一 或 赛道三)",
+      "body": "**概念**：Eoove 的完整演示版——用户通过问卷+对话+数据导入，在 10 分钟内构建自己的 PersonVec 数字分身，然后可以让数字分身帮你做决策（选课/选工作/选旅行目的地）。\n\n**复用**：Eoove 全栈（问卷+对话提取+PersonVec+知识图谱+顾问系统）\n\n**展示亮点**：展台上让参观者体验 → 5 分钟后数字分身开始\"代替你思考\"\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"数字个体实验室\"项目的技术可行性：\n\n1. **Eoove Demo 现状**：\n   - Eoove-demo 当前能跑通的完整流程有哪些？\n   - 需要补齐哪些模块才能作为展览级 demo？\n   - Phase I + I.5 的功能是否足够支撑一个 10 分钟体验？\n\n2. **快速画像构建**：\n   - 从\"零数据\"到\"有意义的 PersonVec\"最少需要多少步骤？\n   - 是否可以设计一个 3 分钟快速版流程？\n   - 搜索 \"rapid personality assessment cold start AI\"\n\n3. **数字分身决策能力**：\n   - 用 PersonVec 驱动 LLM 做个性化决策推荐的 prompt 工程方案？\n   - 搜索 \"LLM persona-driven recommendation prompt engineering\"\n   - 决策结果的\"像不像本人\"如何让用户验证？\n\n4. **展览交互设计**：\n   - 大学生展览上的最佳交互时长？5分钟还是10分钟？\n   - 搜索 \"hackathon demo booth interaction design university\"\n   - 如何让排队等候的人也有东西看？（大屏实时展示？）\n\n5. **字节平台集成**：\n   - 这个方向放在赛道一（互动空间）还是赛道三（AI体验）更合适？\n   - 是否需要接入抖音平台还是纯 Web 展示就够？\n```\n\n---",
+      "research_prompt": "帮我调查\"数字个体实验室\"项目的技术可行性：\n\n1. **Eoove Demo 现状**：\n   - Eoove-demo 当前能跑通的完整流程有哪些？\n   - 需要补齐哪些模块才能作为展览级 demo？\n   - Phase I + I.5 的功能是否足够支撑一个 10 分钟体验？\n\n2. **快速画像构建**：\n   - 从\"零数据\"到\"有意义的 PersonVec\"最少需要多少步骤？\n   - 是否可以设计一个 3 分钟快速版流程？\n   - 搜索 \"rapid personality assessment cold start AI\"\n\n3. **数字分身决策能力**：\n   - 用 PersonVec 驱动 LLM 做个性化决策推荐的 prompt 工程方案？\n   - 搜索 \"LLM persona-driven recommendation prompt engineering\"\n   - 决策结果的\"像不像本人\"如何让用户验证？\n\n4. **展览交互设计**：\n   - 大学生展览上的最佳交互时长？5分钟还是10分钟？\n   - 搜索 \"hackathon demo booth interaction design university\"\n   - 如何让排队等候的人也有东西看？（大屏实时展示？）\n\n5. **字节平台集成**：\n   - 这个方向放在赛道一（互动空间）还是赛道三（AI体验）更合适？\n   - 是否需要接入抖音平台还是纯 Web 展示就够？",
+      "slug": "brainstorming-10"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 11,
+      "heading": "方向 11：情绪电台 — 刷到治愈你的那一刻（赛道三）",
+      "title": "情绪电台 — 刷到治愈你的那一刻(赛道三)",
+      "body": "**概念**：通过简短对话检测用户当前情绪状态 → 在信息流中插入定制的\"情绪卡片\"：焦虑时推冥想引导，低落时推搞笑合集，兴奋时推深度内容。\n\n**复用**：Eoove 的情绪分析(mood_tag, emotion.valence) + nightowl 的 RAG\n\n**展示亮点**：输入\"今天好累\" → 信息流变成温暖色调 + 治愈内容卡片\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"情绪电台\"项目的技术可行性：\n\n1. **情绪检测**：\n   - 中文文本情绪分析有哪些轻量方案？\n   - 搜索 \"chinese sentiment emotion detection API model lightweight\"\n   - 豆包 API 是否支持情绪分析？\n   - Eoove 的 mood_tag 提取模块能否直接复用？\n\n2. **情绪到内容的映射**：\n   - 不同情绪状态推荐什么类型内容的心理学依据？\n   - 搜索 \"emotion-based content recommendation psychology research\"\n   - 是否有现成的\"情绪-内容类型\"映射表？\n\n3. **抖音内容分类**：\n   - 抖音精选的视频是否有情绪标签/分类？\n   - 如何获取按情绪分类的优质视频数据？\n   - 是否可以用 LLM 对视频标题/描述进行情绪分类？\n\n4. **信息流 UI 情绪化**：\n   - 根据情绪改变 UI 色调/动效的技术方案？\n   - 搜索 \"emotion-adaptive UI design color scheme dynamic\"\n   - 40 小时内能做出多精致的情绪化 UI？\n\n5. **心理健康合规**：\n   - 涉及情绪/心理健康的 AI 产品是否有合规要求？\n   - 搜索 \"AI 心理健康 应用 合规 要求 中国\"\n   - 需要加什么免责声明？\n```\n\n---",
+      "research_prompt": "帮我调查\"情绪电台\"项目的技术可行性：\n\n1. **情绪检测**：\n   - 中文文本情绪分析有哪些轻量方案？\n   - 搜索 \"chinese sentiment emotion detection API model lightweight\"\n   - 豆包 API 是否支持情绪分析？\n   - Eoove 的 mood_tag 提取模块能否直接复用？\n\n2. **情绪到内容的映射**：\n   - 不同情绪状态推荐什么类型内容的心理学依据？\n   - 搜索 \"emotion-based content recommendation psychology research\"\n   - 是否有现成的\"情绪-内容类型\"映射表？\n\n3. **抖音内容分类**：\n   - 抖音精选的视频是否有情绪标签/分类？\n   - 如何获取按情绪分类的优质视频数据？\n   - 是否可以用 LLM 对视频标题/描述进行情绪分类？\n\n4. **信息流 UI 情绪化**：\n   - 根据情绪改变 UI 色调/动效的技术方案？\n   - 搜索 \"emotion-adaptive UI design color scheme dynamic\"\n   - 40 小时内能做出多精致的情绪化 UI？\n\n5. **心理健康合规**：\n   - 涉及情绪/心理健康的 AI 产品是否有合规要求？\n   - 搜索 \"AI 心理健康 应用 合规 要求 中国\"\n   - 需要加什么免责声明？",
+      "slug": "brainstorming-11"
+    },
+    {
+      "source_key": "brainstorming",
+      "source_path": "/Users/sevencolor/code/0BKHDD/predocs/brainstorming/directions.md",
+      "index": 12,
+      "heading": "方向 12：多源融合画像 — 你的数据全景图（赛道二 或 赛道三）",
+      "title": "多源融合画像 — 你的数据全景图(赛道二 或 赛道三)",
+      "body": "**概念**：用户授权接入多个数据源（Notion笔记、微信读书、B站历史、抖音偏好）→ ETL 统一处理 → 生成全维度个人画像 → 可视化\"数据全景图\" → 基于画像进行个性化内容推荐。\n\n**复用**：nightowl ETL 架构 + Eoove 多源融合(softmax fusion) + 连接器框架\n\n**展示亮点**：连接 2-3 个数据源 → 实时生成一个酷炫的个人数据仪表盘\n\n### 可行性调查 Prompt\n\n```\n帮我调查\"多源融合画像\"项目的技术可行性：\n\n1. **各平台数据获取 API**：\n   - Notion API：已有 nightowl 实现，确认是否稳定\n   - 微信读书：是否有开放 API？搜索 \"微信读书 API 书架 笔记 开发者\"\n   - B站：搜索 \"bilibili API 观看历史 收藏 开放平台\"\n   - 豆瓣：搜索 \"豆瓣 API 2025 是否还能用\"\n   - 网易云音乐：搜索 \"网易云音乐 API 听歌记录\"\n   - 哪些平台有官方 API，哪些需要用户手动导出？\n\n2. **ETL 管线扩展**：\n   - nightowl 的 Notion ETL 架构是否容易扩展到其他数据源？\n   - 40 小时内能接入几个数据源？\n\n3. **融合算法**：\n   - Eoove 的 softmax 融合在多源场景下的效果如何？\n   - 搜索 \"multi-source user profiling fusion algorithm\"\n\n4. **数据全景图可视化**：\n   - 类似 Spotify Wrapped 的年度总结可视化方案？\n   - 搜索 \"data dashboard personal analytics visualization template\"\n   - 有哪些好看的个人数据可视化开源项目？\n\n5. **隐私和授权**：\n   - 多数据源接入的授权流程如何简化？\n   - 是否需要 OAuth？哪些平台支持？\n```\n\n---",
+      "research_prompt": "帮我调查\"多源融合画像\"项目的技术可行性：\n\n1. **各平台数据获取 API**：\n   - Notion API：已有 nightowl 实现，确认是否稳定\n   - 微信读书：是否有开放 API？搜索 \"微信读书 API 书架 笔记 开发者\"\n   - B站：搜索 \"bilibili API 观看历史 收藏 开放平台\"\n   - 豆瓣：搜索 \"豆瓣 API 2025 是否还能用\"\n   - 网易云音乐：搜索 \"网易云音乐 API 听歌记录\"\n   - 哪些平台有官方 API，哪些需要用户手动导出？\n\n2. **ETL 管线扩展**：\n   - nightowl 的 Notion ETL 架构是否容易扩展到其他数据源？\n   - 40 小时内能接入几个数据源？\n\n3. **融合算法**：\n   - Eoove 的 softmax 融合在多源场景下的效果如何？\n   - 搜索 \"multi-source user profiling fusion algorithm\"\n\n4. **数据全景图可视化**：\n   - 类似 Spotify Wrapped 的年度总结可视化方案？\n   - 搜索 \"data dashboard personal analytics visualization template\"\n   - 有哪些好看的个人数据可视化开源项目？\n\n5. **隐私和授权**：\n   - 多数据源接入的授权流程如何简化？\n   - 是否需要 OAuth？哪些平台支持？",
+      "slug": "brainstorming-12"
+    }
+  ],
+  "plan_summary": "total_calls=100\ndirection=96\nsynthesis=4\nassumption_challenge=24\nbaseline_research=24\ncross_direction_compare=1\nevolution=24\nfinal_pack=24\nfinal_recommendation=1\nhybrid_generation=1\ntrack_landscape=1"
+}
