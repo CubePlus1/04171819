@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import CardPageP1 from './CardPageP1.jsx';
 import CardPageP2 from './CardPageP2.jsx';
@@ -6,18 +6,33 @@ import CardPageP3 from './CardPageP3.jsx';
 
 const PAGE_RENDERERS = { P1: CardPageP1, P2: CardPageP2, P3: CardPageP3 };
 
-export default function DunCard({ card, spotlight }) {
+export default function DunCard({ card, spotlight, onAction }) {
   const [index, setIndex] = useState(0);
   const pages = card.pages ?? [];
   const active = pages[index] ?? pages[0];
   const Renderer = PAGE_RENDERERS[active?.id] ?? CardPageP1;
 
-  const clamp = (n) => Math.max(0, Math.min(pages.length - 1, n));
-  const goto = (n) => setIndex(clamp(n));
+  const clamp = useCallback((n) => Math.max(0, Math.min(pages.length - 1, n)), [pages.length]);
+  const goto = useCallback((n) => setIndex(clamp(n)), [clamp]);
+
+  const onKey = useCallback(
+    (e) => {
+      if (e.key === 'ArrowLeft')  { goto(index - 1); e.preventDefault(); }
+      if (e.key === 'ArrowRight') { goto(index + 1); e.preventDefault(); }
+      if (e.key === 'Home')       { goto(0); e.preventDefault(); }
+      if (e.key === 'End')        { goto(pages.length - 1); e.preventDefault(); }
+    },
+    [index, pages.length, goto],
+  );
 
   return (
     <motion.article
       layout
+      role="group"
+      aria-roledescription="履约型内容卡片"
+      aria-label={`${card.script_id} 剧本 · ${active?.name ?? ''}`}
+      tabIndex={0}
+      onKeyDown={onKey}
       initial={{ opacity: 0, y: 40, scale: 0.96 }}
       animate={{
         opacity: 1,
@@ -28,20 +43,27 @@ export default function DunCard({ card, spotlight }) {
           : '0 18px 48px -16px rgba(255, 91, 95, 0.35)',
       }}
       transition={{ type: 'spring', stiffness: 180, damping: 22 }}
-      className="feed-snap relative h-full w-full overflow-hidden rounded-2xl border border-white/10 bg-panel"
+      className="feed-snap focus-ring relative h-full w-full overflow-hidden rounded-2xl border border-white/10 bg-panel"
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-ember/10 via-kiss/5 to-transparent" />
 
-      <div className="absolute right-3 top-3 z-10 flex gap-1">
+      <div className="absolute right-2 top-2 z-10 flex gap-0.5" role="tablist" aria-label="卡片分页">
         {pages.map((p, i) => (
           <button
             key={p.id}
             onClick={() => goto(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === index ? 'w-6 bg-warmth' : 'w-2 bg-white/20'
-            }`}
-            aria-label={`跳到 ${p.id}`}
-          />
+            role="tab"
+            aria-current={i === index ? 'page' : undefined}
+            aria-selected={i === index}
+            aria-label={`跳到 ${p.id} · ${p.name}`}
+            className="focus-ring flex h-8 w-8 items-center justify-center"
+          >
+            <span
+              className={`block h-1.5 rounded-full transition-all ${
+                i === index ? 'w-6 bg-warmth' : 'w-2 bg-white/20'
+              }`}
+            />
+          </button>
         ))}
       </div>
 
@@ -69,14 +91,14 @@ export default function DunCard({ card, spotlight }) {
             transition={{ duration: 0.25 }}
             className="h-full w-full"
           >
-            <Renderer page={active} scriptId={card.script_id} />
+            <Renderer page={active} scriptId={card.script_id} onAction={onAction} />
           </motion.div>
         </AnimatePresence>
       </motion.div>
 
       {pages.length > 1 && (
         <div className="absolute inset-x-0 bottom-1 flex items-center justify-center gap-2 text-[10px] text-stone-400 no-select">
-          ← 左右滑 · P1 / P2 / P3 →
+          ← 左右滑或 ← → 键 · P1 / P2 / P3 →
         </div>
       )}
     </motion.article>

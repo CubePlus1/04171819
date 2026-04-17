@@ -1,10 +1,23 @@
-import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { motion, MotionConfig } from 'framer-motion';
 import ProductPanel from './panels/ProductPanel.jsx';
 import AgentPanel from './panels/AgentPanel.jsx';
+import Toast from './components/Toast.jsx';
 import { useDemoStore } from './store/useDemoStore.js';
 import { bootstrap, resetDemo } from './api/client.js';
 import { connectWs } from './api/ws.js';
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setReduced(mql.matches);
+    apply();
+    mql.addEventListener('change', apply);
+    return () => mql.removeEventListener('change', apply);
+  }, []);
+  return reduced;
+}
 
 export default function App() {
   const hydrate = useDemoStore((s) => s.hydrate);
@@ -17,10 +30,14 @@ export default function App() {
   const connected = useDemoStore((s) => s.connected);
   const user = useDemoStore((s) => s.user);
 
-  // StrictMode 保护：开发模式下 effect 会跑两次，不要重复引导 / 创建两个 WS
+  const [bootState, setBootState] = useState({ status: 'loading', error: null });
+  const [toast, setToast] = useState(null);
+  const reducedMotion = usePrefersReducedMotion();
+
   const bootedOnceRef = useRef(false);
   const wasConnectedOnceRef = useRef(false);
   const bootTokenRef = useRef(0);
+  const bootRef = useRef(null);
 
   useEffect(() => {
     if (bootedOnceRef.current) return;
@@ -28,21 +45,24 @@ export default function App() {
 
     async function boot() {
       const token = ++bootTokenRef.current;
+      setBootState((s) => (s.status === 'ready' ? s : { status: 'loading', error: null }));
       try {
         const data = await bootstrap();
-        if (token !== bootTokenRef.current) return; // 被新的 boot 超越，丢弃
+        if (token !== bootTokenRef.current) return;
         hydrate(data);
+        setBootState({ status: 'ready', error: null });
       } catch (err) {
         console.error('bootstrap failed', err);
+        if (token !== bootTokenRef.current) return;
+        setBootState({ status: 'error', error: err.message || 'unknown' });
       }
     }
-
+    bootRef.current = boot;
     boot();
 
     const ws = connectWs({
       onOpen: () => {
         setConnected(true);
-        // 之前连接过 → 现在是重连 → 重新拉一遍 bootstrap，保证错过的卡片被同步
         if (wasConnectedOnceRef.current) boot();
         wasConnectedOnceRef.current = true;
       },
@@ -78,44 +98,55 @@ export default function App() {
       },
     });
 
-    return () => {
-      ws.close();
-    };
+    return () => ws.close();
   }, [hydrate, setConnected, beginWorkflow, applyStep, endWorkflow, onCardGenerated, resetStore]);
 
   async function handleReset() {
-    // 单一事实来源：服务端广播 demo.reset → 客户端统一在 WS handler 里 reset + boot
     try {
       resetStore();
       await resetDemo();
     } catch (err) {
       console.error('reset failed', err);
+      setToast('重置失败，请检查后端连通');
     }
   }
 
-  return (
-    <div className="flex h-full w-full flex-col">
-      <Header connected={connected} user={user} onReset={handleReset} />
-      <main className="relative grid flex-1 min-h-0 grid-cols-12 gap-4 px-5 pb-5">
-        <motion.section
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="col-span-7 min-h-0"
-        >
-          <ProductPanel />
-        </motion.section>
+  function handleRetryBoot() {
+    bootRef.current?.();
+  }
 
-        <motion.section
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.08 }}
-          className="col-span-5 min-h-0"
-        >
-          <AgentPanel />
-        </motion.section>
-      </main>
-    </div>
+  return (
+    <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
+      <div className="flex h-full w-full flex-col">
+        <Header connected={connected} user={user} onReset={handleReset} />
+
+        {bootState.status === 'error' && (
+          <ErrorBanner message={bootState.error} onRetry={handleRetryBoot} />
+        )}
+
+        <main className="relative grid flex-1 min-h-0 grid-cols-12 gap-4 px-5 pb-5">
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            className="col-span-7 min-h-0"
+          >
+            <ProductPanel bootStatus={bootState.status} onAction={(label) => setToast(label)} />
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.08 }}
+            className="col-span-5 min-h-0"
+          >
+            <AgentPanel onToast={setToast} />
+          </motion.section>
+        </main>
+
+        <Toast message={toast} onDismiss={() => setToast(null)} />
+      </div>
+    </MotionConfig>
   );
 }
 
@@ -139,25 +170,46 @@ function Header({ connected, user, onReset }) {
       <div className="flex items-center gap-3">
         {user && (
           <span className="pill">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-warmth" />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-warmth" aria-hidden="true" />
             {user.nickname}
           </span>
         )}
-        <span className="pill">
+        <span className="pill" role="status" aria-live="polite">
           <span
             className={`inline-block h-1.5 w-1.5 rounded-full ${
-              connected ? 'bg-emerald-400' : 'bg-stone-500'
+              connected ? 'bg-emerald-400' : 'bg-stone-400'
             }`}
+            aria-hidden="true"
           />
           {connected ? 'WS 已连接' : 'WS 断开中'}
         </span>
         <button
-          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-stone-200 hover:bg-white/10"
+          className="focus-ring rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-stone-200 hover:bg-white/10"
           onClick={onReset}
         >
           重置演示
         </button>
       </div>
     </header>
+  );
+}
+
+function ErrorBanner({ message, onRetry }) {
+  return (
+    <div
+      role="alert"
+      className="mx-6 mb-2 flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-900/30 px-4 py-2 text-[13px] text-red-100"
+    >
+      <div>
+        <span className="font-medium">无法连接到后端</span>
+        <span className="ml-2 text-red-200/80">{message}</span>
+      </div>
+      <button
+        onClick={onRetry}
+        className="focus-ring rounded-full bg-red-500/30 px-3 py-1 text-[12px] hover:bg-red-500/40"
+      >
+        重试
+      </button>
+    </div>
   );
 }
