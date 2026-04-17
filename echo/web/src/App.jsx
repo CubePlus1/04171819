@@ -86,7 +86,7 @@ export default function App() {
 
   const presets = boot?.presets ?? [];
 
-  const rendered = useMemo(() => renderThread(events), [events]);
+  const rendered = useMemo(() => renderThread(events, reducedMotion), [events, reducedMotion]);
 
   return (
     <div className="shell">
@@ -157,13 +157,13 @@ export default function App() {
   );
 }
 
-function renderThread(events) {
+function renderThread(events, reducedMotion) {
   const out = [];
   for (const ev of events) {
     if (ev.kind === 'me') {
       out.push(<UserBubble key={ev.id} text={ev.text} />);
     } else if (ev.kind === 'echo') {
-      out.push(<EchoBubble key={ev.id} voice={ev.voice} tag={ev.tag} relative={ev.relative} />);
+      out.push(<EchoBubble key={ev.id} voice={ev.voice} tag={ev.tag} relative={ev.relative} reducedMotion={reducedMotion} />);
     } else if (ev.kind === 'postcard') {
       out.push(<Postcard key={ev.id} postcard={ev.postcard} />);
     }
