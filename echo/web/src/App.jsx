@@ -1,24 +1,49 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEcho } from './useEcho.js';
 import { UserBubble, EchoBubble, TypingBubble } from './Bubble.jsx';
 import Postcard from './Postcard.jsx';
 
 const API_STATE = '/api/state';
 
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setReduced(mql.matches);
+    apply();
+    mql.addEventListener('change', apply);
+    return () => mql.removeEventListener('change', apply);
+  }, []);
+  return reduced;
+}
+
 function useBootstrap() {
   const [data, setData] = useState({ loading: true, error: null, value: null });
-  const refresh = async () => {
+  const tokenRef = useRef(0);
+  const bootedRef = useRef(false);
+
+  const refresh = useCallback(async () => {
+    const myToken = ++tokenRef.current;
     setData((s) => ({ ...s, loading: true, error: null }));
     try {
       const r = await fetch(API_STATE);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      if (!r.ok) throw new Error('不在线');
       const v = await r.json();
+      if (myToken !== tokenRef.current) return; // 被更新的请求覆盖
       setData({ loading: false, error: null, value: v });
     } catch (err) {
+      if (myToken !== tokenRef.current) return;
       setData({ loading: false, error: err.message || '没接住', value: null });
     }
-  };
-  useEffect(() => { refresh(); }, []);
+  }, []);
+
+  useEffect(() => {
+    // StrictMode dev 双调用保护
+    if (bootedRef.current) return;
+    bootedRef.current = true;
+    refresh();
+  }, [refresh]);
+
   return { ...data, refresh };
 }
 
@@ -27,18 +52,36 @@ export default function App() {
   const { value: boot, error: bootErr, refresh } = useBootstrap();
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
+  const liveMsgRef = useRef('');
+  const [liveMsg, setLiveMsg] = useState('');
+  const reducedMotion = usePrefersReducedMotion();
+
+  // 单一 live region：整句播报（完整 voice / postcard.closing），不给打字机中间态
+  useEffect(() => {
+    const last = events[events.length - 1];
+    if (!last) return;
+    let msg = '';
+    if (last.kind === 'echo' && last.voice)       msg = last.voice;
+    else if (last.kind === 'postcard')            msg = `${last.postcard.heading} · ${last.postcard.closing}`;
+    else if (last.kind === 'me')                  msg = ''; // 用户自己的消息不播报
+    if (msg && msg !== liveMsgRef.current) {
+      liveMsgRef.current = msg;
+      setLiveMsg(msg);
+    }
+  }, [events]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [events, running]);
+    const behavior = reducedMotion ? 'auto' : 'smooth';
+    bottomRef.current?.scrollIntoView({ behavior, block: 'end' });
+  }, [events, running, reducedMotion]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const v = text.trim();
     if (!v || running) return;
-    setText('');
     await send(v);
-    refresh(); // 抓回最新的 memories 状态
+    setText('');        // 成功或失败后再清空；失败时用户可 ↑ 键在浏览器历史里找到
+    refresh();          // 抓最新 memories
   };
 
   const presets = boot?.presets ?? [];
@@ -47,8 +90,9 @@ export default function App() {
 
   return (
     <div className="shell">
+      {/* 单点 live region；子组件不再各自挂 aria-live */}
       <span className="sr-only" role="status" aria-live="polite">
-        {running ? '回响正在回答' : '回响在听'}
+        {liveMsg}
       </span>
 
       <header className="header">
@@ -65,10 +109,12 @@ export default function App() {
       </section>
 
       {bootErr && (
-        <div className="footer">没连上回响的那头 · <button onClick={refresh} style={{ background: 'none', border: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>再试一次</button></div>
+        <div className="footer" role="alert">
+          没连上回响的那头 · <button onClick={refresh} style={{ background: 'none', border: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>再试一次</button>
+        </div>
       )}
       {error && !running && (
-        <div className="footer">{error}</div>
+        <div className="footer" role="alert">{error}</div>
       )}
 
       <div className="composer">
@@ -80,7 +126,7 @@ export default function App() {
                   key={p.id}
                   type="button"
                   disabled={running}
-                  onClick={() => { setText(p.text); }}
+                  onClick={() => setText(p.text)}
                 >
                   {p.text}
                 </button>
@@ -88,13 +134,14 @@ export default function App() {
             </div>
           )}
           <form className="composer-inner" onSubmit={onSubmit}>
+            <label htmlFor="echo-input" className="sr-only">输入一句念头</label>
             <input
+              id="echo-input"
               autoFocus
               value={text}
               onChange={(e) => setText(e.target.value.slice(0, 140))}
               placeholder="把你心里那句惦记说出来 · 回车"
               disabled={running}
-              aria-label="输入一句念头"
             />
             <button type="submit" disabled={running || !text.trim()}>
               {running ? '在听…' : '说出口'}
@@ -103,7 +150,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="footer">
+      <div className="footer" aria-hidden="true">
         履约型内容的另一种猜想 · 姊妹实验 · {boot?.user?.nickname ?? '念念'}
       </div>
     </div>

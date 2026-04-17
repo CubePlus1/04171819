@@ -1,5 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false
+      : false,
+  );
+  useEffect(() => {
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setReduced(mql.matches);
+    apply();
+    mql.addEventListener('change', apply);
+    return () => mql.removeEventListener('change', apply);
+  }, []);
+  return reduced;
+}
+
 function useTypewriter(text, { speed = 28, enabled = true } = {}) {
   const [shown, setShown] = useState(enabled ? '' : text);
   const timerRef = useRef(null);
@@ -27,13 +43,20 @@ export function UserBubble({ text }) {
   );
 }
 
-export function EchoBubble({ voice, tag, relative, disableTypewriter }) {
-  const shown = useTypewriter(voice ?? '', { enabled: !disableTypewriter });
+/**
+ * EchoBubble
+ *  - 视觉上是打字机动效；
+ *  - 对 assistive tech 整句播报（aria-label 一次性给完整消息），避免被打字机半句半句刷屏；
+ *  - 自己不再拥有 live region；顶层 App 有一处集中 aria-live，这里只是内容节点。
+ */
+export function EchoBubble({ voice, tag, relative }) {
+  const reduced = usePrefersReducedMotion();
+  const shown = useTypewriter(voice ?? '', { enabled: !reduced });
   return (
-    <div className="bubble echo" role="status" aria-live="polite">
-      <span>{shown}</span>
-      {tag && <span className="tag">{tag}</span>}
-      {relative && <span className="relative">{relative}</span>}
+    <div className="bubble echo" aria-label={voice}>
+      <span aria-hidden="true">{shown}</span>
+      {tag && <span className="tag" aria-hidden="true">{tag}</span>}
+      {relative && <span className="relative" aria-hidden="true">{relative}</span>}
     </div>
   );
 }

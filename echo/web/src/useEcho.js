@@ -5,26 +5,32 @@ export function useEcho() {
   const [events, setEvents] = useState([]);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState(null);
+  // 原子单飞：同一 request id 的 finally 才会清自己的 controller
+  const inFlightIdRef = useRef(0);
   const abortRef = useRef(null);
 
   const reset = useCallback(() => {
     setEvents([]);
     setError(null);
     setRunning(false);
+    inFlightIdRef.current += 1;
     abortRef.current?.abort();
+    abortRef.current = null;
   }, []);
 
   const send = useCallback(async (text) => {
-    if (running) return;
     const trimmed = text.trim();
     if (!trimmed) return;
+    // 原子 CAS：如果已有 in-flight，直接忽略本次调用
+    if (abortRef.current) return;
+
+    const myId = ++inFlightIdRef.current;
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     setError(null);
     setRunning(true);
-    setEvents((prev) => [...prev, { kind: 'me', text: trimmed, id: `me-${Date.now()}` }]);
-
-    const controller = new AbortController();
-    abortRef.current = controller;
+    setEvents((prev) => [...prev, { kind: 'me', text: trimmed, id: `me-${myId}` }]);
 
     try {
       const resp = await fetch('/api/echo', {
@@ -76,14 +82,17 @@ export function useEcho() {
         }
       }
     } catch (err) {
-      if (err.name !== 'AbortError') {
+      if (err.name !== 'AbortError' && inFlightIdRef.current === myId) {
         setError(err.message || '没接住');
       }
     } finally {
-      setRunning(false);
-      abortRef.current = null;
+      // 只清理"自己这次"的状态，避免后发请求被前一次的 finally 擦掉
+      if (inFlightIdRef.current === myId) {
+        setRunning(false);
+        abortRef.current = null;
+      }
     }
-  }, [running]);
+  }, []);
 
   return { events, running, error, send, reset };
 }
