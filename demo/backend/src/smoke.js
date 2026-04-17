@@ -174,29 +174,99 @@ async function main() {
   assert(!acao || !acao.includes('evil.example.com'),
     `未知 origin 不在 CORS 允许列表（ACAO=${acao}）`);
 
-  // 并发去重：reset 后同一时刻发两条相同评论，仅应产生 1 张卡片，第二条返回 signal-already-fulfilled
+  // 所有 5 个预设都应能发出并都有合理响应（ok 或 no-match 都可接受，但不能崩）
   await resetDemo();
+  const presetBoot = await (await fetch(`${BASE}/api/bootstrap`)).json();
+  assert(presetBoot.presets.length === 5, `bootstrap 预设数量 = 5（实际 ${presetBoot.presets.length}）`);
+  for (const p of presetBoot.presets) {
+    const r = await (await fetch(`${BASE}/api/comment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+      body: JSON.stringify({ text: p.text }),
+    })).json();
+    assert(r.runId?.startsWith('run_'), `预设「${p.id}」返回 runId`);
+    assert(r.ok === true || r.ok === false, `预设「${p.id}」响应字段完整`);
+    await new Promise((res) => setTimeout(res, 350)); // 让 rate limiter 消化
+  }
+
+  // 并发去重（同时捕获两条 run 的 WS 帧）：reset 后两条同评论 → 1 张卡 + 败者只走到 step 4 fail
+  await resetDemo();
+
+  const concFrames = [];
+  const onConcMsg = (raw) => {
+    try { concFrames.push(JSON.parse(raw.toString())); } catch {/* ignore */}
+  };
+  ws.on('message', onConcMsg);
+
   const [concA, concB] = await Promise.all([
     fetch(`${BASE}/api/comment`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
       body: JSON.stringify({ text: '蹲链接姐妹们 上衣链接求！' }),
     }).then((r) => r.json()),
     fetch(`${BASE}/api/comment`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
       body: JSON.stringify({ text: '蹲链接姐妹们 上衣链接求！' }),
     }).then((r) => r.json()),
   ]);
+  // 再等一下，确保 WS 事件都到了
+  await new Promise((res) => setTimeout(res, 1500));
+  ws.off('message', onConcMsg);
+
   const okCount = [concA, concB].filter((r) => r.ok).length;
   const dupReason = [concA, concB].filter((r) => !r.ok).map((r) => r.reason);
   assert(okCount === 1, `并发去重 · 仅 1 条成功（实际 ${okCount} · 另一条 reason=${JSON.stringify(dupReason)}）`);
   assert(dupReason.includes('signal-already-fulfilled'),
     '并发去重 · 失败方 reason=signal-already-fulfilled');
 
+  const winner = [concA, concB].find((r) => r.ok);
+  const loser  = [concA, concB].find((r) => !r.ok);
+
+  const loserEndFrame = concFrames.find(
+    (f) => f.type === 'workflow.end' && f.payload.run_id === loser.runId,
+  );
+  const loserCardFrame = concFrames.find(
+    (f) => f.type === 'card.generated' && f.payload.run_id === loser.runId,
+  );
+  const loserStepFrames = concFrames
+    .filter((f) => f.type === 'workflow.step' && f.payload.run_id === loser.runId)
+    .map((f) => f.payload.step);
+  assert(!!loserEndFrame && loserEndFrame.payload.ok === false,
+    '并发去重 · 败者 WS 收到 workflow.end ok=false');
+  assert(!loserCardFrame, '并发去重 · 败者 WS 不应收到 card.generated');
+  assert(loserStepFrames.includes(4) && !loserStepFrames.includes(5),
+    `并发去重 · 败者在 step 4 停下（实际 steps=${JSON.stringify(loserStepFrames)}）`);
+
+  const winnerCardFrame = concFrames.find(
+    (f) => f.type === 'card.generated' && f.payload.run_id === winner.runId,
+  );
+  assert(!!winnerCardFrame, '并发去重 · 胜者 WS 收到 card.generated');
+
   const postConcurrentBoot = await (await fetch(`${BASE}/api/bootstrap`)).json();
   assert(postConcurrentBoot.cards.length === 1,
     `并发去重 · DB 最终仅 1 张卡片（实际 ${postConcurrentBoot.cards.length}）`);
+
+  // reset-drain：一条 in-flight 期间 reset 应返回 409 in-flight-workflow
+  await resetDemo();
+  const inflight = fetch(`${BASE}/api/comment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+    body: JSON.stringify({ text: '蹲后续 爷爷真帅' }),
+  });
+  // 在评论刚入栈时立即 reset（5 个 step × 400ms 的总窗口 ~2s）
+  await new Promise((res) => setTimeout(res, 150));
+  const raceReset = await fetch(`${BASE}/api/reset`, {
+    method: 'POST',
+    headers: { Origin: ORIGIN },
+  });
+  // reset 策略会先排空 3s，等评论完成后可能返回 200。我们要求：要么 409，要么 200 但评论已完成。
+  // 关键是：reset 不会中途 closeDb 导致 in-flight 500
+  const inflightRes = await (await inflight).json();
+  assert(inflightRes.ok === true || inflightRes.reason === 'signal-already-fulfilled',
+    `reset-drain · in-flight 评论未被 reset 打断（实际 ${JSON.stringify(inflightRes)}）`);
+  assert([200, 409].includes(raceReset.status),
+    `reset-drain · race reset 状态码 ∈ {200, 409}（实际 ${raceReset.status}）`);
 
   ws.close();
   console.log('\n🎉 smoke all green');
