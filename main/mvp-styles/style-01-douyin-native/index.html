@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 (Dunu Dao Le) - Douyin AI Experience MVP</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans SC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dyPink: '#FE2C55',
+                        dyCyan: '#25F4EE',
+                        dyBlack: '#000000',
+                        dyDarkGray: '#161823',
+                    },
+                    animation: {
+                        'bounce-dy': 'bounce-dy 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        'slide-up': 'slide-up 0.5s ease-out forwards',
+                        'glow-cyan': 'glow-cyan 2s infinite alternate',
+                    },
+                    keyframes: {
+                        'bounce-dy': {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '60%': { transform: 'scale(1.05)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        'slide-up': {
+                            '0%': { transform: 'translateY(100%)' },
+                            '100%': { transform: 'translateY(0)' },
+                        },
+                        'glow-cyan': {
+                            '0%': { boxShadow: '0 0 5px rgba(37, 244, 238, 0.2)' },
+                            '100%': { boxShadow: '0 0 15px rgba(37, 244, 238, 0.6)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/css">
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Noto Sans SC', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Douyin Feed Styling */
+        .feed-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+        .feed-container::-webkit-scrollbar { display: none; }
+        .feed-item {
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .glass-card {
+            background: rgba(22, 24, 35, 0.9);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .terminal-scroll::-webkit-scrollbar { width: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: #000; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #25F4EE; border-radius: 10px; }
+
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s; }
+        .dot.active { background: #25F4EE; width: 14px; border-radius: 3px; }
+
+        .neon-border { border: 1px solid rgba(37, 244, 238, 0.3); box-shadow: 0 0 15px rgba(37, 244, 238, 0.1); }
+
+        .cursor { display: inline-block; width: 8px; height: 16px; background: #25F4EE; animation: blink 1s infinite; margin-left: 4px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .spinning-disk { animation: spin 4s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .capsule-pages-container { width: 100%; overflow: hidden; position: relative; cursor: grab; }
+        .capsule-pages-container:active { cursor: grabbing; }
+        .capsule-pages { display: flex; transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .capsule-page { min-width: 100%; padding: 1.25rem; user-select: none; }
+
+        /* Video Mock Styling */
+        .video-placeholder {
+            background: #1a1a1a;
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+            aspect-ratio: 9/16;
+            max-height: 200px;
+        }
+        .play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(254, 44, 85, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="flex">
+
+    <!-- LEFT: PRODUCT PANEL -->
+    <div class="w-[55%] md:w-[50%] lg:w-[420px] h-screen bg-dyBlack relative overflow-hidden flex-shrink-0 border-r border-white/5">
+        <div id="feed" class="feed-container">
+            <!-- Normal Content -->
+            <div class="feed-item" style="background-image: url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800');">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60"></div>
+                <div class="absolute bottom-24 left-4 z-10">
+                    <div class="font-bold text-lg mb-1 flex items-center gap-1">@大山的穿搭日记 <i class="fas fa-check-circle text-blue-400 text-[10px]"></i></div>
+                    <div class="text-sm opacity-95 leading-relaxed">这件上衣真的绝了，姐妹们！春天穿太有气质了。求链接的评论区排队哦~ #穿搭 #春季新款 #求同款</div>
+                </div>
+                <!-- Side Actions -->
+                <div class="absolute right-3 bottom-28 flex flex-col gap-5 items-center">
+                    <div class="flex flex-col items-center">
+                        <div class="w-11 h-11 rounded-full border border-white/20 overflow-hidden mb-1">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=mountain" alt="avatar">
+                        </div>
+                        <div class="bg-dyPink rounded-full w-4 h-4 flex items-center justify-center -mt-3 z-10"><i class="fas fa-plus text-[8px]"></i></div>
+                    </div>
+                    <div class="flex flex-col items-center"><i class="fas fa-heart text-2xl text-white"></i><span class="text-[11px] mt-1">12.4w</span></div>
+                    <div class="flex flex-col items-center"><i class="fas fa-comment-dots text-2xl"></i><span class="text-[11px] mt-1">3412</span></div>
+                    <div class="flex flex-col items-center"><i class="fas fa-bookmark text-2xl"></i><span class="text-[11px] mt-1">8901</span></div>
+                    <div class="flex flex-col items-center"><i class="fas fa-share text-2xl"></i><span class="text-[11px] mt-1">1.2w</span></div>
+                    <div class="w-9 h-9 rounded-full bg-dyDarkGray flex items-center justify-center spinning-disk border-2 border-white/10 mt-2">
+                        <div class="w-5 h-5 rounded-full bg-dyPink"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Dynamic Capsule will be inserted here -->
+        </div>
+
+        <!-- Navigation Arrows (P1/P2/P3 control) -->
+        <div id="nav-overlay" class="absolute inset-0 pointer-events-none z-30 opacity-0 transition-opacity">
+            <button onclick="prevPage()" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/10 pointer-events-auto flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button onclick="nextPage()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/10 pointer-events-auto flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Tab Bar -->
+        <div class="absolute bottom-0 left-0 w-full h-16 bg-black flex items-center justify-around z-40 border-t border-white/5 px-4">
+            <div class="flex flex-col items-center gap-1"><i class="fas fa-home text-lg text-white"></i><span class="text-[9px]">首页</span></div>
+            <div class="flex flex-col items-center gap-1 opacity-40"><i class="fas fa-users text-lg"></i><span class="text-[9px]">朋友</span></div>
+            <div class="relative -top-1">
+                <div class="w-11 h-7 bg-white rounded flex items-center justify-center text-black font-black text-xl">+</div>
+                <div class="absolute inset-0 bg-dyCyan -z-10 -left-1 rounded"></div>
+                <div class="absolute inset-0 bg-dyPink -z-10 left-1 rounded"></div>
+            </div>
+            <div class="flex flex-col items-center gap-1 opacity-40"><i class="fas fa-comment text-lg"></i><span class="text-[9px]">消息</span></div>
+            <div class="flex flex-col items-center gap-1 opacity-40"><i class="fas fa-user text-lg"></i><span class="text-[9px]">我</span></div>
+        </div>
+    </div>
+
+    <!-- RIGHT: AGENT PANEL -->
+    <div class="flex flex-1 h-screen bg-dyDarkGray p-2 md:p-4 lg:p-6 flex-col min-w-0">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded bg-dyCyan/10 flex items-center justify-center border border-dyCyan/20">
+                    <i class="fas fa-brain text-dyCyan text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black italic tracking-tight">AI 为你记得</h1>
+                    <div class="text-[10px] text-dyCyan font-mono uppercase tracking-[0.2em] opacity-50">Memory Retrieval Engine // Ready</div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <div class="px-3 py-1 bg-white/5 rounded-full text-[9px] font-mono border border-white/10">BETA v0.2</div>
+            </div>
+        </div>
+
+        <!-- Terminal Log -->
+        <div class="flex-1 neon-border bg-black rounded-2xl overflow-hidden flex flex-col mb-6">
+            <div class="bg-black/80 p-3 border-b border-white/5 flex items-center justify-between">
+                <div class="flex gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-dyPink"></div>
+                    <div class="w-2 h-2 rounded-full bg-dyCyan"></div>
+                </div>
+                <div class="text-[9px] font-mono opacity-30 italic">agent_reasoning_pipeline</div>
+            </div>
+            
+            <div id="terminal" class="flex-1 p-5 font-mono text-xs terminal-scroll overflow-y-auto space-y-2 leading-relaxed">
+                <div class="text-white/20">系统已就绪，正在监听互动轨迹...</div>
+                <div class="text-dyCyan">> 等待指令 <span class="cursor"></span></div>
+            </div>
+
+            <!-- Workflow Visualizer -->
+            <div class="bg-black/90 border-t border-white/5 grid grid-cols-5 p-3">
+                <div id="step-1" class="flex flex-col items-center gap-1 opacity-20 transition-all">
+                    <i class="fas fa-comment-alt text-xs"></i>
+                    <span class="text-[8px] font-bold text-center">评论入栈</span>
+                </div>
+                <div id="step-2" class="flex flex-col items-center gap-1 opacity-20 transition-all">
+                    <i class="fas fa-eye text-xs"></i>
+                    <span class="text-[8px] font-bold text-center">意图识别</span>
+                </div>
+                <div id="step-3" class="flex flex-col items-center gap-1 opacity-20 transition-all">
+                    <i class="fas fa-history text-xs"></i>
+                    <span class="text-[8px] font-bold text-center">匹配历史</span>
+                </div>
+                <div id="step-4" class="flex flex-col items-center gap-1 opacity-20 transition-all">
+                    <i class="fas fa-save text-xs"></i>
+                    <span class="text-[8px] font-bold text-center">记录写库</span>
+                </div>
+                <div id="step-5" class="flex flex-col items-center gap-1 opacity-20 transition-all">
+                    <i class="fas fa-rocket text-xs"></i>
+                    <span class="text-[8px] font-bold text-center">触发卡片</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inputs Area -->
+        <div class="space-y-4">
+            <div class="relative">
+                <input id="agent-input" type="text" placeholder="输入你想蹲的内容..." class="w-full bg-black border border-white/10 rounded-xl px-5 py-4 text-sm font-bold focus:border-dyCyan outline-none transition-all placeholder:opacity-30">
+                <button onclick="triggerAgent('manual')" class="absolute right-2 top-2 bottom-2 bg-dyCyan text-black font-black px-6 rounded-lg text-xs hover:scale-105 active:scale-95 transition-all">触发</button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="triggerAgent('A')" class="bg-white/5 border border-white/5 py-3 rounded-xl text-[11px] font-bold hover:bg-dyPink/10 hover:border-dyPink transition-all">
+                    蹲链接 A
+                </button>
+                <button onclick="triggerAgent('B')" class="bg-white/5 border border-white/5 py-3 rounded-xl text-[11px] font-bold hover:bg-dyCyan/10 hover:border-dyCyan transition-all">
+                    稍后再看 B
+                </button>
+                <button onclick="triggerAgent('C')" class="bg-white/5 border border-white/5 py-3 rounded-xl text-[11px] font-bold hover:bg-yellow-400/10 hover:border-yellow-400 transition-all">
+                    蹲后续 C
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO SFX -->
+    <audio id="sfx-trigger" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+    <script>
+        const scripts = {
+            'A': {
+                route: 'A',
+                context: "你 3 周前在「大山的穿搭日记」里蹲过这件上衣",
+                header: "当时蹲的终于放出来了",
+                title: "蹲到了！🔗",
+                p1_content: `
+                    <div class="bg-white/5 p-4 rounded-2xl flex items-center justify-between mb-4 border border-white/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center overflow-hidden italic font-black text-dyPink">STYLE</div>
+                            <div>
+                                <div class="text-sm font-bold text-white">莫代尔质感廓形上衣</div>
+                                <div class="text-[10px] text-white/50">官方自营店 · 现货直发</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-dyPink font-black text-lg">¥299</div>
+                        </div>
+                    </div>
+                `,
+                p2: "AI 注意到你 3 周前曾评论求链接。博主刚刚更新了置顶。我们比对并确认了这件廓形上衣，现在它已经在你的信息流里就位了。",
+                p3: "• 3周前 留言「蹲链接姐妹们」<br>• 2周前 搜索了「缎面上衣 春款」",
+                btns: ["看介绍", "加到我蹲过的", "收藏"]
+            },
+            'B': {
+                route: 'B',
+                context: "你一个月前在「30 天变身 Day1」按了稍后再看",
+                header: "她更完啦！AI 帮你摘了前情",
+                title: "续看 30 天系列 ✨",
+                p1_content: `
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <div class="aspect-square bg-white/10 rounded-lg flex items-center justify-center text-[10px] text-white/30">Day 1</div>
+                        <div class="aspect-square bg-dyCyan/20 border border-dyCyan/40 rounded-lg flex items-center justify-center text-[10px] text-dyCyan font-bold">Today</div>
+                        <div class="aspect-square bg-white/5 rounded-lg flex items-center justify-center text-[10px] text-white/20">Final</div>
+                    </div>
+                    <div class="text-xs text-white/60 leading-relaxed mb-4">AI 摘要：博主已更新至第 30 天，你的进度条停留在 Day 1。系列内容从基础有氧已进阶至力量训练。</div>
+                `,
+                p2: "AI 记得你当时按了「稍后再看」。博主已经把 30 天系列更完。这是你那条没看完的时间线，随时能续上。",
+                p3: "• 1个月前 点击「稍后再看」<br>• 期间关注了 2 位同类健身博主",
+                btns: ["开始续看", "加到清单", "稍后提醒"]
+            },
+            'C': {
+                route: 'C',
+                context: "你 2 周前在「爷爷的退伍档案」下评论了「蹲后续爷爷真帅」",
+                header: "爷爷的老战友联系到他了",
+                title: "最终集有后续 🎖️",
+                p1_content: `
+                    <div class="video-placeholder mb-4">
+                        <div class="play-btn"><i class="fas fa-play text-white"></i></div>
+                        <div class="absolute bottom-2 left-2 px-2 py-0.5 bg-black/60 rounded text-[9px] text-dyCyan">前情提要 10s</div>
+                    </div>
+                `,
+                p2: "AI 识别到你在上集评论区的强烈期待。博主刚刚发布了最终集。这是为了回响你的那句「蹲后续」，爷爷的寻找终于有了圆满结局。",
+                p3: "• 2周前 评论「蹲后续爷爷真帅」<br>• 1周前 点赞了博主的作者回复",
+                btns: ["立即观看", "加到我蹲过的", "分享感动"]
+            }
+        };
+
+        let activeScript = 'A';
+        let currentPage = 0;
+        const totalPages = 3;
+
+        function updateDots() {
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (dot) dot.classList.toggle('active', i === currentPage);
+            }
+        }
+
+        function setPage(p) {
+            currentPage = Math.max(0, Math.min(totalPages - 1, p));
+            const pages = document.getElementById('capsule-pages');
+            if (pages) {
+                pages.style.transform = `translateX(-${currentPage * 100}%)`;
+                updateDots();
+            }
+        }
+
+        function nextPage() { setPage(currentPage + 1); }
+        function prevPage() { setPage(currentPage - 1); }
+
+        async function triggerAgent(val) {
+            const input = val === 'manual' ? document.getElementById('agent-input').value : val;
+            if (!input) return;
+
+            // Determine Script: preset = fixed; manual = keyword-route A/B/C
+            if (val === 'A' || val === 'B' || val === 'C') {
+                activeScript = val;
+            } else {
+                const t = String(input || '');
+                if (/稍后再看|稍后看|追更|月前|系列|续看|30\s*天/.test(t)) {
+                    activeScript = 'B';
+                } else if (/蹲后续|后续|下集|下一集|催更|坐等|等更/.test(t)) {
+                    activeScript = 'C';
+                } else {
+                    activeScript = 'A';
+                }
+            }
+
+            const data = scripts[activeScript];
+            const terminal = document.getElementById('terminal');
+            
+            // UI Reset (XSS-safe: use textContent, no template innerHTML with user input)
+            terminal.innerHTML = '';
+            const head = document.createElement('div');
+            head.className = 'text-dyCyan';
+            head.textContent = '> 检测到意图触发: "' + input + '"';
+            terminal.appendChild(head);
+            for(let i=1; i<=5; i++) {
+                const s = document.getElementById(`step-${i}`);
+                s.classList.remove('opacity-100', 'text-dyCyan');
+                s.classList.add('opacity-20');
+            }
+
+            // Logic Steps
+            const logs = [
+                { id: 'step-1', text: '评论文本已入栈，深度解析关键词...' },
+                { id: 'step-2', text: 'AI 意图识别：识别为「' + (activeScript==='A'?'蹲链接':activeScript==='B'?'稍后再看':'追更后续') + '」意图' },
+                { id: 'step-3', text: '匹配历史数据库：找到 ' + (activeScript==='B'?'1个月前':'2-3周前') + ' 的互动锚点' },
+                { id: 'step-4', text: '已写入记忆：这是一个你还没闭环的念头' },
+                { id: 'step-5', text: '正在生成履约胶囊，即刻同步至信息流...' }
+            ];
+
+            for (let i = 0; i < logs.length; i++) {
+                await new Promise(r => setTimeout(r, 600 + Math.random()*400));
+                const entry = document.createElement('div');
+                entry.className = i === 4 ? 'text-dyPink font-bold' : 'text-white/60';
+                entry.innerHTML = `<span class="opacity-20 mr-2">[${new Date().toLocaleTimeString([], {hour12:false})}]</span> ${logs[i].text}`;
+                terminal.appendChild(entry);
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                const step = document.getElementById(logs[i].id);
+                step.classList.remove('opacity-20');
+                step.classList.add('opacity-100', 'text-dyCyan');
+            }
+
+            // Reveal Card
+            revealCard(data);
+        }
+
+        function revealCard(data) {
+            const feed = document.getElementById('feed');
+            
+            // Remove previous capsule if exists
+            const old = document.getElementById('capsule-item');
+            if (old) old.remove();
+
+            const html = `
+                <div id="capsule-item" class="feed-item" style="background-image: url('https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80&w=800');">
+                    <div class="absolute inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center p-4">
+                        <div id="capsule-card" class="w-full glass-card rounded-[2.5rem] overflow-hidden flex flex-col animate-bounce-dy shadow-2xl">
+                            
+                            <!-- AI Header -->
+                            <div class="p-5 flex items-center justify-between border-b border-white/5">
+                                <div class="flex items-center gap-2">
+                                    <div class="bg-dyCyan text-black px-2 py-0.5 rounded text-[9px] font-black italic">AI 为你记得</div>
+                                    <span class="text-[10px] font-bold tracking-widest text-white/40 uppercase">履约胶囊</span>
+                                </div>
+                                <div class="flex gap-1.5">
+                                    <span id="dot-0" class="dot active"></span>
+                                    <span id="dot-1" class="dot"></span>
+                                    <span id="dot-2" class="dot"></span>
+                                </div>
+                            </div>
+
+                            <!-- Swipe Pages -->
+                            <div class="capsule-pages-container" id="swipe-container">
+                                <div id="capsule-pages" class="capsule-pages">
+                                    <!-- P1 -->
+                                    <div class="capsule-page">
+                                        <div class="bg-dyCyan/10 text-dyCyan p-4 rounded-2xl mb-3 border border-dyCyan/25 text-sm font-bold leading-relaxed">
+                                            ${data.context}
+                                        </div>
+                                        <div class="text-[11px] text-white/50 mb-4 italic">“${data.header}”</div>
+                                        <h2 class="text-3xl font-black mb-5 tracking-tighter italic text-white">${data.title}</h2>
+                                        
+                                        ${data.p1_content}
+
+                                        <div class="flex flex-col gap-2">
+                                            <button onclick="event.stopPropagation(); showAction('${data.btns[0]}')" class="w-full bg-dyPink text-white py-4 rounded-2xl font-black text-base shadow-lg shadow-dyPink/20 active:scale-95 transition-all">
+                                                ${data.btns[0]}
+                                            </button>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <button onclick="event.stopPropagation(); showAction('${data.btns[1]}')" class="bg-white/5 py-3 rounded-2xl text-xs font-bold text-white/70 hover:bg-white/10">
+                                                    ${data.btns[1]}
+                                                </button>
+                                                <button onclick="event.stopPropagation(); showAction('${data.btns[2]}')" class="bg-white/5 py-3 rounded-2xl text-xs font-bold text-white/70 hover:bg-white/10">
+                                                    ${data.btns[2]}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- P2 -->
+                                    <div class="capsule-page">
+                                        <div class="text-[10px] font-black text-dyCyan mb-4 tracking-[0.2em] uppercase flex items-center gap-2">
+                                            <i class="fas fa-magic"></i> AI 懂你瞬间
+                                        </div>
+                                        <div class="space-y-4">
+                                            <div class="p-5 bg-white/5 rounded-2xl border border-white/5">
+                                                <p class="text-sm leading-relaxed text-white/90 font-medium">
+                                                    ${data.p2}
+                                                </p>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-[10px] text-white/30 italic">
+                                                <i class="fas fa-shield-alt"></i> 基于你的互动记录，非广告推送
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- P3 -->
+                                    <div class="capsule-page">
+                                        <div class="text-[10px] font-black text-dyCyan mb-4 tracking-[0.2em] uppercase flex items-center gap-2">
+                                            <i class="fas fa-shoe-prints"></i> 你的心动足迹
+                                        </div>
+                                        <div class="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[1px] before:bg-white/10">
+                                            <div class="relative">
+                                                <div class="absolute -left-5 top-1.5 w-2 h-2 rounded-full bg-dyCyan/40"></div>
+                                                <div class="text-xs text-white/80 leading-relaxed">
+                                                    ${data.p3}
+                                                </div>
+                                            </div>
+                                            <div class="relative">
+                                                <div class="absolute -left-5 top-1.5 w-2 h-2 rounded-full bg-dyPink animate-pulse"></div>
+                                                <div class="text-xs font-bold text-dyPink">04.18 (今天)</div>
+                                                <div class="text-[11px] text-white/70">AI 为你接回了这个念念不忘的瞬间</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            feed.insertAdjacentHTML('beforeend', html);
+            
+            // Scroll to Capsule
+            setTimeout(() => {
+                feed.scrollTo({ top: feed.clientHeight, behavior: 'smooth' });
+                document.getElementById('nav-overlay').classList.add('opacity-100');
+                document.getElementById('sfx-trigger').play().catch(e => {});
+                
+                // Initialize Swipe
+                initSwipe();
+                setPage(0);
+            }, 300);
+        }
+
+        // Swipe Logic
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        function initSwipe() {
+            const container = document.getElementById('swipe-container');
+            if (!container) return;
+            
+            container.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            container.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+        }
+
+        function handleSwipe() {
+            const threshold = 50;
+            if (touchEndX < touchStartX - threshold) nextPage();
+            if (touchEndX > touchStartX + threshold) prevPage();
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') prevPage();
+        });
+
+        // Inline toast for CTA actions (replaces alert())
+        function showAction(label) {
+            let toast = document.getElementById('action-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'action-toast';
+                toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-dyCyan text-black px-6 py-3 rounded-full font-black text-sm shadow-lg z-50 transition-opacity duration-300 pointer-events-none';
+                toast.style.opacity = '0';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = '已执行：' + label;
+            toast.style.opacity = '1';
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 1600);
+        }
+
+        window.onload = () => {
+            const logs = [
+                '正在校准跨会话记忆库...',
+                '意图识别引擎已加载 [Dunu-V2]',
+                '等待用户评论或关键词触发...'
+            ];
+            logs.forEach((m, i) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.className = 'text-white/30';
+                    div.innerText = m;
+                    document.getElementById('terminal').appendChild(div);
+                }, i * 300);
+            });
+        };
+    </script>
+</body>
+</html>
