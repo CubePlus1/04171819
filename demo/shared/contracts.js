@@ -48,6 +48,27 @@ export const INTENTS = Object.freeze({
 export const MAX_COMMENT_GRAPHEMES = 140;
 
 /**
+ * Mind 可视化阶段 · 与 workflow step 一一对应，但独立演化
+ * 前后端都引用这个常量，避免字面量 drift
+ */
+export const MIND_PHASES = Object.freeze({
+  IDLE:   'idle',     // 无 step 运行 · 静态星座
+  SCAN:   'scan',     // step 1 · 全部未履约节点柔和呼吸
+  RECALL: 'recall',   // step 2 · focus_signal 浮起
+  MATCH:  'match',    // step 3 · signal ↔ action 连线点亮
+  SEAL:   'seal',     // step 4 · 原子声明 · 金印落下
+  EMIT:   'emit',     // step 5 · 从 mind 射向信息流
+});
+
+export const STEP_TO_MIND_PHASE = Object.freeze({
+  1: MIND_PHASES.SCAN,
+  2: MIND_PHASES.RECALL,
+  3: MIND_PHASES.MATCH,
+  4: MIND_PHASES.SEAL,
+  5: MIND_PHASES.EMIT,
+});
+
+/**
  * 情景锚点统一用 floor-based 阈值，让后端 P1 文案和前端历史列表的相对时间保持一致
  */
 export function relativeTimeCn(iso) {

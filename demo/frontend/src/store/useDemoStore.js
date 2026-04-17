@@ -88,8 +88,15 @@ export const useDemoStore = create((set) => ({
       if (state.activeRunId && frame?.run_id && state.activeRunId !== frame.run_id) return state;
       const steps = state.steps.map((s) => {
         if (s.step < frame.step) return { ...s, status: 'done' };
-        if (s.step === frame.step)
-          return { ...s, status: 'active', detail: frame.detail, name: frame.name };
+        if (s.step === frame.step) {
+          return {
+            ...s,
+            status: 'active',
+            detail: frame.detail,
+            name: frame.name,
+            mind: frame.mind ?? s.mind,
+          };
+        }
         return s;
       });
       return { steps };

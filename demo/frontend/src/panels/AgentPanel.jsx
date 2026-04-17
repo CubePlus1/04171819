@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import AgentWorkflow from '../components/AgentWorkflow.jsx';
+import AgentMind from '../components/AgentMind.jsx';
 import TriggerPicker from '../components/TriggerPicker.jsx';
 import AmbientPulse from '../components/AmbientPulse.jsx';
 import { useDemoStore } from '../store/useDemoStore.js';
@@ -99,12 +100,25 @@ export default function AgentPanel({ onToast }) {
             />
           </section>
 
+          {/* Mind · 主视觉：念头图谱 · 夹在 AmbientPulse 和 AgentWorkflow 之间 */}
+          <motion.section layout>
+            <AgentMind />
+          </motion.section>
+
           <section className="glass rounded-2xl p-4">
             <TriggerPicker onPick={(t) => trigger({ topic: t.topic })} disabled={disabled || !pending} />
           </section>
 
+          {/* 原 5 步工作流折成 "查看细节" · 保留给想看调试信息的评委 */}
           <motion.section layout className="glass rounded-2xl p-4">
-            <AgentWorkflow />
+            <details>
+              <summary className="cursor-pointer list-none text-[12px] uppercase tracking-[0.18em] text-stone-400 hover:text-stone-200 focus-ring">
+                查看 AI 背后的 5 步 · 默认折起
+              </summary>
+              <div className="mt-4">
+                <AgentWorkflow />
+              </div>
+            </details>
             {!pending && !running && (
               <div className="mt-3 rounded-xl border border-warmth/20 bg-warmth/5 px-3 py-2 text-[12px] text-warmth">
                 这一轮她的念头都替她接回来了 · 顶部「重置演示」可以再来一次
