@@ -23,7 +23,7 @@ class AbortError extends Error {
 const INTENT_RULES = [
   { intent: 'link_request',   label: '蹲链接', topic: 'knit-top',      patterns: [/蹲.*链接/, /链接.*求/, /求.*链接/, /同款/] },
   { intent: 'sequel_request', label: '蹲后续', topic: 'grandpa',       patterns: [/蹲.*后续/, /蹲.*下集/, /后续呢/] },
-  { intent: 'series_catchup', label: '稍后再看未消费', topic: 'series-30days', patterns: [/稍后再看/, /忘了看/, /没追完/] },
+  { intent: 'series_catchup', label: '还没来得及追完', topic: 'series-30days', patterns: [/稍后再看/, /忘了看/, /没追完/] },
 ];
 
 function classify(text) {
@@ -68,7 +68,7 @@ function postcardFor({ match, signal, script }) {
     heading: `你 ${rel} 在 ${c.display} 下评论过`,
     body: match.payload.summary,
     highlight: { note: match.payload.title },
-    closing: '爷爷的老战友联系到他了',
+    closing: '你当时惦记的那句后续 · 我替你等到了',
     creator: c.display,
   };
 }

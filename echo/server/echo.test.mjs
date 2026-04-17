@@ -52,7 +52,7 @@ await runCase('剧本 C · 蹲后续 · postcard.kind=sequel · 爷爷收束', a
   assert.equal(end.payload.script, 'C');
   const post = events.find((e) => e.type === 'postcard');
   assert.equal(post.payload.postcard.kind, 'sequel');
-  assert.match(post.payload.postcard.closing, /老战友/);
+  assert.match(post.payload.postcard.closing, /后续|等到/);
 });
 
 await runCase('未知意图 → no-match，且没有 postcard', async () => {

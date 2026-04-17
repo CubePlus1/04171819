@@ -25,7 +25,7 @@ export const REASON_TEXT_CN = Object.freeze({
   [REASONS.ALREADY_FULFILLED]: '这件事我之前替你接过一次了 · 这次让它停在这儿。',
   [REASONS.SERVER_ERROR]:      '路上摔了一下 · 再说一次？',
   [REASONS.RATE_LIMITED]:      '说得太快了 · 稍等一拍。',
-  [REASONS.TOO_MANY_STREAMS]:  '同时在聊的太多了 · 稍后再说。',
+  [REASONS.TOO_MANY_STREAMS]:  '我一下子接住了太多念头 · 让我缓一口气。',
 });
 
 export const ACTION_VERB_CN = Object.freeze({

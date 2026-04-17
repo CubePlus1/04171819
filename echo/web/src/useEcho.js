@@ -49,7 +49,9 @@ export function useEcho() {
       });
       if (!resp.ok) {
         const body = await resp.json().catch(() => ({}));
-        throw new Error(body.error || '刚刚没接住，再试一次');
+        // body.error 可能是 REASONS 里定义的机器码 → 映射到中文；兜底用通用文案
+        const friendly = REASON_TEXT_CN[body.error] ?? '刚刚没接住 · 再说一次？';
+        throw new Error(friendly);
       }
 
       const reader = resp.body.getReader();
