@@ -51,10 +51,10 @@ runCase('剧本 A · P1 + P2 · 商品卡 · 主按钮「加到清单」', () =>
   }, userId: 'demo-user' });
   assert.deepEqual(card.pages.map((p) => p.id), ['P1', 'P2']);
   assert.equal(card.pages[0].answer.type, 'product_card');
-  assert.equal(card.pages[0].emotional_close, '当时蹲的终于放出来了');
+  assert.equal(card.pages[0].emotional_close, '当时蹲的，这次替你接住了');
   const primaryLabels = card.pages[0].actions.primary.map((a) => a.label);
   assert.ok(primaryLabels.includes('加到清单'), `primary 含「加到清单」：${primaryLabels}`);
-  assert.match(card.pages[0].context_line, /^你.+在.+评论了「蹲链接姐妹们」$/);
+  assert.match(card.pages[0].context_line, /^你.+在「大山的穿搭日记」那儿.+「蹲链接姐妹们」$/);
 });
 
 runCase('剧本 B · P1 + P3 · 系列网格 · 情感收束「AI 帮你摘了前情」', () => {
@@ -65,7 +65,7 @@ runCase('剧本 B · P1 + P3 · 系列网格 · 情感收束「AI 帮你摘了�
   });
   assert.deepEqual(card.pages.map((p) => p.id), ['P1', 'P3']);
   assert.equal(card.pages[0].answer.type, 'series_grid');
-  assert.equal(card.pages[0].emotional_close, '她已经更完了，AI 帮你摘了前情');
+  assert.equal(card.pages[0].emotional_close, '你没来得及追完的，这次替你接上了');
   assert.ok(card.pages[0].actions.primary.some((a) => a.label === '续看'));
 });
 
@@ -82,7 +82,7 @@ runCase('剧本 C · P1 + P2 + P3 · 内嵌视频 · 情感收束「爷爷的老
   assert.equal(card.pages[0].answer.type, 'inline_video');
   assert.equal(card.pages[0].answer.video.preview_seconds, 10);
   assert.equal(card.pages[0].emotional_close, '爷爷的老战友联系到他了');
-  assert.match(card.pages[1].warm_summary, /AI 看到你蹲过/);
+  assert.match(card.pages[1].warm_summary, /这件事|回音|惦记/);
   assert.ok(card.pages[2].items.length > 0, 'P3 行为足迹列表非空');
 });
 

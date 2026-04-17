@@ -28,7 +28,7 @@ export default function AgentPanel({ onToast }) {
   // 成功落卡时抛一条轻 toast，让评委感觉到「发生了什么」
   useEffect(() => {
     if (lastCompleted?.cardId) {
-      onToast?.('AI 为你记得 · 卡片已浮现在左侧');
+      onToast?.('你刚刚那句惦记，已经回来了');
     }
   }, [lastCompleted, onToast]);
 
@@ -55,11 +55,11 @@ export default function AgentPanel({ onToast }) {
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="pill bg-hintB/15 text-hintB">Agent 面板</span>
-          <span className="text-[12px] text-stone-400">AI 工作后台 · 评委亲手触发</span>
+          <span className="pill bg-hintB/15 text-hintB">念头后台</span>
+          <span className="text-[12px] text-stone-400">它怎么把你记起来 · 你来起个头</span>
         </div>
-        <div className="text-[11px] text-stone-500">
-          {connected ? '实时同步中' : '等待连接...'}
+        <div className="text-[11px] text-stone-400">
+          {connected ? '正陪着你' : '等这句话过来…'}
         </div>
       </div>
 
@@ -82,10 +82,10 @@ export default function AgentPanel({ onToast }) {
             {history.length > 0 && (
               <section className="glass rounded-2xl p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-stone-500">
-                    她过去蹲过的（Seed）
+                  <div className="text-[11px] tracking-[0.18em] text-stone-400">
+                    她曾经放不下的这些事
                   </div>
-                  <span className="text-[10px] text-stone-500">共 {history.length} 条</span>
+                  <span className="text-[10px] text-stone-400">共 {history.length} 条</span>
                 </div>
                 <ul className="divide-y divide-white/5">
                   {history.slice(0, 4).map((h) => (

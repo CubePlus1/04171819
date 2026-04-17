@@ -19,8 +19,10 @@ export function getClientId() {
 
 async function handle(res) {
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`HTTP ${res.status} ${body}`);
+    // 不把原始 HTTP 状态码/堆栈暴露给评委；同时保留 dev console 里有诊断信息
+    const body = await res.text().catch(() => '');
+    console.warn('api error', res.status, body);
+    throw new Error('刚刚没接住，再试一次');
   }
   return res.json();
 }
