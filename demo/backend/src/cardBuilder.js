@@ -152,4 +152,3 @@ export function buildCard({ match, intentResult, userId }) {
   };
 }
 
-export const __test__ = { buildContextLine, buildAnswer, buildP2, buildP3, SCRIPT_TO_PAGES };
