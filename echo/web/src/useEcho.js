@@ -1,5 +1,6 @@
 // 从 POST /api/echo 的 SSE 流里增量收 event，作为 hook 暴露
 import { useCallback, useRef, useState } from 'react';
+import { SSE_EVENTS, REASONS, REASON_TEXT_CN } from '@shared/contracts.mjs';
 
 export function useEcho() {
   const [events, setEvents] = useState([]);
@@ -65,11 +66,11 @@ export function useEcho() {
           }
           try {
             const payload = JSON.parse(data);
-            if (event === 'bubble') {
+            if (event === SSE_EVENTS.BUBBLE) {
               setEvents((prev) => [...prev, { kind: 'echo', id: `b-${payload.run_id}-${payload.id}`, ...payload }]);
-            } else if (event === 'postcard') {
+            } else if (event === SSE_EVENTS.POSTCARD) {
               setEvents((prev) => [...prev, { kind: 'postcard', id: `c-${payload.run_id}`, ...payload }]);
-            } else if (event === 'end') {
+            } else if (event === SSE_EVENTS.END) {
               if (payload.ok === false) {
                 setEvents((prev) => [...prev, {
                   kind: 'echo',
@@ -98,10 +99,5 @@ export function useEcho() {
 }
 
 function reasonText(reason) {
-  switch (reason) {
-    case 'no-match':           return '这一次我没找到能接住的那条，下次再说。';
-    case 'no-action':          return '那条线索还没动静 · 我先记下了。';
-    case 'already-fulfilled':  return '这件事我之前替你接过一次了 · 这次让它停在这儿。';
-    default:                    return '这一次没接住 · 再说一次？';
-  }
+  return REASON_TEXT_CN[reason] ?? REASON_TEXT_CN[REASONS.SERVER_ERROR];
 }

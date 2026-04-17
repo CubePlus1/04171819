@@ -28,7 +28,7 @@ npm run dev          # 起后端 :4100 + 前端 :5174
 | 字体 | 无衬线 (PingFang) | 衬线 (Noto Serif SC / Songti) |
 | 反馈 | 5 步状态面板 + 多页卡片 | 5 条对话气泡 + 一张「明信片」bubble |
 | 推送 | WebSocket broadcast | SSE 单向流 |
-| 状态 | Zustand + runId 过滤 | 单次 request 一次订阅，无全局 store |
+| 状态 | Zustand + runId 过滤 | 前端无全局 store / 服务端仅进程内 state |
 
 ## 情感设计
 

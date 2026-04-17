@@ -1,5 +1,6 @@
 // 对话式 5 步生成器：把主 demo 的 "workflow step" 改写成"她在自言自语"的气泡
 import { getState, claimFulfillment, creator, relativeTimeCn } from './store.mjs';
+import { SSE_EVENTS, REASONS, ACTION_VERB_CN } from '../shared/contracts.mjs';
 
 const SLEEP = (ms, signal) =>
   new Promise((resolve, reject) => {
@@ -83,11 +84,11 @@ function postcardFor({ match, signal, script }) {
 export async function* runEcho({ text, signal: abortSignal, sleep = SLEEP }) {
   const doSleep = (ms) => sleep(ms, abortSignal);
   const rid = `echo_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
-  yield { type: 'begin', payload: { run_id: rid, text } };
+  yield { type: SSE_EVENTS.BEGIN, payload: { run_id: rid, text } };
 
   // 1 · 听到
   await doSleep(380);
-  yield { type: 'bubble', payload: { run_id: rid, id: 1, voice: '听到了…' } };
+  yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 1, voice: '听到了…' } };
 
   // 2 · 认识
   await doSleep(520);
@@ -95,7 +96,7 @@ export async function* runEcho({ text, signal: abortSignal, sleep = SLEEP }) {
   const intent = m?.intent ?? 'passive_interest';
   const label  = m?.label  ?? '淡淡的念头';
   yield {
-    type: 'bubble',
+    type: SSE_EVENTS.BUBBLE,
     payload: {
       run_id: rid, id: 2,
       voice: `这句话的样子我记得 · 像是一句${label}`,
@@ -106,20 +107,20 @@ export async function* runEcho({ text, signal: abortSignal, sleep = SLEEP }) {
   // 3 · 翻出老物件
   await doSleep(520);
   if (!m) {
-    yield { type: 'bubble', payload: { run_id: rid, id: 3, voice: '等等，我在你的记忆里翻一翻… 好像没有能接住的那条。' } };
-    yield { type: 'end', payload: { run_id: rid, ok: false, reason: 'no-match' } };
+    yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 3, voice: '等等，我在你的记忆里翻一翻… 好像没有能接住的那条。' } };
+    yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: false, reason: REASONS.NO_MATCH } };
     return;
   }
   const state = getState();
   const signal = state.signals.find((s) => s.topic === m.topic && !s.fulfilled);
   if (!signal) {
-    yield { type: 'bubble', payload: { run_id: rid, id: 3, voice: '这件事我之前替你接过一次了 · 这次先让它停在这里。' } };
-    yield { type: 'end', payload: { run_id: rid, ok: false, reason: 'already-fulfilled' } };
+    yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 3, voice: '这件事我之前替你接过一次了 · 这次先让它停在这里。' } };
+    yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: false, reason: REASONS.ALREADY_FULFILLED } };
     return;
   }
   const c = creator(signal.creator);
   yield {
-    type: 'bubble',
+    type: SSE_EVENTS.BUBBLE,
     payload: {
       run_id: rid, id: 3,
       voice: `你之前在 ${c.display} 那儿 ${signal.text ? `说过「${signal.text}」` : '停留过一会儿'}`,
@@ -131,17 +132,12 @@ export async function* runEcho({ text, signal: abortSignal, sleep = SLEEP }) {
   await doSleep(520);
   const action = state.actions.find((a) => a.topic === m.topic);
   if (!action) {
-    yield { type: 'bubble', payload: { run_id: rid, id: 4, voice: `${c.display} 那边暂时还没新动作 · 先把这件事记下了` } };
-    yield { type: 'end', payload: { run_id: rid, ok: false, reason: 'no-action' } };
+    yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 4, voice: `${c.display} 那边暂时还没新动作 · 先把这件事记下了` } };
+    yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: false, reason: REASONS.NO_ACTION } };
     return;
   }
-  const ACTION_VERB_CN = {
-    post_link:        '刚刚放出了那个链接',
-    post_sequel:      '发了那集的后续',
-    series_completed: '把那个系列更完了',
-  };
   yield {
-    type: 'bubble',
+    type: SSE_EVENTS.BUBBLE,
     payload: {
       run_id: rid, id: 4,
       voice: `${c.display} ${ACTION_VERB_CN[action.kind] ?? '有了新动作'} · 我记得这件事`,
@@ -152,11 +148,11 @@ export async function* runEcho({ text, signal: abortSignal, sleep = SLEEP }) {
   await doSleep(620);
   const claimed = claimFulfillment(signal.id);
   if (!claimed) {
-    yield { type: 'bubble', payload: { run_id: rid, id: 5, voice: '啊，这条刚刚被另一股念头接走了。' } };
-    yield { type: 'end', payload: { run_id: rid, ok: false, reason: 'already-fulfilled' } };
+    yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 5, voice: '啊，这条刚刚被另一股念头接走了。' } };
+    yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: false, reason: REASONS.ALREADY_FULFILLED } };
     return;
   }
   const postcard = postcardFor({ match: action, signal, script: pickScript(intent) });
-  yield { type: 'postcard', payload: { run_id: rid, postcard } };
-  yield { type: 'end', payload: { run_id: rid, ok: true, script: pickScript(intent) } };
+  yield { type: SSE_EVENTS.POSTCARD, payload: { run_id: rid, postcard } };
+  yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: true, script: pickScript(intent) } };
 }

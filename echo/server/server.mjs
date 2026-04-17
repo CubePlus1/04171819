@@ -6,6 +6,7 @@
 import { createServer } from 'node:http';
 import { runEcho } from './echo.mjs';
 import { getState, resetState, relativeTimeCn } from './store.mjs';
+import { REASONS, SSE_EVENTS } from '../shared/contracts.mjs';
 
 const PORT = Number(process.env.PORT ?? 4100);
 const MAX_TEXT = 140;
@@ -194,15 +195,15 @@ const server = createServer(async (req, res) => {
     if (url.pathname === '/api/echo' && req.method === 'POST') {
       const ip = remoteIp;
       const rl = echoLimit.take(ip);
-      if (!rl.ok) return json(res, 429, { ok: false, error: 'rate-limited', retry_after: rl.retryAfter }, origin);
+      if (!rl.ok) return json(res, 429, { ok: false, error: REASONS.RATE_LIMITED, retry_after: rl.retryAfter }, origin);
 
       // 并发流上限
       const perIp = streamsByIp.get(ip) ?? 0;
       if (perIp >= MAX_STREAMS_PER_IP) {
-        return json(res, 429, { ok: false, error: 'too-many-streams', scope: 'ip' }, origin);
+        return json(res, 429, { ok: false, error: REASONS.TOO_MANY_STREAMS, scope: 'ip' }, origin);
       }
       if (activeStreams.size >= MAX_STREAMS_GLOBAL) {
-        return json(res, 503, { ok: false, error: 'too-many-streams', scope: 'global' }, origin);
+        return json(res, 503, { ok: false, error: REASONS.TOO_MANY_STREAMS, scope: 'global' }, origin);
       }
 
       let body;
@@ -240,11 +241,11 @@ const server = createServer(async (req, res) => {
         for await (const event of runEcho({ text, signal: abortCtrl.signal })) {
           if (abortCtrl.signal.aborted) break;
           sseWrite(res, event.type, event.payload);
-          if (event.type === 'end') break;
+          if (event.type === SSE_EVENTS.END) break;
         }
       } catch (err) {
         if (err.name !== 'AbortError' && !res.writableEnded) {
-          sseWrite(res, 'end', { ok: false, reason: 'server-error' });
+          sseWrite(res, SSE_EVENTS.END, { ok: false, reason: REASONS.SERVER_ERROR });
         }
       } finally {
         clearInterval(keepAlive);

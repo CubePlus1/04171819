@@ -15,7 +15,7 @@ const CREATORS = {
   'grandpa': { id: 'grandpa', display: '爷爷的退伍档案',   avatar: '🎖' },
 };
 
-export function buildInitialState() {
+function buildInitialState() {
   return {
     user: { id: 'echo-user', nickname: '念念' },
     signals: [
@@ -35,7 +35,8 @@ export function buildInitialState() {
   };
 }
 
-const state = buildInitialState();
+// buildInitialState 目前只在本文件使用；去掉多余 export
+let state = buildInitialState();
 
 export function getState() {
   return state;
