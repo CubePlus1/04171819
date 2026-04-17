@@ -51,7 +51,9 @@ export default function App() {
   const { events, running, error, send, reset } = useEcho();
   const { value: boot, error: bootErr, refresh } = useBootstrap();
   const [text, setText] = useState('');
+  const [composing, setComposing] = useState(false); // IME 选词中
   const bottomRef = useRef(null);
+  const inputRef = useRef(null);
   const liveMsgRef = useRef('');
   const [liveMsg, setLiveMsg] = useState('');
   const reducedMotion = usePrefersReducedMotion();
@@ -77,6 +79,7 @@ export default function App() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (composing) return; // 中文输入法选词中，不提交
     const v = text.trim();
     if (!v || running) return;
     const ok = await send(v);
@@ -84,7 +87,8 @@ export default function App() {
       setText('');
       refresh();
     }
-    // 失败时保留输入，避免草稿丢失；用户可以直接再回车一次
+    // 失败时保留输入；成功或失败都把焦点还回输入框，保持键盘流
+    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   const presets = boot?.presets ?? [];
@@ -155,11 +159,15 @@ export default function App() {
             <label htmlFor="echo-input" className="sr-only">输入一句念头</label>
             <input
               id="echo-input"
+              ref={inputRef}
               autoFocus
               value={text}
               onChange={(e) => setText(e.target.value.slice(0, 140))}
+              onCompositionStart={() => setComposing(true)}
+              onCompositionEnd={() => setComposing(false)}
               placeholder="把你心里那句惦记说出来 · 回车"
-              disabled={running}
+              readOnly={running}
+              aria-busy={running}
             />
             <button type="submit" disabled={running || !text.trim()}>
               {running ? '在听…' : '说出口'}

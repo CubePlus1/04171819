@@ -73,7 +73,17 @@ body {
 }
 .memories li:last-child { border-bottom: 0; }
 .memories li .t { color: var(--muted); margin-right: 8px; }
-.memories li.done { opacity: 0.5; text-decoration: line-through; }
+.memories li.done {
+  opacity: 0.45;
+  color: var(--muted);
+}
+.memories li.done::before {
+  content: '已接住 · ';
+  color: var(--sepia);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  margin-right: 6px;
+}
 
 .conversation {
   display: flex;
@@ -297,4 +307,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .bubble, .postcard { animation: none; opacity: 1; transform: none; }
   .typing-dot { animation: none; }
+  .composer button,
+  .presets button {
+    transition: none !important;
+  }
+  .composer button:hover { transform: none !important; }
 }
