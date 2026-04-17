@@ -8,6 +8,9 @@ import { bootstrap, resetDemo, getClientId } from './api/client.js';
 import { connectWs } from './api/ws.js';
 import { WS_EVENTS } from '@shared/contracts.js';
 
+// 确保 getClientId 在任何消息到达前已生成并固化到 sessionStorage
+getClientId();
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -71,10 +74,10 @@ export default function App() {
       onMessage: (msg) => {
         const p = msg.payload ?? {};
         const myClient = getClientId();
+        // client_id 匹配 = 本标签页发起；若事件里没带 client_id，回退到接收所有（向后兼容）
         const isMine = !p.client_id || p.client_id === myClient;
         switch (msg.type) {
           case WS_EVENTS.WORKFLOW_BEGIN:
-            // 只接管 client_id 匹配的，也就是本标签页发起的
             if (isMine) beginWorkflow(p.run_id);
             break;
           case WS_EVENTS.WORKFLOW_STEP:
@@ -92,8 +95,8 @@ export default function App() {
             }
             break;
           case WS_EVENTS.CARD_GENERATED:
-            // 卡片全员可见（可以旁观），spotlight 由 store 自行判断是否本 run
-            onCardGenerated(p.card, p.run_id);
+            // 卡片全员可见；spotlight 只有 client_id 匹配的 run 才抢
+            onCardGenerated(p.card, isMine);
             break;
           case WS_EVENTS.DEMO_RESET:
             resetStore();
