@@ -7,10 +7,11 @@ import { useDemoStore } from '../store/useDemoStore.js';
 import { submitComment } from '../api/client.js';
 import { relativeTimeCn } from '../utils/time.js';
 
-export default function AgentPanel() {
+export default function AgentPanel({ onToast }) {
   const running = useDemoStore((s) => s.running);
   const connected = useDemoStore((s) => s.connected);
   const history = useDemoStore((s) => s.history);
+  const lastCompleted = useDemoStore((s) => s.lastCompleted);
   const [err, setErr] = useState(null);
   // 本地瞬时锁：从点击到 workflow.begin 到达之间也阻止第二次点击
   const [submitting, setSubmitting] = useState(false);
@@ -23,6 +24,13 @@ export default function AgentPanel() {
       setSubmitting(false);
     }
   }, [running]);
+
+  // 成功落卡时抛一条轻 toast，让评委感觉到「发生了什么」
+  useEffect(() => {
+    if (lastCompleted?.cardId) {
+      onToast?.('AI 为你记得 · 卡片已浮现在左侧');
+    }
+  }, [lastCompleted, onToast]);
 
   async function trigger(text) {
     if (submittingRef.current || running) return;

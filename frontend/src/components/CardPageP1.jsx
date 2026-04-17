@@ -88,7 +88,22 @@ function Answer({ answer }) {
   return <AnswerInline answer={answer} />;
 }
 
-export default function CardPageP1({ page, scriptId }) {
+const ACTION_FEEDBACK = {
+  add_wish: '已加到「我蹲过的」清单',
+  view:     '播放中...（demo 演示，不跳转）',
+  resume:   '续看 · 从 Day1 接着来',
+  recap:    'AI 摘要：她其实没变，只是变得温柔了',
+  play:     '播放中 · 含 10s 前情提要',
+  share:    '已复制分享链接到剪贴板',
+  save:     '收藏到「我蹲过的」',
+  not_now:  '已告诉 AI：这次划过',
+};
+
+export default function CardPageP1({ page, scriptId, onAction }) {
+  const handleAction = (id, label) => {
+    const feedback = ACTION_FEEDBACK[id] ?? label;
+    onAction?.(feedback);
+  };
   return (
     <div className="flex h-full flex-col gap-3 p-4">
       <div className="flex items-center gap-2">
@@ -111,7 +126,8 @@ export default function CardPageP1({ page, scriptId }) {
         {page.actions?.primary?.map((a) => (
           <button
             key={a.id}
-            className="rounded-full bg-ember px-4 py-1.5 text-[13px] font-medium text-white shadow-card transition hover:translate-y-[-1px]"
+            onClick={() => handleAction(a.id, a.label)}
+            className="focus-ring rounded-full bg-ember px-4 py-1.5 text-[13px] font-medium text-white shadow-card transition hover:translate-y-[-1px]"
           >
             {a.label}
           </button>
@@ -119,7 +135,8 @@ export default function CardPageP1({ page, scriptId }) {
         {page.actions?.secondary?.map((a) => (
           <button
             key={a.id}
-            className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[12px] text-stone-200 hover:bg-white/10"
+            onClick={() => handleAction(a.id, a.label)}
+            className="focus-ring rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[12px] text-stone-200 hover:bg-white/10"
           >
             {a.label}
           </button>

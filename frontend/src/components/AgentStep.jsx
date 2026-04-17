@@ -13,8 +13,8 @@ function Detail({ step, detail }) {
   if (step === 1) {
     return (
       <div className="mt-2 text-[12px] leading-relaxed text-stone-300">
-        <span className="text-stone-500">评论：</span>「{detail.text}」
-        <span className="ml-2 text-stone-500">字符数 {detail.length}</span>
+        <span className="text-stone-400">评论：</span>「{detail.text}」
+        <span className="ml-2 text-stone-400">字符数 {detail.length}</span>
       </div>
     );
   }
@@ -22,7 +22,7 @@ function Detail({ step, detail }) {
     return (
       <div className="mt-2 space-y-1 text-[12px] text-stone-300">
         <div>
-          <span className="text-stone-500">分类：</span>
+          <span className="text-stone-400">分类：</span>
           <span className="text-kiss">{detail.label}</span>
           <span className="ml-2 rounded-full bg-warmth/15 px-2 py-0.5 text-[10px] text-warmth">
             置信度 {(detail.confidence * 100).toFixed(0)}%
@@ -39,16 +39,16 @@ function Detail({ step, detail }) {
     return (
       <div className="mt-2 space-y-1 text-[12px] text-stone-300">
         <div>
-          <span className="text-stone-500">历史信号：</span>
+          <span className="text-stone-400">历史信号：</span>
           {detail.signal?.text ? `「${detail.signal.text}」` : `《${detail.signal?.video_title}》`}
         </div>
         <div>
-          <span className="text-stone-500">博主：</span>{detail.creator}
+          <span className="text-stone-400">博主：</span>{detail.creator}
           <span className="mx-2 text-stone-600">·</span>
-          <span className="text-stone-500">博主动作：</span>{detail.action_type}
+          <span className="text-stone-400">博主动作：</span>{detail.action_type}
         </div>
         <div>
-          <span className="text-stone-500">落在剧本：</span>
+          <span className="text-stone-400">落在剧本：</span>
           <span className="text-warmth">{detail.script}</span>
         </div>
       </div>
@@ -57,9 +57,10 @@ function Detail({ step, detail }) {
   if (step === 4) {
     return (
       <div className="mt-2 text-[12px] text-stone-300">
-        <span className="text-stone-500">record:</span>{' '}
+        <span className="text-stone-400">入库 ID：</span>{' '}
         <code className="rounded bg-black/40 px-1.5 py-0.5 text-[11px] text-warmth">{detail.card_id}</code>
-        <span className="ml-2 text-stone-500">script</span> {detail.script}
+        <span className="ml-2 text-stone-400">剧本：</span>
+        <span className="text-warmth">{detail.script}</span>
       </div>
     );
   }
@@ -67,7 +68,7 @@ function Detail({ step, detail }) {
     return (
       <div className="mt-2 space-y-1 text-[12px] text-stone-300">
         <div>
-          <span className="text-stone-500">页面：</span>
+          <span className="text-stone-400">页面：</span>
           {detail.pages?.join(' / ')}
         </div>
         <div className="text-stone-400">{detail.preview_context}</div>
@@ -106,7 +107,7 @@ export default function AgentStep({ step, index, isLast }) {
       >
         <div className="flex items-center justify-between">
           <div className="text-[13px] font-medium">{step.name}</div>
-          <div className="text-[10px] uppercase tracking-[0.18em] text-stone-500">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
             {step.status === 'active' ? 'RUNNING' : step.status === 'done' ? 'DONE' : step.status === 'fail' ? 'FAIL' : 'IDLE'}
           </div>
         </div>
