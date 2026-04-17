@@ -4,7 +4,7 @@ import ProductPanel from './panels/ProductPanel.jsx';
 import AgentPanel from './panels/AgentPanel.jsx';
 import Toast from './components/Toast.jsx';
 import { useDemoStore } from './store/useDemoStore.js';
-import { bootstrap, resetDemo } from './api/client.js';
+import { bootstrap, resetDemo, getClientId } from './api/client.js';
 import { connectWs } from './api/ws.js';
 import { WS_EVENTS } from '@shared/contracts.js';
 
@@ -70,23 +70,29 @@ export default function App() {
       onClose: () => setConnected(false),
       onMessage: (msg) => {
         const p = msg.payload ?? {};
+        const myClient = getClientId();
+        const isMine = !p.client_id || p.client_id === myClient;
         switch (msg.type) {
           case WS_EVENTS.WORKFLOW_BEGIN:
-            beginWorkflow(p.run_id);
+            // 只接管 client_id 匹配的，也就是本标签页发起的
+            if (isMine) beginWorkflow(p.run_id);
             break;
           case WS_EVENTS.WORKFLOW_STEP:
-            applyStep(p);
+            if (isMine) applyStep(p);
             break;
           case WS_EVENTS.WORKFLOW_END:
-            endWorkflow({
-              ok: p.ok,
-              cardId: p.cardId,
-              scriptId: p.scriptId,
-              reason: p.reason,
-              runId: p.run_id,
-            });
+            if (isMine) {
+              endWorkflow({
+                ok: p.ok,
+                cardId: p.cardId,
+                scriptId: p.scriptId,
+                reason: p.reason,
+                runId: p.run_id,
+              });
+            }
             break;
           case WS_EVENTS.CARD_GENERATED:
+            // 卡片全员可见（可以旁观），spotlight 由 store 自行判断是否本 run
             onCardGenerated(p.card, p.run_id);
             break;
           case WS_EVENTS.DEMO_RESET:
