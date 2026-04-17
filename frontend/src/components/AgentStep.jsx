@@ -8,80 +8,154 @@ const STATUS_COLORS = {
 };
 
 const ACTION_VERB_CN = {
-  post_link:        '把你蹲的链接放出来了',
+  post_link:        '把她蹲过的款放出了链接',
   post_sequel:      '发了那集的后续',
-  series_completed: '把你收藏过的系列更完了',
-  reply_tutorial:   '在回复里带上了你求的教程',
+  series_completed: '把她收藏过的系列更完了',
+  reply_tutorial:   '在回复里带上了她求的教程',
 };
 
-function Detail({ step, detail }) {
-  if (!detail) return null;
+const SIGNAL_VERB_CN = {
+  comment_intent:    '评论过',
+  watch_later:       '按了稍后再看',
+  unfinished_save:   '收藏过',
+  unsatisfied_search:'搜过',
+  passive_interest:  '反复刷到过',
+};
 
-  if (step === 1) {
+function DetailStep1({ detail }) {
+  // ambient 形态：{ total, open, note }
+  if (detail.open != null) {
     return (
-      <div className="mt-2 text-[12px] leading-relaxed text-stone-300">
-        <span className="text-stone-400">评论：</span>「{detail.text}」
-        <span className="ml-2 text-stone-400">字符数 {detail.length}</span>
+      <div className="mt-2 text-[12px] text-stone-300">
+        <span className="text-stone-400">后台扫描：</span>
+        {detail.note ?? `${detail.open} 件事还没接回来`}
       </div>
     );
   }
-  if (step === 2) {
-    return (
-      <div className="mt-2 space-y-1 text-[12px] text-stone-300">
-        <div>
-          <span className="text-stone-400">分类：</span>
-          <span className="text-kiss">{detail.label}</span>
-          <span className="ml-2 rounded-full bg-warmth/15 px-2 py-0.5 text-[10px] text-warmth">
-            置信度 {(detail.confidence * 100).toFixed(0)}%
-          </span>
-        </div>
-        <div className="text-stone-400">{detail.rationale}</div>
-      </div>
-    );
-  }
-  if (step === 3) {
+  // comment 形态（遗留）：{ text, length }
+  return (
+    <div className="mt-2 text-[12px] leading-relaxed text-stone-300">
+      <span className="text-stone-400">她说：</span>「{detail.text}」
+      <span className="ml-2 text-stone-400">字符数 {detail.length}</span>
+    </div>
+  );
+}
+
+function DetailStep2({ detail }) {
+  // ambient 形态：{ hit, signal, creator, recall }
+  if ('hit' in detail) {
     if (!detail.hit) {
-      return <div className="mt-2 text-[12px] text-red-300">这一次没找到你曾惦记的那条</div>;
+      return <div className="mt-2 text-[12px] text-red-300">这一次还没找到能接住的那条</div>;
     }
     return (
       <div className="mt-2 space-y-1 text-[12px] text-stone-300">
         <div>
-          <span className="text-stone-400">你当时说过：</span>
+          <span className="text-stone-400">她当时：</span>
           {detail.signal?.text ? `「${detail.signal.text}」` : `《${detail.signal?.video_title}》`}
         </div>
         <div>
-          <span className="text-stone-400">她这次给了回音：</span>{detail.creator}
-          <span className="mx-2 text-stone-600">·</span>
-          {ACTION_VERB_CN[detail.action_type] ?? detail.action_type}
+          <span className="text-stone-400">在：</span>{detail.creator}
         </div>
-        <div>
-          <span className="text-stone-400">该用哪种方式接回来：</span>
-          <span className="text-warmth">{detail.script}</span>
-        </div>
+        {detail.recall && (
+          <div className="text-stone-400 italic">{detail.recall}</div>
+        )}
       </div>
     );
   }
-  if (step === 4) {
-    return (
-      <div className="mt-2 text-[12px] text-stone-300">
-        <span className="text-stone-400">这次被接住的：</span>{' '}
-        <code className="rounded bg-black/40 px-1.5 py-0.5 text-[11px] text-warmth">{detail.card_id}</code>
-        <span className="ml-2 text-stone-400">·</span>
-        <span className="ml-1 text-warmth">{detail.script}</span>
+  // comment 形态：{ label, confidence, rationale }
+  return (
+    <div className="mt-2 space-y-1 text-[12px] text-stone-300">
+      <div>
+        <span className="text-stone-400">分类：</span>
+        <span className="text-kiss">{detail.label}</span>
+        <span className="ml-2 rounded-full bg-warmth/15 px-2 py-0.5 text-[10px] text-warmth">
+          把握度 {(detail.confidence * 100).toFixed(0)}%
+        </span>
       </div>
-    );
-  }
-  if (step === 5) {
+      <div className="text-stone-400">{detail.rationale}</div>
+    </div>
+  );
+}
+
+function DetailStep3({ detail }) {
+  // ambient 形态：{ creator, action_type, action_summary, script }
+  if (detail.action_summary != null || detail.action_type != null) {
     return (
       <div className="mt-2 space-y-1 text-[12px] text-stone-300">
         <div>
-          <span className="text-stone-400">页面：</span>
-          {detail.pages?.join(' / ')}
+          <span className="text-stone-400">她这次给了回音：</span>
+          {detail.creator}
+          <span className="mx-2 text-stone-600">·</span>
+          {ACTION_VERB_CN[detail.action_type] ?? detail.action_type}
         </div>
-        <div className="text-stone-400">{detail.preview_context}</div>
+        {detail.action_summary && (
+          <div className="text-stone-400">{detail.action_summary}</div>
+        )}
+        {detail.script && (
+          <div>
+            <span className="text-stone-400">该用哪种方式接回来：</span>
+            <span className="text-warmth">剧本 {detail.script}</span>
+          </div>
+        )}
       </div>
     );
   }
+  // comment 形态：{ hit, signal, creator, action_type, script }（旧 runWorkflow）
+  if (!detail.hit) {
+    return <div className="mt-2 text-[12px] text-red-300">这一次没找到你曾惦记的那条</div>;
+  }
+  return (
+    <div className="mt-2 space-y-1 text-[12px] text-stone-300">
+      <div>
+        <span className="text-stone-400">你当时说过：</span>
+        {detail.signal?.text ? `「${detail.signal.text}」` : `《${detail.signal?.video_title}》`}
+      </div>
+      <div>
+        <span className="text-stone-400">她这次给了回音：</span>{detail.creator}
+        <span className="mx-2 text-stone-600">·</span>
+        {ACTION_VERB_CN[detail.action_type] ?? detail.action_type}
+      </div>
+      <div>
+        <span className="text-stone-400">该用哪种方式接回来：</span>
+        <span className="text-warmth">{detail.script}</span>
+      </div>
+    </div>
+  );
+}
+
+function DetailStep4({ detail }) {
+  if (detail.ok === false) {
+    return <div className="mt-2 text-[12px] text-red-300">{detail.reason ?? '这条刚刚被抢先接走了'}</div>;
+  }
+  return (
+    <div className="mt-2 text-[12px] text-stone-300">
+      <span className="text-stone-400">这次被接住的：</span>{' '}
+      <code className="rounded bg-black/40 px-1.5 py-0.5 text-[11px] text-warmth">{detail.card_id}</code>
+      <span className="ml-2 text-stone-400">·</span>
+      <span className="ml-1 text-warmth">剧本 {detail.script}</span>
+    </div>
+  );
+}
+
+function DetailStep5({ detail }) {
+  return (
+    <div className="mt-2 space-y-1 text-[12px] text-stone-300">
+      <div>
+        <span className="text-stone-400">页面：</span>
+        {detail.pages?.join(' / ')}
+      </div>
+      <div className="text-stone-400">{detail.preview_context}</div>
+    </div>
+  );
+}
+
+function Detail({ step, detail }) {
+  if (!detail) return null;
+  if (step === 1) return <DetailStep1 detail={detail} />;
+  if (step === 2) return <DetailStep2 detail={detail} />;
+  if (step === 3) return <DetailStep3 detail={detail} />;
+  if (step === 4) return <DetailStep4 detail={detail} />;
+  if (step === 5) return <DetailStep5 detail={detail} />;
   return null;
 }
 
@@ -115,7 +189,7 @@ export default function AgentStep({ step, index, isLast }) {
         <div className="flex items-center justify-between">
           <div className="text-[13px] font-medium">{step.name}</div>
           <div className="text-[10px] tracking-[0.18em] text-stone-400">
-            {step.status === 'active' ? '记起中…' : step.status === 'done' ? '已接住' : step.status === 'fail' ? '暂时落空' : '等你一句话'}
+            {step.status === 'active' ? '记起中…' : step.status === 'done' ? '已接住' : step.status === 'fail' ? '暂时落空' : '等下一次'}
           </div>
         </div>
         <AnimatePresence>

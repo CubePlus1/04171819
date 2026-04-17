@@ -1,112 +1,151 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import AgentWorkflow from '../components/AgentWorkflow.jsx';
-import CommentInput from '../components/CommentInput.jsx';
-import PresetPicker from '../components/PresetPicker.jsx';
+import TriggerPicker from '../components/TriggerPicker.jsx';
+import AmbientPulse from '../components/AmbientPulse.jsx';
 import { useDemoStore } from '../store/useDemoStore.js';
-import { submitComment } from '../api/client.js';
+import { ambientTick } from '../api/client.js';
 import { relativeTimeCn } from '../utils/time.js';
+
+const AUTO_TICK_MS = 9000;   // 约 9 秒一条 —— 给评委留出看左边卡片的时间
+const KICKOFF_DELAY_MS = 1200; // 页面到手到第一条履约之间的呼吸
 
 export default function AgentPanel({ onToast }) {
   const running = useDemoStore((s) => s.running);
   const connected = useDemoStore((s) => s.connected);
   const history = useDemoStore((s) => s.history);
+  const pending = useDemoStore((s) => s.pending);
+  const setPending = useDemoStore((s) => s.setPending);
   const lastCompleted = useDemoStore((s) => s.lastCompleted);
-  const [err, setErr] = useState(null);
-  // 本地瞬时锁：从点击到 workflow.begin 到达之间也阻止第二次点击
-  const [submitting, setSubmitting] = useState(false);
-  const submittingRef = useRef(false);
+  const lastReason = useDemoStore((s) => s.lastReason);
 
-  // 后端 workflow.end 到达时解锁
-  useEffect(() => {
-    if (!running) {
-      submittingRef.current = false;
-      setSubmitting(false);
+  const [autoOn, setAutoOn] = useState(true);
+  const submittingRef = useRef(false);
+  const autoTimerRef = useRef(null);
+
+  const trigger = useCallback(async ({ topic, signalId } = {}) => {
+    if (submittingRef.current || running || !pending) return;
+    submittingRef.current = true;
+    try {
+      const res = await ambientTick({ topic, signalId });
+      if (typeof res?.pending === 'boolean') setPending(res.pending);
+    } catch (e) {
+      onToast?.(e.message || '刚刚没接住');
+    } finally {
+      setTimeout(() => { submittingRef.current = false; }, 300);
     }
+  }, [running, pending, onToast, setPending]);
+
+  // 运行结束后自动释放
+  useEffect(() => {
+    if (!running) submittingRef.current = false;
   }, [running]);
 
-  // 成功落卡时抛一条轻 toast，让评委感觉到「发生了什么」
+  // 自动 tick 引擎：开启时按节奏让后台接下一条
+  useEffect(() => {
+    if (!autoOn || !connected || !pending) return;
+    // 当前正在跑就等跑完；下次 render 会重新调度
+    if (running || submittingRef.current) return;
+
+    autoTimerRef.current = setTimeout(() => {
+      trigger();
+    }, AUTO_TICK_MS);
+    return () => clearTimeout(autoTimerRef.current);
+  }, [autoOn, connected, pending, running, trigger]);
+
+  // 连接建立后先等一拍，再踢第一条（避免"页面一加载就立刻弹卡"的突兀感）
+  const firstKickoffRef = useRef(false);
+  useEffect(() => {
+    if (firstKickoffRef.current) return;
+    if (!autoOn || !connected || !pending) return;
+    firstKickoffRef.current = true;
+    const t = setTimeout(() => trigger(), KICKOFF_DELAY_MS);
+    return () => clearTimeout(t);
+  }, [autoOn, connected, pending, trigger]);
+
+  // 成功落卡 → 柔和 toast
   useEffect(() => {
     if (lastCompleted?.cardId) {
-      onToast?.('你刚刚那句惦记，已经回来了');
+      onToast?.('她念念不忘的，替她接回来了');
     }
   }, [lastCompleted, onToast]);
 
-  async function trigger(text) {
-    if (submittingRef.current || running) return;
-    submittingRef.current = true;
-    setSubmitting(true);
-    setErr(null);
-    try {
-      await submitComment(text);
-    } catch (e) {
-      submittingRef.current = false;
-      setSubmitting(false);
-      setErr(e.message || '提交失败');
-    }
-  }
-
-  const disabled = submitting || running || !connected;
+  const disabled = running || !connected;
 
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="pill bg-hintB/15 text-hintB">念头后台</span>
-          <span className="text-[12px] text-stone-400">它怎么把你记起来 · 你来起个头</span>
+          <span className="text-[12px] text-stone-400">被动刷到即成立 · 无须输入</span>
         </div>
         <div className="text-[11px] text-stone-400">
-          {connected ? '正陪着你' : '等这句话过来…'}
+          {connected ? '正陪着她' : '等她上线…'}
         </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-hidden rounded-3xl border border-white/5 bg-ink p-4">
-        <div className="grid h-full min-h-0 grid-cols-1 gap-3">
-          <div className="flex flex-col gap-4 overflow-y-auto pr-1 scrollbar-none">
-            <section className="glass rounded-2xl p-4">
-              <CommentInput onSubmit={trigger} disabled={disabled} />
-              {err && <div className="mt-2 text-[12px] text-red-300">{err}</div>}
-            </section>
+        <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pr-1 scrollbar-none">
 
-            <section className="glass rounded-2xl p-4">
-              <PresetPicker onPick={trigger} disabled={disabled} />
-            </section>
+          <section>
+            <AmbientPulse
+              running={running}
+              autoOn={autoOn}
+              pending={pending}
+              nextTickMs={AUTO_TICK_MS}
+              disabled={disabled}
+              onToggleAuto={() => setAutoOn((v) => !v)}
+              onTickNow={() => trigger()}
+            />
+          </section>
 
-            <motion.section layout className="glass rounded-2xl p-4">
-              <AgentWorkflow />
-            </motion.section>
+          <section className="glass rounded-2xl p-4">
+            <TriggerPicker onPick={(t) => trigger({ topic: t.topic })} disabled={disabled || !pending} />
+          </section>
 
-            {history.length > 0 && (
-              <section className="glass rounded-2xl p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <div className="text-[11px] tracking-[0.18em] text-stone-400">
-                    她曾经放不下的这些事
-                  </div>
-                  <span className="text-[10px] text-stone-400">共 {history.length} 条</span>
-                </div>
-                <ul className="divide-y divide-white/5">
-                  {history.slice(0, 4).map((h) => (
-                    <li key={h.id} className="flex items-start gap-2 py-2 text-[12px]">
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-warmth" />
-                      <div className="flex-1">
-                        <div className="text-stone-200">
-                          {h.raw_text ? `「${h.raw_text}」` : h.video_title}
-                        </div>
-                        <div className="text-stone-500">
-                          {relativeTimeCn(h.occurred_at)} · {h.creator_display} · {h.signal_type}
-                          {h.fulfilled === 1 && (
-                            <span className="ml-1 rounded bg-warmth/15 px-1.5 py-0.5 text-[10px] text-warmth">
-                              已履约
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </section>
+          <motion.section layout className="glass rounded-2xl p-4">
+            <AgentWorkflow />
+            {!pending && !running && (
+              <div className="mt-3 rounded-xl border border-warmth/20 bg-warmth/5 px-3 py-2 text-[12px] text-warmth">
+                这一轮她的念头都替她接回来了 · 顶部「重置演示」可以再来一次
+              </div>
             )}
-          </div>
+          </motion.section>
+
+          {history.length > 0 && (
+            <section className="glass rounded-2xl p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="text-[11px] tracking-[0.18em] text-stone-400">
+                  她曾经放不下的这些事
+                </div>
+                <span className="text-[10px] text-stone-400">共 {history.length} 条</span>
+              </div>
+              <ul className="divide-y divide-white/5">
+                {history.slice(0, 6).map((h) => (
+                  <li key={h.id} className="flex items-start gap-2 py-2 text-[12px]">
+                    <span
+                      className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${
+                        h.fulfilled === 1 ? 'bg-warmth/50' : 'bg-warmth'
+                      }`}
+                    />
+                    <div className="flex-1">
+                      <div className="text-stone-200">
+                        {h.raw_text ? `「${h.raw_text}」` : h.video_title}
+                      </div>
+                      <div className="text-stone-400">
+                        {relativeTimeCn(h.occurred_at)} · {h.creator_display} · {h.signal_type}
+                        {h.fulfilled === 1 && (
+                          <span className="ml-1 rounded bg-warmth/15 px-1.5 py-0.5 text-[10px] text-warmth">
+                            已接回来
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       </div>
     </div>

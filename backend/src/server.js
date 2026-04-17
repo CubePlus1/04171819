@@ -8,6 +8,7 @@ import cors from 'cors';
 import { DB_PATH, getDb, runSchema, closeDb } from './db.js';
 import { createBroadcaster } from './events.js';
 import { runWorkflow, newRunId } from './workflow.js';
+import { runAmbient, hasPendingAmbient } from './ambient.js';
 import { createRateLimiter } from './rateLimit.js';
 import { createLogger } from './logger.js';
 import { seed } from './seed.js';
@@ -128,17 +129,21 @@ function createApp(broadcast, state) {
       .all(DEMO_USER_ID, BOOTSTRAP_CARDS_LIMIT)
       .map((row) => ({ ...row, pages: JSON.parse(row.pages_json) }));
 
+    // 「扫描片段」：不是评论输入，而是评委可以挑一类信号让 AI 后台先处理
+    //   —— 语义对齐 principle.json 里的"被动刷到即成立"，而不是"让用户输入"
+    const triggers = [
+      { id: 'trigger-A', label: '蹲链接 · 链接型',     script: 'A', topic: 'dashan-knit-top',  hint: '把她那条评论下蹲过的上衣接回来' },
+      { id: 'trigger-B', label: '稍后再看 · 系列型',   script: 'B', topic: '30days-series',     hint: '把她一个月前按稍后再看的系列接上' },
+      { id: 'trigger-C', label: '蹲后续 · 情感收尾',   script: 'C', topic: 'grandpa-archive',   hint: '把她蹲过的那集后续接过来' },
+    ];
+    const pending = hasPendingAmbient(DEMO_USER_ID);
+
     res.json({
       server_epoch: SERVER_EPOCH,
       user,
       feed: fixtures.feed,
-      presets: [
-        { id: 'preset-A', text: '蹲链接姐妹们 上衣链接求！', script: 'A' },
-        { id: 'preset-B', text: '一个月前按稍后再看 忘了看', script: 'B' },
-        { id: 'preset-C', text: '蹲后续 爷爷真帅',          script: 'C' },
-        { id: 'preset-tutorial', text: '求个教程 我上次看到这里就放不下了',  script: 'A' },
-        { id: 'preset-plus-one', text: '同问 我也一直在等这句回音',            script: 'A' },
-      ],
+      triggers,
+      pending,
       history,
       cards,
     });
@@ -187,6 +192,52 @@ function createApp(broadcast, state) {
     } catch (err) {
       log.error('workflow failed', { run_id: runId, err: err.message, stack: err.stack });
       broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ok: false, reason: REASON_CODES.SERVER_ERROR });
+      res.status(500).json({ ok: false, runId, error: 'internal' });
+    } finally {
+      state.inFlight.delete(runId);
+    }
+  });
+
+  // Ambient · 不要求评论输入，AI 后台从未履约信号 × 博主新动作里挑下一条
+  app.post('/api/ambient/tick', async (req, res) => {
+    const rl = commentLimiter.take(req.ip || 'unknown');
+    if (++pruneCounter % 64 === 0) commentLimiter.prune();
+    if (!rl.ok) {
+      res.set('Retry-After', String(rl.retryAfter));
+      return res.status(429).json({ ok: false, error: REASON_CODES.RATE_LIMITED, retry_after: rl.retryAfter });
+    }
+
+    const body = req.body ?? {};
+    const topic   = typeof body.topic === 'string' && body.topic ? body.topic : null;
+    const signalId = Number.isInteger(body.signalId) ? body.signalId : null;
+    const rawUserId = body.userId;
+    const userId = typeof rawUserId === 'string' && rawUserId ? rawUserId : DEMO_USER_ID;
+    const rawClientId = body.clientId;
+    const clientId = typeof rawClientId === 'string' && rawClientId ? rawClientId : null;
+
+    const runId = newRunId();
+    state.inFlight.add(runId);
+    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, client_id: clientId, ambient: true, userId });
+    try {
+      const result = await runAmbient({
+        userId, runId, topic, signalId,
+        onStep: (frame) => broadcast(WS_EVENTS.WORKFLOW_STEP, { ...frame, ambient: true }),
+      });
+      if (result.ok) {
+        broadcast(WS_EVENTS.CARD_GENERATED, { run_id: runId, client_id: clientId, card: result.card });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ambient: true, ok: true, cardId: result.card.id });
+      } else {
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ambient: true, ok: false, reason: result.reason });
+      }
+      res.json({
+        ok: result.ok,
+        runId,
+        pending: hasPendingAmbient(userId),
+        ...(result.ok ? { cardId: result.card.id } : { reason: result.reason }),
+      });
+    } catch (err) {
+      log.error('ambient failed', { run_id: runId, err: err.message, stack: err.stack });
+      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ambient: true, ok: false, reason: REASON_CODES.SERVER_ERROR });
       res.status(500).json({ ok: false, runId, error: 'internal' });
     } finally {
       state.inFlight.delete(runId);
