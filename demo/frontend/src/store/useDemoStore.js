@@ -9,44 +9,69 @@ const STEP_TEMPLATE = [
 ];
 
 const initialState = {
-  // 连接
   connected: false,
 
-  // 展示数据（从 /api/bootstrap 拉回）
   user: null,
   feed: [],
   presets: [],
   history: [],
 
-  // 卡片
-  cards: [],            // 已生成卡片（按时间倒序）
+  cards: [],
   spotlightCardId: null,
 
   // Agent 工作流
   running: false,
+  activeRunId: null,
   steps: STEP_TEMPLATE.map((s) => ({ ...s })),
-  lastCompleted: null,  // 最近一次 ok 的结论 {cardId, scriptId}
+  lastCompleted: null,
   lastReason: null,
 };
+
+function dedupeMergeCards(primary, existing) {
+  const seen = new Set();
+  const out = [];
+  for (const c of primary) {
+    if (c?.id && !seen.has(c.id)) { seen.add(c.id); out.push(c); }
+  }
+  for (const c of existing) {
+    if (c?.id && !seen.has(c.id)) { seen.add(c.id); out.push(c); }
+  }
+  return out;
+}
+
+function shouldApplyFrame(state, frameRunId) {
+  if (!state.activeRunId || !frameRunId) return true;
+  return state.activeRunId === frameRunId;
+}
 
 export const useDemoStore = create((set) => ({
   ...initialState,
 
   setConnected: (connected) => set({ connected }),
 
+  /**
+   * hydrate 合并策略：
+   * - 引导数据作为基线（server 视图），覆盖 user / feed / presets / history
+   * - cards 做去重合并（引导在前，本地已有新卡在后），保留 WS 到达但尚未入库的卡片
+   * - 不重置 workflow 状态；清理靠显式 reset()
+   */
   hydrate: ({ user, feed, presets, history, cards }) =>
-    set({
-      user,
-      feed: feed ?? [],
-      presets: presets ?? [],
-      history: history ?? [],
-      cards: cards ?? [],
-      spotlightCardId: (cards && cards[0]?.id) ?? null,
+    set((state) => {
+      const mergedCards = dedupeMergeCards(cards ?? [], state.cards);
+      return {
+        user,
+        feed: feed ?? state.feed,
+        presets: presets ?? state.presets,
+        history: history ?? state.history,
+        cards: mergedCards,
+        spotlightCardId: state.spotlightCardId ?? mergedCards[0]?.id ?? null,
+      };
     }),
 
-  beginWorkflow: () =>
+  beginWorkflow: (runId) =>
     set({
       running: true,
+      activeRunId: runId ?? null,
       steps: STEP_TEMPLATE.map((s) => ({ ...s, status: 'idle' })),
       lastCompleted: null,
       lastReason: null,
@@ -54,40 +79,49 @@ export const useDemoStore = create((set) => ({
 
   applyStep: (frame) =>
     set((state) => {
+      if (!shouldApplyFrame(state, frame?.run_id)) return state;
       const steps = state.steps.map((s) => {
         if (s.step < frame.step) return { ...s, status: 'done' };
-        if (s.step === frame.step) return { ...s, status: 'active', detail: frame.detail, name: frame.name };
+        if (s.step === frame.step)
+          return { ...s, status: 'active', detail: frame.detail, name: frame.name };
         return s;
       });
       return { steps };
     }),
 
-  endWorkflow: ({ ok, cardId, scriptId, reason }) =>
+  endWorkflow: ({ ok, cardId, scriptId, reason, runId }) =>
     set((state) => {
-      const steps = state.steps.map((s, idx, arr) => {
+      if (!shouldApplyFrame(state, runId)) return state;
+      const steps = state.steps.map((s) => {
         if (ok) return { ...s, status: 'done' };
         if (s.status === 'active') return { ...s, status: 'fail' };
         return s;
       });
       return {
         running: false,
+        activeRunId: null,
         steps,
         lastCompleted: ok ? { cardId, scriptId } : null,
         lastReason: ok ? null : reason,
       };
     }),
 
-  onCardGenerated: (card) =>
-    set((state) => ({
-      cards: [card, ...state.cards.filter((c) => c.id !== card.id)],
-      spotlightCardId: card.id,
-    })),
+  onCardGenerated: (card, runId) =>
+    set((state) => {
+      // run_id 不匹配时仍然接受卡片（其它标签页生成），但不抢当前 run 的 spotlight
+      const accepted = !state.activeRunId || !runId || state.activeRunId === runId;
+      return {
+        cards: [card, ...state.cards.filter((c) => c.id !== card.id)],
+        spotlightCardId: accepted ? card.id : state.spotlightCardId,
+      };
+    }),
 
   clearSpotlight: () => set({ spotlightCardId: null }),
 
+  /** 硬复位：用于 /api/reset 或重连后清理 workflow UI */
   reset: () =>
-    set({
+    set((state) => ({
       ...initialState,
-      // 保留 connected，其它重置
-    }),
+      connected: state.connected,
+    })),
 }));
