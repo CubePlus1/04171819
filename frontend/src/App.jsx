@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
 import ProductPanel from './panels/ProductPanel.jsx';
 import AgentPanel from './panels/AgentPanel.jsx';
 import Toast from './components/Toast.jsx';
+import ThemeSwitcher from './themes/ThemeSwitcher.jsx';
+import { THEMES } from './themes/tokens.js';
+import { useTheme } from './themes/useTheme.js';
 import { useDemoStore } from './store/useDemoStore.js';
 import { bootstrap, resetDemo, getClientId } from './api/client.js';
 import { connectWs } from './api/ws.js';
 import { WS_EVENTS } from '@shared/contracts.js';
 
-// 确保 getClientId 在任何消息到达前已生成并固化到 sessionStorage
+// 确保 clientId 在 WS 消息到达前已生成
 getClientId();
 
 function usePrefersReducedMotion() {
@@ -22,6 +25,13 @@ function usePrefersReducedMotion() {
   }, []);
   return reduced;
 }
+
+const SPLIT_TO_GRID = {
+  '7-5': { left: 'col-span-7',  right: 'col-span-5'  },
+  '6-6': { left: 'col-span-6',  right: 'col-span-6'  },
+  '8-4': { left: 'col-span-8',  right: 'col-span-4'  },
+  '5-7': { left: 'col-span-5',  right: 'col-span-7'  },
+};
 
 export default function App() {
   const hydrate = useDemoStore((s) => s.hydrate);
@@ -37,6 +47,8 @@ export default function App() {
   const [bootState, setBootState] = useState({ status: 'loading', error: null });
   const [toast, setToast] = useState(null);
   const reducedMotion = usePrefersReducedMotion();
+
+  const { current: theme, switchTheme, cycleTheme } = useTheme(THEMES);
 
   const bootedOnceRef = useRef(false);
   const wasConnectedOnceRef = useRef(false);
@@ -74,7 +86,6 @@ export default function App() {
       onMessage: (msg) => {
         const p = msg.payload ?? {};
         const myClient = getClientId();
-        // client_id 匹配 = 本标签页发起；若事件里没带 client_id，回退到接收所有（向后兼容）
         const isMine = !p.client_id || p.client_id === myClient;
         switch (msg.type) {
           case WS_EVENTS.WORKFLOW_BEGIN:
@@ -95,7 +106,6 @@ export default function App() {
             }
             break;
           case WS_EVENTS.CARD_GENERATED:
-            // 卡片全员可见；spotlight 只有 client_id 匹配的 run 才抢
             onCardGenerated(p.card, isMine);
             break;
           case WS_EVENTS.DEMO_RESET:
@@ -111,7 +121,24 @@ export default function App() {
     return () => ws.close();
   }, [hydrate, setConnected, beginWorkflow, applyStep, endWorkflow, onCardGenerated, resetStore]);
 
-  async function handleReset() {
+  // 键盘快切：[ 上一款，] 下一款，T 打开切换器
+  useEffect(() => {
+    function onKey(e) {
+      // 忽略输入框里的按键
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.key === '[') { cycleTheme(-1); setToast(`风格：${findName(-1)}`); }
+      if (e.key === ']') { cycleTheme(+1); setToast(`风格：${findName(+1)}`); }
+    }
+    function findName(dir) {
+      const idx = THEMES.findIndex((x) => x.id === theme.id);
+      return THEMES[(idx + dir + THEMES.length) % THEMES.length].name;
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [theme.id, cycleTheme]);
+
+  const handleReset = useCallback(async () => {
     try {
       resetStore();
       await resetDemo();
@@ -119,16 +146,23 @@ export default function App() {
       console.error('reset failed', err);
       setToast('重置失败，请检查后端连通');
     }
-  }
+  }, [resetStore]);
 
-  function handleRetryBoot() {
-    bootRef.current?.();
-  }
+  const handleRetryBoot = useCallback(() => bootRef.current?.(), []);
+
+  const split = SPLIT_TO_GRID[theme.layout?.split_ratio ?? '7-5'];
 
   return (
     <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
       <div className="flex h-full w-full flex-col">
-        <Header connected={connected} user={user} onReset={handleReset} />
+        <Header
+          connected={connected}
+          user={user}
+          onReset={handleReset}
+          themes={THEMES}
+          theme={theme}
+          onPickTheme={(id) => { switchTheme(id); setToast(`风格：${THEMES.find((t)=>t.id===id)?.name}`); }}
+        />
 
         {bootState.status === 'error' && (
           <ErrorBanner message={bootState.error} onRetry={handleRetryBoot} />
@@ -139,7 +173,7 @@ export default function App() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
-            className="col-span-7 min-h-0"
+            className={`${split.left} min-h-0`}
           >
             <ProductPanel bootStatus={bootState.status} onAction={(label) => setToast(label)} />
           </motion.section>
@@ -148,7 +182,7 @@ export default function App() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.08 }}
-            className="col-span-5 min-h-0"
+            className={`${split.right} min-h-0`}
           >
             <AgentPanel onToast={setToast} />
           </motion.section>
@@ -160,7 +194,7 @@ export default function App() {
   );
 }
 
-function Header({ connected, user, onReset }) {
+function Header({ connected, user, onReset, themes, theme, onPickTheme }) {
   return (
     <header className="flex items-center justify-between px-6 pt-5 pb-3 no-select">
       <div className="flex items-center gap-3">
@@ -168,10 +202,10 @@ function Header({ connected, user, onReset }) {
           <span className="absolute inset-0 rounded-full bg-ember/20 blur-md" />
         </div>
         <div className="leading-tight">
-          <div className="text-[15px] font-semibold tracking-[0.18em] text-stone-100">
+          <div className="text-[15px] font-semibold tracking-[0.18em] text-[var(--color-text)]">
             蹲到了 · DUNDAO
           </div>
-          <div className="text-[11px] text-stone-400">
+          <div className="text-[11px] text-[var(--color-text-muted)]">
             字节 Hackathon · 赛道三｜履约型内容 · 过去 × 此刻的桥
           </div>
         </div>
@@ -193,8 +227,9 @@ function Header({ connected, user, onReset }) {
           />
           {connected ? 'WS 已连接' : 'WS 断开中'}
         </span>
+        <ThemeSwitcher themes={themes} current={theme} onPick={onPickTheme} />
         <button
-          className="focus-ring rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-stone-200 hover:bg-white/10"
+          className="focus-ring rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-[var(--color-text)] hover:bg-white/10"
           onClick={onReset}
         >
           重置演示
