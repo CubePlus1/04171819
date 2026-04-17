@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import ProductPanel from './panels/ProductPanel.jsx';
 import AgentPanel from './panels/AgentPanel.jsx';
@@ -13,50 +13,79 @@ export default function App() {
   const applyStep = useDemoStore((s) => s.applyStep);
   const endWorkflow = useDemoStore((s) => s.endWorkflow);
   const onCardGenerated = useDemoStore((s) => s.onCardGenerated);
+  const resetStore = useDemoStore((s) => s.reset);
   const connected = useDemoStore((s) => s.connected);
   const user = useDemoStore((s) => s.user);
 
+  // StrictMode 保护：开发模式下 effect 会跑两次，不要重复引导 / 创建两个 WS
+  const bootedOnceRef = useRef(false);
+  const wasConnectedOnceRef = useRef(false);
+  const bootTokenRef = useRef(0);
+
   useEffect(() => {
-    let mounted = true;
+    if (bootedOnceRef.current) return;
+    bootedOnceRef.current = true;
 
     async function boot() {
+      const token = ++bootTokenRef.current;
       try {
         const data = await bootstrap();
-        if (!mounted) return;
+        if (token !== bootTokenRef.current) return; // 被新的 boot 超越，丢弃
         hydrate(data);
       } catch (err) {
         console.error('bootstrap failed', err);
       }
     }
+
     boot();
 
     const ws = connectWs({
-      onOpen: () => setConnected(true),
+      onOpen: () => {
+        setConnected(true);
+        // 之前连接过 → 现在是重连 → 重新拉一遍 bootstrap，保证错过的卡片被同步
+        if (wasConnectedOnceRef.current) boot();
+        wasConnectedOnceRef.current = true;
+      },
       onClose: () => setConnected(false),
       onMessage: (msg) => {
+        const p = msg.payload ?? {};
         switch (msg.type) {
-          case 'workflow.begin':   beginWorkflow(); break;
-          case 'workflow.step':    applyStep(msg.payload); break;
-          case 'workflow.end': {
-            const p = msg.payload || {};
-            endWorkflow({ ok: p.ok, cardId: p.cardId, scriptId: p.scriptId, reason: p.reason });
+          case 'workflow.begin':
+            beginWorkflow(p.run_id);
             break;
-          }
-          case 'card.generated':   onCardGenerated(msg.payload.card); break;
-          case 'demo.reset':       boot(); break;
-          default: break;
+          case 'workflow.step':
+            applyStep(p);
+            break;
+          case 'workflow.end':
+            endWorkflow({
+              ok: p.ok,
+              cardId: p.cardId,
+              scriptId: p.scriptId,
+              reason: p.reason,
+              runId: p.run_id,
+            });
+            break;
+          case 'card.generated':
+            onCardGenerated(p.card, p.run_id);
+            break;
+          case 'demo.reset':
+            resetStore();
+            boot();
+            break;
+          default:
+            break;
         }
       },
     });
 
     return () => {
-      mounted = false;
       ws.close();
     };
-  }, [hydrate, setConnected, beginWorkflow, applyStep, endWorkflow, onCardGenerated]);
+  }, [hydrate, setConnected, beginWorkflow, applyStep, endWorkflow, onCardGenerated, resetStore]);
 
   async function handleReset() {
     try {
+      resetStore();
       await resetDemo();
       const data = await bootstrap();
       hydrate(data);

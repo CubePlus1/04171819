@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import AgentWorkflow from '../components/AgentWorkflow.jsx';
 import CommentInput from '../components/CommentInput.jsx';
@@ -12,15 +12,33 @@ export default function AgentPanel() {
   const connected = useDemoStore((s) => s.connected);
   const history = useDemoStore((s) => s.history);
   const [err, setErr] = useState(null);
+  // 本地瞬时锁：从点击到 workflow.begin 到达之间也阻止第二次点击
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+
+  // 后端 workflow.end 到达时解锁
+  useEffect(() => {
+    if (!running) {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
+  }, [running]);
 
   async function trigger(text) {
+    if (submittingRef.current || running) return;
+    submittingRef.current = true;
+    setSubmitting(true);
     setErr(null);
     try {
       await submitComment(text);
     } catch (e) {
+      submittingRef.current = false;
+      setSubmitting(false);
       setErr(e.message || '提交失败');
     }
   }
+
+  const disabled = submitting || running || !connected;
 
   return (
     <div className="flex h-full flex-col gap-3">
@@ -38,12 +56,12 @@ export default function AgentPanel() {
         <div className="grid h-full min-h-0 grid-cols-1 gap-3">
           <div className="flex flex-col gap-4 overflow-y-auto pr-1 scrollbar-none">
             <section className="glass rounded-2xl p-4">
-              <CommentInput onSubmit={trigger} disabled={running || !connected} />
+              <CommentInput onSubmit={trigger} disabled={disabled} />
               {err && <div className="mt-2 text-[12px] text-red-300">{err}</div>}
             </section>
 
             <section className="glass rounded-2xl p-4">
-              <PresetPicker onPick={trigger} disabled={running || !connected} />
+              <PresetPicker onPick={trigger} disabled={disabled} />
             </section>
 
             <motion.section layout className="glass rounded-2xl p-4">
