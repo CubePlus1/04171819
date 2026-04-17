@@ -7,7 +7,7 @@ import cors from 'cors';
 
 import { DB_PATH, getDb, runSchema, closeDb } from './db.js';
 import { createBroadcaster } from './events.js';
-import { runWorkflow } from './workflow.js';
+import { runWorkflow, newRunId } from './workflow.js';
 import { createLogger } from './logger.js';
 import { seed } from './seed.js';
 
@@ -17,6 +17,15 @@ const FIXTURES_PATH = resolve(__dirname, '../data/fixtures.json');
 
 const PORT = Number(process.env.PORT ?? 4000);
 const DEMO_USER_ID = 'demo-user';
+
+// 仅本机可触发破坏性操作（reset）；部署到真机/云端时可通过 env 显式放开
+const LOCAL_ONLY_HOSTS = new Set(['127.0.0.1', '::1', 'localhost', '::ffff:127.0.0.1']);
+
+function isLocalRequest(req) {
+  if (process.env.ALLOW_REMOTE_RESET === '1') return true;
+  const ip = req.ip || req.socket?.remoteAddress || '';
+  return LOCAL_ONLY_HOSTS.has(ip);
+}
 
 function ensureDb() {
   mkdirSync(dirname(DB_PATH), { recursive: true });
@@ -35,6 +44,7 @@ function loadFixtures() {
 
 function createApp(broadcast) {
   const app = express();
+  app.set('trust proxy', 'loopback');
   app.use(cors());
   app.use(express.json({ limit: '64kb' }));
 
@@ -75,7 +85,8 @@ function createApp(broadcast) {
 
   app.post('/api/comment', async (req, res) => {
     const text = typeof req.body?.text === 'string' ? req.body.text.trim() : '';
-    const userId = req.body?.userId || DEMO_USER_ID;
+    const rawUserId = req.body?.userId;
+    const userId = typeof rawUserId === 'string' && rawUserId ? rawUserId : DEMO_USER_ID;
     if (!text) {
       return res.status(400).json({ ok: false, error: 'text required' });
     }
@@ -83,28 +94,38 @@ function createApp(broadcast) {
       return res.status(400).json({ ok: false, error: 'text too long (max 140)' });
     }
 
-    broadcast('workflow.begin', { text, userId });
+    const runId = newRunId();
+    broadcast('workflow.begin', { run_id: runId, text, userId });
     try {
       const result = await runWorkflow({
         comment: text,
         userId,
+        runId,
         onStep: (frame) => broadcast('workflow.step', frame),
       });
       if (result.ok) {
-        broadcast('card.generated', { card: result.card });
-        broadcast('workflow.end', { ok: true, cardId: result.card.id });
+        broadcast('card.generated', { run_id: runId, card: result.card });
+        broadcast('workflow.end', { run_id: runId, ok: true, cardId: result.card.id });
       } else {
-        broadcast('workflow.end', { ok: false, reason: result.reason });
+        broadcast('workflow.end', { run_id: runId, ok: false, reason: result.reason });
       }
-      res.json({ ok: result.ok, ...(result.ok ? { cardId: result.card.id } : { reason: result.reason }) });
+      res.json({
+        ok: result.ok,
+        runId,
+        ...(result.ok ? { cardId: result.card.id } : { reason: result.reason }),
+      });
     } catch (err) {
-      log.error('workflow failed', { err: err.message, stack: err.stack });
-      broadcast('workflow.end', { ok: false, reason: 'server-error' });
-      res.status(500).json({ ok: false, error: 'internal' });
+      log.error('workflow failed', { run_id: runId, err: err.message, stack: err.stack });
+      broadcast('workflow.end', { run_id: runId, ok: false, reason: 'server-error' });
+      res.status(500).json({ ok: false, runId, error: 'internal' });
     }
   });
 
-  app.post('/api/reset', (_req, res) => {
+  app.post('/api/reset', (req, res) => {
+    if (!isLocalRequest(req)) {
+      log.warn('reset rejected (non-local)', { ip: req.ip });
+      return res.status(403).json({ ok: false, error: 'reset is local-only' });
+    }
     log.info('reset requested');
     closeDb();
     seed();
@@ -121,7 +142,7 @@ function createApp(broadcast) {
 function main() {
   ensureDb();
   const httpServer = createServer();
-  const { broadcast } = createBroadcaster(httpServer, { path: '/ws' });
+  const { wss, broadcast } = createBroadcaster(httpServer, { path: '/ws' });
   const app = createApp(broadcast);
   httpServer.on('request', app);
 
@@ -130,14 +151,33 @@ function main() {
     log.info(`ws endpoint    ws://localhost:${PORT}/ws`);
   });
 
+  let shuttingDown = false;
   function shutdown(signal) {
+    if (shuttingDown) return;
+    shuttingDown = true;
     log.info(`received ${signal}, shutting down`);
-    httpServer.close(() => {
-      closeDb();
-      process.exit(0);
+
+    // 1. 先告别所有 WS 客户端，让 httpServer.close() 能收到它们的断开事件
+    const farewell = JSON.stringify({ type: 'server.shutdown', ts: Date.now() });
+    for (const client of wss.clients) {
+      try { if (client.readyState === client.OPEN) client.send(farewell); } catch {/* ignore */}
+      try { client.terminate(); } catch {/* ignore */}
+    }
+    const forceTimer = setTimeout(() => {
+      log.warn('force exit after 5s timeout');
+      process.exit(1);
+    }, 5000);
+    forceTimer.unref();
+
+    // 2. 关 WS server（不再接受新 upgrade）
+    wss.close(() => {
+      // 3. 关 HTTP server
+      httpServer.close(() => {
+        clearTimeout(forceTimer);
+        closeDb();
+        process.exit(0);
+      });
     });
-    // 兜底：5s 内强退
-    setTimeout(() => process.exit(1), 5000).unref();
   }
   process.on('SIGINT', () => shutdown('SIGINT'));
   process.on('SIGTERM', () => shutdown('SIGTERM'));

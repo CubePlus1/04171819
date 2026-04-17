@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS intent_signals (
 );
 
 CREATE INDEX IF NOT EXISTS idx_intent_signals_user_topic
-  ON intent_signals(user_id, topic, fulfilled);
+  ON intent_signals(user_id, topic, fulfilled, occurred_at);
 
 -- 博主新动作：发链接 / 更新下一集 / 更完系列
 CREATE TABLE IF NOT EXISTS creator_actions (
@@ -57,6 +57,9 @@ CREATE TABLE IF NOT EXISTS creator_actions (
 CREATE INDEX IF NOT EXISTS idx_creator_actions_topic
   ON creator_actions(topic, occurred_at DESC);
 
+CREATE INDEX IF NOT EXISTS idx_creator_actions_type_time
+  ON creator_actions(action_type, occurred_at DESC);
+
 -- 已触发并展示给用户的履约卡片
 CREATE TABLE IF NOT EXISTS cards (
   id               TEXT PRIMARY KEY,
@@ -73,3 +76,7 @@ CREATE TABLE IF NOT EXISTS cards (
 
 CREATE INDEX IF NOT EXISTS idx_cards_user_created
   ON cards(user_id, created_at DESC);
+
+-- 防御层：一张 intent_signal 最多履约一次
+CREATE UNIQUE INDEX IF NOT EXISTS idx_cards_unique_signal
+  ON cards(intent_signal_id);
