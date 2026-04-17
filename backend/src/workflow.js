@@ -145,12 +145,11 @@ export async function runWorkflow({
   }));
   await sleep(stepDelayMs);
 
-  // Step 5 触发卡片生成（广播完整 card payload）
+  // Step 5 触发卡片生成（仅 metadata；完整 card 在 card.generated 单独下发，避免重复传输）
   onStep?.(stepFrame(runId, 5, '触发卡片生成', {
     card_id: card.id,
     pages: card.pages.map((p) => p.id),
     preview_context: card.pages[0]?.context_line,
-    card,
   }));
   log.info('workflow finished', { run_id: runId, card_id: card.id, script: card.script_id });
 

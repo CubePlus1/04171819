@@ -18,6 +18,7 @@ const FIXTURES_PATH = resolve(__dirname, '../data/fixtures.json');
 
 const PORT = Number(process.env.PORT ?? 4000);
 const DEMO_USER_ID = 'demo-user';
+const BOOTSTRAP_CARDS_LIMIT = Number(process.env.BOOTSTRAP_CARDS_LIMIT ?? 30);
 
 // 仅本机可触发破坏性操作（reset）；部署到真机/云端时可通过 env 显式放开
 const LOCAL_ONLY_HOSTS = new Set(['127.0.0.1', '::1', 'localhost', '::ffff:127.0.0.1']);
@@ -92,6 +93,7 @@ function createApp(broadcast, state) {
     capacity: Number(process.env.RATE_LIMIT_CAPACITY ?? 12),
     refillPerSec: Number(process.env.RATE_LIMIT_REFILL ?? 3),
   });
+  let pruneCounter = 0;
 
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true, ts: Date.now() });
@@ -109,8 +111,13 @@ function createApp(broadcast, state) {
               ORDER BY s.occurred_at DESC`)
       .all(DEMO_USER_ID);
     const cards = db
-      .prepare('SELECT * FROM cards WHERE user_id = ? ORDER BY created_at DESC')
-      .all(DEMO_USER_ID)
+      .prepare(
+        `SELECT * FROM cards
+           WHERE user_id = ?
+        ORDER BY created_at DESC
+           LIMIT ?`,
+      )
+      .all(DEMO_USER_ID, BOOTSTRAP_CARDS_LIMIT)
       .map((row) => ({ ...row, pages: JSON.parse(row.pages_json) }));
 
     res.json({
@@ -130,6 +137,7 @@ function createApp(broadcast, state) {
 
   app.post('/api/comment', async (req, res) => {
     const rl = commentLimiter.take(req.ip || 'unknown');
+    if (++pruneCounter % 64 === 0) commentLimiter.prune();
     if (!rl.ok) {
       res.set('Retry-After', String(rl.retryAfter));
       return res.status(429).json({ ok: false, error: 'rate-limited', retry_after: rl.retryAfter });
