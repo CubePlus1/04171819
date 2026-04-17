@@ -16,8 +16,9 @@ const initialState = {
 
   user: null,
   feed: [],
-  presets: [],
+  triggers: [],
   history: [],
+  pending: true,            // 是否还有未履约 × 有匹配动作的信号
 
   cards: [],
   spotlightCardId: null,
@@ -52,7 +53,7 @@ export const useDemoStore = create((set) => ({
    * - server_epoch 变化 → 后端重启/reset → 本地 cards 视为 phantom → 丢弃
    * - 否则按去重合并（保留 WS 早到、bootstrap 稍晚到的新卡片）
    */
-  hydrate: ({ server_epoch, user, feed, presets, history, cards }) =>
+  hydrate: ({ server_epoch, user, feed, triggers, history, cards, pending }) =>
     set((state) => {
       const epochChanged = state.serverEpoch && server_epoch && state.serverEpoch !== server_epoch;
       const nextCards = epochChanged
@@ -62,12 +63,15 @@ export const useDemoStore = create((set) => ({
         serverEpoch: server_epoch ?? state.serverEpoch,
         user,
         feed: feed ?? state.feed,
-        presets: presets ?? state.presets,
+        triggers: triggers ?? state.triggers,
         history: history ?? state.history,
+        pending: typeof pending === 'boolean' ? pending : state.pending,
         cards: nextCards,
         spotlightCardId: epochChanged ? null : (state.spotlightCardId ?? nextCards[0]?.id ?? null),
       };
     }),
+
+  setPending: (pending) => set({ pending }),
 
   beginWorkflow: (runId) =>
     set({

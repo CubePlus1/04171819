@@ -9,7 +9,6 @@ export function getClientId() {
     }
     return id;
   } catch {
-    // sessionStorage 不可用（隐私模式 / SSR），退化为内存生成一次
     if (!globalThis.__dundao_client_id__) {
       globalThis.__dundao_client_id__ = `c_mem_${Date.now().toString(36)}`;
     }
@@ -19,7 +18,6 @@ export function getClientId() {
 
 async function handle(res) {
   if (!res.ok) {
-    // 不把原始 HTTP 状态码/堆栈暴露给评委；同时保留 dev console 里有诊断信息
     const body = await res.text().catch(() => '');
     console.warn('api error', res.status, body);
     throw new Error('刚刚没接住，再试一次');
@@ -31,12 +29,23 @@ export async function bootstrap() {
   return handle(await fetch('/api/bootstrap'));
 }
 
-export async function submitComment(text, userId = 'demo-user') {
+/**
+ * Ambient tick · 让 AI 后台挑下一条可履约信号（可选精确到 topic / signalId）
+ * - 不带参 → 选最旧的未履约 × 有匹配动作的那条
+ * - 带 topic → 从该主题下未履约里挑
+ * - 带 signalId → 精确指定某条
+ */
+export async function ambientTick({ topic, signalId } = {}) {
   return handle(
-    await fetch('/api/comment', {
+    await fetch('/api/ambient/tick', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, userId, clientId: getClientId() }),
+      body: JSON.stringify({
+        userId: 'demo-user',
+        clientId: getClientId(),
+        ...(topic     != null ? { topic }    : {}),
+        ...(signalId  != null ? { signalId } : {}),
+      }),
     }),
   );
 }
