@@ -27,6 +27,8 @@ const initialState = {
   lastReason: null,
 };
 
+const MAX_CARDS_IN_UI = 40;
+
 function dedupeMergeCards(primary, existing) {
   const seen = new Set();
   const out = [];
@@ -36,7 +38,7 @@ function dedupeMergeCards(primary, existing) {
   for (const c of existing) {
     if (c?.id && !seen.has(c.id)) { seen.add(c.id); out.push(c); }
   }
-  return out;
+  return out.slice(0, MAX_CARDS_IN_UI);
 }
 
 function shouldApplyFrame(state, frameRunId) {
@@ -108,11 +110,13 @@ export const useDemoStore = create((set) => ({
 
   onCardGenerated: (card, runId) =>
     set((state) => {
-      // run_id 不匹配时仍然接受卡片（其它标签页生成），但不抢当前 run 的 spotlight
-      const accepted = !state.activeRunId || !runId || state.activeRunId === runId;
+      // 只在「本地当前 run」产生卡片时接管 spotlight + 自动滚动
+      // 远端（旁观者视角或其它标签页）产生的卡片只入列表，不抢视觉焦点
+      const isLocalRun = state.activeRunId && runId && state.activeRunId === runId;
+      const deduped = [card, ...state.cards.filter((c) => c.id !== card.id)].slice(0, MAX_CARDS_IN_UI);
       return {
-        cards: [card, ...state.cards.filter((c) => c.id !== card.id)],
-        spotlightCardId: accepted ? card.id : state.spotlightCardId,
+        cards: deduped,
+        spotlightCardId: isLocalRun ? card.id : state.spotlightCardId,
       };
     }),
 

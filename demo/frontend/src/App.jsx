@@ -84,11 +84,10 @@ export default function App() {
   }, [hydrate, setConnected, beginWorkflow, applyStep, endWorkflow, onCardGenerated, resetStore]);
 
   async function handleReset() {
+    // 单一事实来源：服务端广播 demo.reset → 客户端统一在 WS handler 里 reset + boot
     try {
       resetStore();
       await resetDemo();
-      const data = await bootstrap();
-      hydrate(data);
     } catch (err) {
       console.error('reset failed', err);
     }
