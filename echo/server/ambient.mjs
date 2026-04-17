@@ -3,7 +3,7 @@
 // 与 echo.mjs (runEcho, 评论触发) 互补。产品上这是主路径：
 //   页面一加载就有 SSE 流入；用户只需要看，不需要打字。
 import { getState, claimFulfillment, creator, relativeTimeCn } from './store.mjs';
-import { SSE_EVENTS, REASONS, ACTION_VERB_CN } from '../shared/contracts.mjs';
+import { SSE_EVENTS, REASONS, ACTION_VERB_CN, MIND_PHASES } from '../shared/contracts.mjs';
 
 const STEP_DELAY_MS = 420;
 
@@ -91,6 +91,32 @@ function newRunId() {
 }
 
 /**
+ * 快照当前 store 的 mind 节点集合（signals + creator actions）。
+ * step 1 下发完整节点；后续步骤只带 focus_* / phase，减小 wire 体积。
+ */
+function snapshotMindNodes() {
+  const state = getState();
+  return [
+    ...state.signals.map((s) => ({
+      id: `signal:${s.id}`,
+      kind: 'signal',
+      topic: s.topic,
+      label: s.text || '那条视频',
+      signal_type: s.kind,
+      fulfilled: Boolean(s.fulfilled),
+      occurred_at: s.occurred_at,
+    })),
+    ...state.actions.map((a) => ({
+      id: `action:${a.id}`,
+      kind: 'action',
+      topic: a.topic,
+      action_type: a.kind,
+      occurred_at: a.occurred_at,
+    })),
+  ];
+}
+
+/**
  * 一次 ambient 回响生成器：yield 5 步气泡 + postcard。
  */
 export async function* runAmbientEcho({ signal: abortSignal, topic = null } = {}) {
@@ -98,54 +124,127 @@ export async function* runAmbientEcho({ signal: abortSignal, topic = null } = {}
   const rid = newRunId();
   yield { type: SSE_EVENTS.BEGIN, payload: { run_id: rid, ambient: true } };
 
-  // 1 · 想起
+  // 1 · 想起 · mind.phase=scan，下发完整 nodes
   await doSleep(380);
-  yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 1, voice: '让我看看她还惦记着什么…' } };
+  const mindNodes = snapshotMindNodes();
+  yield {
+    type: SSE_EVENTS.BUBBLE,
+    payload: {
+      run_id: rid, id: 1,
+      voice: '让我看看她还惦记着什么…',
+      mind: {
+        phase: MIND_PHASES.SCAN,
+        nodes: mindNodes,
+      },
+    },
+  };
 
-  // 2 · 挑中一条
+  // 2 · 挑中一条 · mind.phase=recall
   await doSleep(520);
   const state = getState();
   const picked = pickNext(state, { topic });
   if (!picked) {
-    yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 2, voice: '她惦记的，都替她接回来了。' } };
+    yield {
+      type: SSE_EVENTS.BUBBLE,
+      payload: {
+        run_id: rid, id: 2,
+        voice: '她惦记的，都替她接回来了。',
+        mind: { phase: MIND_PHASES.RECALL, focus_signal_id: null, reason: REASONS.NO_MATCH },
+      },
+    };
     yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: false, reason: REASONS.NO_MATCH } };
     return;
   }
   const { signal, action } = picked;
   const c = creator(signal.creator);
+  const focusSignalId = `signal:${signal.id}`;
+  const focusActionId = `action:${action.id}`;
   yield {
     type: SSE_EVENTS.BUBBLE,
     payload: {
       run_id: rid, id: 2,
       voice: `哦，这件事——她 ${relativeTimeCn(signal.occurred_at)}在 ${c.display} 那儿${signal.text ? `说过「${signal.text}」` : '停留过'}`,
       tag: signal.text ? '她当时这么说的' : '她当时看着的',
+      mind: {
+        phase: MIND_PHASES.RECALL,
+        focus_signal_id: focusSignalId,
+        topic: signal.topic,
+      },
     },
   };
 
-  // 3 · 博主新动作
+  // 3 · 博主新动作 · mind.phase=match
   await doSleep(520);
   yield {
     type: SSE_EVENTS.BUBBLE,
     payload: {
       run_id: rid, id: 3,
       voice: `${c.display} ${ACTION_VERB_CN[action.kind] ?? '有了新动作'} · 这条刚好能接回来`,
+      mind: {
+        phase: MIND_PHASES.MATCH,
+        focus_signal_id: focusSignalId,
+        focus_action_id: focusActionId,
+        topic: signal.topic,
+      },
     },
   };
 
-  // 4 · 原子声明
+  // 4 · 原子声明 · mind.phase=seal
   await doSleep(520);
   const claimed = claimFulfillment(signal.id);
   if (!claimed) {
-    yield { type: SSE_EVENTS.BUBBLE, payload: { run_id: rid, id: 4, voice: '啊，这条刚刚被别的念头接走了。' } };
+    yield {
+      type: SSE_EVENTS.BUBBLE,
+      payload: {
+        run_id: rid, id: 4,
+        voice: '啊，这条刚刚被别的念头接走了。',
+        mind: {
+          phase: MIND_PHASES.SEAL,
+          focus_signal_id: focusSignalId,
+          focus_action_id: focusActionId,
+          topic: signal.topic,
+          ok: false,
+          reason: REASONS.ALREADY_FULFILLED,
+        },
+      },
+    };
     yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: false, reason: REASONS.ALREADY_FULFILLED } };
     return;
   }
 
-  // 5 · 明信片
+  // 填补 SEAL 气泡 · 替 mind 演完"金印落下"那一拍
+  yield {
+    type: SSE_EVENTS.BUBBLE,
+    payload: {
+      run_id: rid, id: 4,
+      voice: '这件事 · 替她记下了',
+      mind: {
+        phase: MIND_PHASES.SEAL,
+        focus_signal_id: focusSignalId,
+        focus_action_id: focusActionId,
+        topic: signal.topic,
+      },
+    },
+  };
+
+  // 5 · 明信片 · mind.phase=emit
   await doSleep(620);
   const scriptId = ACTION_TO_SCRIPT[action.kind] ?? 'A';
   const postcard = postcardFor({ signal, action, scriptId });
-  yield { type: SSE_EVENTS.POSTCARD, payload: { run_id: rid, postcard } };
+  yield {
+    type: SSE_EVENTS.POSTCARD,
+    payload: {
+      run_id: rid,
+      postcard,
+      mind: {
+        phase: MIND_PHASES.EMIT,
+        focus_signal_id: focusSignalId,
+        focus_action_id: focusActionId,
+        topic: signal.topic,
+        script: scriptId,
+      },
+    },
+  };
   yield { type: SSE_EVENTS.END, payload: { run_id: rid, ok: true, script: scriptId } };
 }
 

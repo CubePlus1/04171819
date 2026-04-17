@@ -49,6 +49,81 @@ body {
   letter-spacing: 0.16em;
 }
 
+.mind-canvas {
+  position: relative;
+  width: 100%;
+  margin: 16px 0 24px;
+  padding: 10px 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  overflow: hidden;
+}
+.mind-canvas svg { display: block; width: 100%; height: auto; }
+.mind-conn { animation: mindConn 0.5s ease-out forwards; }
+@keyframes mindConn {
+  from { stroke-dashoffset: 40; opacity: 0; }
+  to   { stroke-dashoffset: 0;  opacity: 0.85; }
+}
+.mind-breathe {
+  transform-origin: center;
+  animation: mindBreathe 1.8s ease-in-out infinite;
+}
+@keyframes mindBreathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.mind-focus circle { transition: r 0.4s ease, opacity 0.4s ease; }
+.mind-seal { animation: mindSeal 0.7s ease-out forwards; transform-origin: center; }
+@keyframes mindSeal {
+  0%   { r: 0; opacity: 0; }
+  50%  { r: 14; opacity: 1; }
+  100% { r: 14; opacity: 0; }
+}
+.mind-emit { animation: mindEmit 0.6s ease-out forwards; }
+@keyframes mindEmit {
+  from { transform: translate(0, 0); opacity: 0.95; }
+  to   { transform: translate(-20px, 40px); opacity: 0; }
+}
+
+.mind-canvas[data-reduced="true"] .mind-conn,
+.mind-canvas[data-reduced="true"] .mind-breathe,
+.mind-canvas[data-reduced="true"] .mind-seal,
+.mind-canvas[data-reduced="true"] .mind-emit {
+  animation: none;
+}
+
+.mind-caption {
+  position: absolute;
+  left: 14px; bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+.mind-caption-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.mind-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mind-conn, .mind-breathe, .mind-seal, .mind-emit {
+    animation: none !important;
+  }
+}
+
 .memories {
   margin: 20px 0 40px;
   padding: 20px 22px;

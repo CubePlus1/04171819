@@ -80,13 +80,13 @@ export function useAmbient() {
               setEvents((prev) => pushBounded(prev, {
                 kind: 'echo',
                 id: `b-${payload.run_id}-${payload.id}`,
-                ...payload,
+                ...payload, // 包含 voice / tag / relative / mind
               }));
             } else if (event === SSE_EVENTS.POSTCARD) {
               setEvents((prev) => pushBounded(prev, {
                 kind: 'postcard',
                 id: `c-${payload.run_id}`,
-                ...payload,
+                ...payload, // 包含 postcard / mind
               }));
             } else if (event === SSE_EVENTS.END) {
               if (payload.ok === false && payload.reason && payload.reason !== 'no-match') {

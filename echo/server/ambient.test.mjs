@@ -92,6 +92,31 @@ await runCase('ambient · 自动推出 3 轮 postcard + idle', async () => {
     const idle = events.find((e) => e.event === 'idle');
     assert.ok(idle, '收到 idle 事件');
     assert.equal(idle.data.pending, false, 'idle.pending=false');
+
+    // mind 契约：每个 bubble 和 postcard 都必须携带 mind.phase
+    const bubbles = events.filter((e) => e.event === 'bubble');
+    const missingMind = bubbles.filter((e) => !e.data.mind?.phase);
+    assert.equal(missingMind.length, 0, `所有 bubble 都含 mind.phase（缺失 ${missingMind.length}）`);
+    const missingPostMind = postcards.filter((e) => !e.data.mind?.phase);
+    assert.equal(missingPostMind.length, 0, '所有 postcard 都含 mind.phase');
+
+    // 首轮 happy path 应按 scan/recall/match/seal/emit 顺序出现
+    const firstRun = events.slice(0, events.findIndex((e) => e.event === 'postcard') + 1);
+    const phases = firstRun
+      .filter((e) => e.event === 'bubble' || e.event === 'postcard')
+      .map((e) => e.data.mind?.phase);
+    assert.deepEqual(
+      phases,
+      ['scan', 'recall', 'match', 'seal', 'emit'],
+      `首轮 mind 相位序列（实际 ${JSON.stringify(phases)}）`,
+    );
+
+    // scan 阶段应下发完整 nodes
+    const scanBubble = bubbles.find((e) => e.data.mind?.phase === 'scan');
+    assert.ok(
+      Array.isArray(scanBubble.data.mind.nodes) && scanBubble.data.mind.nodes.length > 0,
+      `scan 阶段 mind.nodes 非空（实际 ${scanBubble?.data.mind?.nodes?.length}）`,
+    );
   } finally {
     child.kill('SIGTERM');
     await once(child, 'exit');

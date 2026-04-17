@@ -36,3 +36,23 @@ export const ACTION_VERB_CN = Object.freeze({
 });
 
 export const SCRIPT_IDS = Object.freeze(['A', 'B', 'C']);
+
+/**
+ * Mind 可视化阶段 · 前后端共用，别让字面量 drift
+ */
+export const MIND_PHASES = Object.freeze({
+  IDLE:   'idle',
+  SCAN:   'scan',
+  RECALL: 'recall',
+  MATCH:  'match',
+  SEAL:   'seal',
+  EMIT:   'emit',
+});
+
+export const STEP_TO_MIND_PHASE = Object.freeze({
+  1: MIND_PHASES.SCAN,
+  2: MIND_PHASES.RECALL,
+  3: MIND_PHASES.MATCH,
+  4: MIND_PHASES.SEAL,
+  5: MIND_PHASES.EMIT,
+});

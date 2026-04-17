@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAmbient } from './useAmbient.js';
 import { UserBubble, EchoBubble, TypingBubble } from './Bubble.jsx';
 import Postcard from './Postcard.jsx';
+import MindCanvas from './MindCanvas.jsx';
 
 const API_STATE = '/api/state';
 
@@ -123,6 +124,8 @@ export default function App() {
       </header>
 
       {boot && <Memories boot={boot} />}
+
+      <MindCanvas events={events} reducedMotion={reducedMotion} idle={idle} />
 
       <section className="conversation" aria-label="回响流">
         {rendered}
