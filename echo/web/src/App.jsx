@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useEcho } from './useEcho.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useAmbient } from './useAmbient.js';
 import { UserBubble, EchoBubble, TypingBubble } from './Bubble.jsx';
 import Postcard from './Postcard.jsx';
 
@@ -22,93 +22,93 @@ function useBootstrap() {
   const tokenRef = useRef(0);
   const bootedRef = useRef(false);
 
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     const myToken = ++tokenRef.current;
     setData((s) => ({ ...s, loading: true, error: null }));
     try {
       const r = await fetch(API_STATE);
       if (!r.ok) throw new Error('不在线');
       const v = await r.json();
-      if (myToken !== tokenRef.current) return; // 被更新的请求覆盖
+      if (myToken !== tokenRef.current) return;
       setData({ loading: false, error: null, value: v });
     } catch (err) {
       if (myToken !== tokenRef.current) return;
       setData({ loading: false, error: err.message || '没接住', value: null });
     }
-  }, []);
+  };
 
   useEffect(() => {
-    // StrictMode dev 双调用保护
     if (bootedRef.current) return;
     bootedRef.current = true;
     refresh();
-  }, [refresh]);
+  }, []);
 
   return { ...data, refresh };
 }
 
 export default function App() {
-  const { events, running, error, send, reset } = useEcho();
+  const { events, connected, idle, error, clear, reconnect } = useAmbient();
   const { value: boot, error: bootErr, refresh } = useBootstrap();
-  const [text, setText] = useState('');
-  const [composing, setComposing] = useState(false); // IME 选词中
   const bottomRef = useRef(null);
-  const inputRef = useRef(null);
   const liveMsgRef = useRef('');
   const [liveMsg, setLiveMsg] = useState('');
   const reducedMotion = usePrefersReducedMotion();
 
-  // 单一 live region：整句播报（完整 voice / postcard.closing），不给打字机中间态
+  // 每来一条新 bubble / postcard，刷新 memories 状态（已接回来的打个印章）
+  const lastEventIdRef = useRef(null);
   useEffect(() => {
     const last = events[events.length - 1];
     if (!last) return;
+    if (last.id === lastEventIdRef.current) return;
+    lastEventIdRef.current = last.id;
+
+    // 单一 live region：完整消息整句播报
     let msg = '';
-    if (last.kind === 'echo' && last.voice)       msg = last.voice;
-    else if (last.kind === 'postcard')            msg = `${last.postcard.heading} · ${last.postcard.closing}`;
-    else if (last.kind === 'me')                  msg = ''; // 用户自己的消息不播报
+    if (last.kind === 'echo' && last.voice) msg = last.voice;
+    else if (last.kind === 'postcard')      msg = `${last.postcard.heading} · ${last.postcard.closing}`;
     if (msg && msg !== liveMsgRef.current) {
       liveMsgRef.current = msg;
       setLiveMsg(msg);
     }
-  }, [events]);
+
+    // postcard 出现时，抓一次最新 memories（打上"已接回来"的标记）
+    if (last.kind === 'postcard') refresh();
+  }, [events, refresh]);
 
   useEffect(() => {
     const behavior = reducedMotion ? 'auto' : 'smooth';
     bottomRef.current?.scrollIntoView({ behavior, block: 'end' });
-  }, [events, running, reducedMotion]);
+  }, [events, reducedMotion]);
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if (composing) return; // 中文输入法选词中，不提交
-    const v = text.trim();
-    if (!v || running) return;
-    const ok = await send(v);
-    if (ok) {
-      setText('');
-      refresh();
-    }
-    // 失败时保留输入；成功或失败都把焦点还回输入框，保持键盘流
-    requestAnimationFrame(() => inputRef.current?.focus());
+  const handleReset = async () => {
+    try {
+      await fetch('/api/reset', { method: 'POST' });
+    } catch {/* ignore */}
+    clear();
+    refresh();
+    reconnect();
   };
-
-  const presets = boot?.presets ?? [];
 
   const rendered = useMemo(() => renderThread(events, reducedMotion), [events, reducedMotion]);
 
   return (
     <div className="shell">
-      {/* 单点 live region；子组件不再各自挂 aria-live */}
+      {/* 单点 live region */}
       <span className="sr-only" role="status" aria-live="polite">
         {liveMsg}
       </span>
 
       <header className="header">
         <h1>回响 · Echo</h1>
-        <div className="sub">把你念念不忘的 · 轻轻说一句</div>
-        {events.length > 0 && (
+        <div className="sub">
+          {connected
+            ? (idle ? '她惦记的都接回来了' : '她一直陪着你 · 你只管刷')
+            : '连上她的那头…'}
+        </div>
+        {(events.length > 0 || idle) && (
           <button
             type="button"
-            onClick={reset}
+            onClick={handleReset}
             aria-label="清空对话 · 重新开始"
             style={{
               marginTop: 12, padding: '4px 14px', fontSize: 12,
@@ -124,57 +124,34 @@ export default function App() {
 
       {boot && <Memories boot={boot} />}
 
-      <section className="conversation" aria-label="对话流">
+      <section className="conversation" aria-label="回响流">
         {rendered}
-        {running && <TypingBubble />}
+        {connected && !idle && events.length === 0 && <TypingBubble />}
         <div ref={bottomRef} />
       </section>
 
       {bootErr && (
         <div className="footer" role="alert">
-          没连上回响的那头 · <button onClick={refresh} style={{ background: 'none', border: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>再试一次</button>
+          没连上回响的那头 ·{' '}
+          <button
+            onClick={refresh}
+            style={{ background: 'none', border: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
+          >
+            再试一次
+          </button>
         </div>
       )}
-      {error && !running && (
-        <div className="footer" role="alert">{error}</div>
-      )}
-
-      <div className="composer">
-        <div style={{ width: '100%', maxWidth: 680 }}>
-          {presets.length > 0 && (
-            <div className="presets" aria-label="预设念头">
-              {presets.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  disabled={running}
-                  onClick={() => setText(p.text)}
-                >
-                  {p.text}
-                </button>
-              ))}
-            </div>
-          )}
-          <form className="composer-inner" onSubmit={onSubmit}>
-            <label htmlFor="echo-input" className="sr-only">输入一句念头</label>
-            <input
-              id="echo-input"
-              ref={inputRef}
-              autoFocus
-              value={text}
-              onChange={(e) => setText(e.target.value.slice(0, 140))}
-              onCompositionStart={() => setComposing(true)}
-              onCompositionEnd={() => setComposing(false)}
-              placeholder="把你心里那句惦记说出来 · 回车"
-              readOnly={running}
-              aria-busy={running}
-            />
-            <button type="submit" disabled={running || !text.trim()}>
-              {running ? '在听…' : '说出口'}
-            </button>
-          </form>
+      {error && (
+        <div className="footer" role="alert">
+          {error} ·{' '}
+          <button
+            onClick={reconnect}
+            style={{ background: 'none', border: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
+          >
+            重新连
+          </button>
         </div>
-      </div>
+      )}
 
       <div className="footer" aria-hidden="true">
         履约型内容的另一种猜想 · 姊妹实验 · {boot?.user?.nickname ?? '念念'}

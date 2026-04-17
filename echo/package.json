@@ -12,7 +12,8 @@
     "build": "npm --prefix web run build",
     "smoke": "node server/smoke.mjs",
     "test": "node server/echo.test.mjs",
-    "test:caps": "node server/caps.test.mjs"
+    "test:caps": "node server/caps.test.mjs",
+    "test:ambient": "node server/ambient.test.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"

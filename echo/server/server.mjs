@@ -5,8 +5,12 @@
 //   POST /api/echo   → SSE 流：逐条 event，最后 event: end
 import { createServer } from 'node:http';
 import { runEcho } from './echo.mjs';
+import { runAmbientEcho, hasPending } from './ambient.mjs';
 import { getState, resetState, relativeTimeCn } from './store.mjs';
 import { REASONS, SSE_EVENTS } from '../shared/contracts.mjs';
+
+const AMBIENT_INTERVAL_MS = Number(process.env.AMBIENT_INTERVAL_MS ?? 8000);
+const AMBIENT_KICKOFF_MS  = Number(process.env.AMBIENT_KICKOFF_MS  ?? 800);
 
 const PORT = Number(process.env.PORT ?? 4100);
 const MAX_TEXT = 140;
@@ -190,6 +194,83 @@ const server = createServer(async (req, res) => {
       }
       resetState();
       return json(res, 200, { ok: true }, origin);
+    }
+
+    // Ambient · 主路径：客户端连上即 SSE 流入被动回响，无需输入
+    if (url.pathname === '/api/ambient' && req.method === 'GET') {
+      // 并发上限同 /api/echo
+      const perIp = streamsByIp.get(remoteIp) ?? 0;
+      if (perIp >= MAX_STREAMS_PER_IP) {
+        return json(res, 429, { ok: false, error: REASONS.TOO_MANY_STREAMS, scope: 'ip' }, origin);
+      }
+      if (activeStreams.size >= MAX_STREAMS_GLOBAL) {
+        return json(res, 503, { ok: false, error: REASONS.TOO_MANY_STREAMS, scope: 'global' }, origin);
+      }
+
+      const topic = new URL(req.url, `http://${req.headers.host}`).searchParams.get('topic') || null;
+      const abortCtrl = new AbortController();
+      const stream = { res, abortCtrl, ip: remoteIp };
+      activeStreams.add(stream);
+      streamsByIp.set(remoteIp, perIp + 1);
+      const closeHandler = () => {
+        if (!abortCtrl.signal.aborted) abortCtrl.abort();
+        if (activeStreams.delete(stream)) {
+          const n = (streamsByIp.get(remoteIp) ?? 1) - 1;
+          if (n <= 0) streamsByIp.delete(remoteIp);
+          else streamsByIp.set(remoteIp, n);
+        }
+      };
+      req.on('close', closeHandler);
+      res.on('close', closeHandler);
+
+      setSseHeaders(res, origin);
+      const keepAlive = setInterval(() => {
+        if (!res.writableEnded) res.write(': keep-alive\n\n');
+      }, 15000);
+
+      try {
+        // 先歇一拍再开始，给页面加载留呼吸
+        await new Promise((r) => setTimeout(r, AMBIENT_KICKOFF_MS));
+
+        while (!abortCtrl.signal.aborted) {
+          if (!hasPending()) {
+            // 全部接完了 · 发一个 idle 事件然后挂住（等 reset 后会有新的可接）
+            sseWrite(res, 'idle', { voice: '她惦记的，都替她接回来了。', pending: false });
+            await new Promise((resolve) => {
+              const t = setTimeout(resolve, AMBIENT_INTERVAL_MS);
+              abortCtrl.signal.addEventListener('abort', () => {
+                clearTimeout(t); resolve();
+              }, { once: true });
+            });
+            continue;
+          }
+          for await (const event of runAmbientEcho({ signal: abortCtrl.signal, topic })) {
+            if (abortCtrl.signal.aborted) break;
+            sseWrite(res, event.type, event.payload);
+            if (event.type === SSE_EVENTS.END) break;
+          }
+          if (abortCtrl.signal.aborted) break;
+
+          // 每轮之间留出节奏（评委看完上一张明信片的时间）
+          await new Promise((resolve) => {
+            const t = setTimeout(resolve, AMBIENT_INTERVAL_MS);
+            abortCtrl.signal.addEventListener('abort', () => {
+              clearTimeout(t); resolve();
+            }, { once: true });
+          });
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError' && !res.writableEnded) {
+          sseWrite(res, SSE_EVENTS.END, { ok: false, reason: REASONS.SERVER_ERROR });
+        }
+      } finally {
+        clearInterval(keepAlive);
+        closeHandler();
+        req.off('close', closeHandler);
+        res.off('close', closeHandler);
+        if (!res.writableEnded) res.end();
+      }
+      return;
     }
 
     if (url.pathname === '/api/echo' && req.method === 'POST') {
