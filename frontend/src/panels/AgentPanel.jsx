@@ -32,16 +32,13 @@ export default function AgentPanel({ onToast }) {
     }
   }, [lastCompleted, onToast]);
 
-  const registerOwnRun = useDemoStore((s) => s.registerOwnRun);
-
   async function trigger(text) {
     if (submittingRef.current || running) return;
     submittingRef.current = true;
     setSubmitting(true);
     setErr(null);
     try {
-      const res = await submitComment(text);
-      if (res?.runId) registerOwnRun(res.runId);
+      await submitComment(text);
     } catch (e) {
       submittingRef.current = false;
       setSubmitting(false);

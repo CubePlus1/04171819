@@ -61,7 +61,7 @@ function buildActionsStrip(scriptId) {
     ],
   };
   if (scriptId === 'A') return { ...shared, primary: [{ id: 'add_wish', label: '加到清单' }, { id: 'view', label: '看' }] };
-  if (scriptId === 'B') return { ...shared, primary: [{ id: 'resume',   label: '续看' }, { id: 'recap', label: '看 AI 摘要' }] };
+  if (scriptId === 'B') return { ...shared, primary: [{ id: 'resume',   label: '续看' }, { id: 'recap', label: '看前情摘要' }] };
   return { ...shared, primary: [{ id: 'play', label: '看' }, { id: 'share', label: '分享给爷爷' }] };
 }
 
