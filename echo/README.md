@@ -80,4 +80,15 @@ echo/
 - 不用 Tailwind，不用组件库，不堆 token 系统
 - 无登录、无 CRUD、无多用户
 
+## 部署边界
+
+**Echo 是「单用户 localhost 实验」**：
+
+- 全局进程内一份 state；没有用户隔离
+- `/api/reset` 默认仅本机可触发（`ALLOW_REMOTE_RESET=1` 显式开）
+- 并发 SSE 流上限：单 IP `3` · 全局 `32`（可通过 `MAX_STREAMS_PER_IP` / `MAX_STREAMS_GLOBAL` 调整）
+- rate limiter 每 64 请求 prune 一次 idle bucket
+
+要放到公网 / 多用户环境，需要另外做 session 隔离 + 代理信任链 + 并发审计。
+
 这是一个**姊妹实验**：同一份原则，不同的表达直觉。

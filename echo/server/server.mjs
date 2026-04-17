@@ -93,21 +93,52 @@ function sseWrite(res, event, data) {
 }
 
 // ===== rate limiter =====
-function makeLimiter({ capacity = 6, refillPerSec = 2 } = {}) {
+function makeLimiter({ capacity = 6, refillPerSec = 2, maxIdleMs = 5 * 60_000, maxBuckets = 1024 } = {}) {
   const buckets = new Map();
-  return function take(key) {
-    const now = Date.now();
-    let b = buckets.get(key);
-    if (!b) { b = { tokens: capacity, ts: now }; buckets.set(key, b); }
-    const elapsed = (now - b.ts) / 1000;
-    b.tokens = Math.min(capacity, b.tokens + elapsed * refillPerSec);
-    b.ts = now;
-    if (b.tokens >= 1) { b.tokens -= 1; return { ok: true }; }
-    return { ok: false, retryAfter: ((1 - b.tokens) / refillPerSec).toFixed(2) };
+
+  function prune(now = Date.now()) {
+    if (buckets.size < maxBuckets / 2) return;
+    for (const [k, b] of buckets) {
+      if (now - b.ts > maxIdleMs) buckets.delete(k);
+    }
+    if (buckets.size > maxBuckets) {
+      // 硬盖：丢弃最早的一半
+      const toDrop = buckets.size - Math.floor(maxBuckets / 2);
+      let i = 0;
+      for (const k of buckets.keys()) {
+        if (i++ >= toDrop) break;
+        buckets.delete(k);
+      }
+    }
+  }
+
+  let callCount = 0;
+  return {
+    take(key) {
+      if (++callCount % 64 === 0) prune();
+      const now = Date.now();
+      let b = buckets.get(key);
+      if (!b) { b = { tokens: capacity, ts: now }; buckets.set(key, b); }
+      const elapsed = (now - b.ts) / 1000;
+      b.tokens = Math.min(capacity, b.tokens + elapsed * refillPerSec);
+      b.ts = now;
+      if (b.tokens >= 1) { b.tokens -= 1; return { ok: true }; }
+      return { ok: false, retryAfter: ((1 - b.tokens) / refillPerSec).toFixed(2) };
+    },
+    size: () => buckets.size,
+    prune,
   };
 }
 
-const echoLimit = makeLimiter({ capacity: 8, refillPerSec: 2 });
+const echoLimit = makeLimiter({
+  capacity: Number(process.env.RL_CAP ?? 8),
+  refillPerSec: Number(process.env.RL_REFILL ?? 2),
+});
+
+// 并发 SSE 流上限（按 IP + 全局）
+const MAX_STREAMS_PER_IP = Number(process.env.MAX_STREAMS_PER_IP ?? 3);
+const MAX_STREAMS_GLOBAL = Number(process.env.MAX_STREAMS_GLOBAL ?? 32);
+const streamsByIp = new Map();
 
 // ===== server =====
 const activeStreams = new Set();
@@ -125,6 +156,9 @@ const server = createServer(async (req, res) => {
   if (origin && !isOriginAllowed(origin)) {
     return json(res, 403, { ok: false, error: 'origin not allowed' }, origin);
   }
+
+  const remoteIp = req.socket.remoteAddress ?? '?';
+  const isLocalhost = remoteIp === '127.0.0.1' || remoteIp === '::1' || remoteIp === '::ffff:127.0.0.1';
 
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
@@ -149,14 +183,27 @@ const server = createServer(async (req, res) => {
     }
 
     if (url.pathname === '/api/reset' && req.method === 'POST') {
+      // 破坏性操作：非 loopback 默认拒绝，可用 ALLOW_REMOTE_RESET=1 显式开
+      if (!isLocalhost && process.env.ALLOW_REMOTE_RESET !== '1') {
+        return json(res, 403, { ok: false, error: 'reset is local-only' }, origin);
+      }
       resetState();
       return json(res, 200, { ok: true }, origin);
     }
 
     if (url.pathname === '/api/echo' && req.method === 'POST') {
-      const ip = req.socket.remoteAddress ?? '?';
-      const rl = echoLimit(ip);
+      const ip = remoteIp;
+      const rl = echoLimit.take(ip);
       if (!rl.ok) return json(res, 429, { ok: false, error: 'rate-limited', retry_after: rl.retryAfter }, origin);
+
+      // 并发流上限
+      const perIp = streamsByIp.get(ip) ?? 0;
+      if (perIp >= MAX_STREAMS_PER_IP) {
+        return json(res, 429, { ok: false, error: 'too-many-streams', scope: 'ip' }, origin);
+      }
+      if (activeStreams.size >= MAX_STREAMS_GLOBAL) {
+        return json(res, 503, { ok: false, error: 'too-many-streams', scope: 'global' }, origin);
+      }
 
       let body;
       try {
@@ -170,11 +217,16 @@ const server = createServer(async (req, res) => {
 
       // AbortController 贯穿取消语义：断连 / shutdown 都能让生成器立即停止，避免履约副作用
       const abortCtrl = new AbortController();
-      const stream = { res, abortCtrl };
+      const stream = { res, abortCtrl, ip };
       activeStreams.add(stream);
+      streamsByIp.set(ip, perIp + 1);
       const closeHandler = () => {
         if (!abortCtrl.signal.aborted) abortCtrl.abort();
-        activeStreams.delete(stream);
+        if (activeStreams.delete(stream)) {
+          const n = (streamsByIp.get(ip) ?? 1) - 1;
+          if (n <= 0) streamsByIp.delete(ip);
+          else streamsByIp.set(ip, n);
+        }
       };
       req.on('close', closeHandler);
       res.on('close', closeHandler);
@@ -196,8 +248,9 @@ const server = createServer(async (req, res) => {
         }
       } finally {
         clearInterval(keepAlive);
-        activeStreams.delete(stream);
+        closeHandler();
         req.off('close', closeHandler);
+        res.off('close', closeHandler);
         if (!res.writableEnded) res.end();
       }
       return;
