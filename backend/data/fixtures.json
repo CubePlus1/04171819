@@ -1,0 +1,192 @@
+{
+  "users": [
+    {
+      "id": "demo-user",
+      "nickname": "小栗子🌰",
+      "avatar": "https://api.dicebear.com/9.x/fun-emoji/svg?seed=dundao-user"
+    }
+  ],
+  "creators": [
+    {
+      "id": "creator-dashan",
+      "handle": "@大山的穿搭日记",
+      "display": "大山的穿搭日记",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=dashan",
+      "bio": "日常 OOTD · 平价好物收集器"
+    },
+    {
+      "id": "creator-30days",
+      "handle": "@30天变身计划",
+      "display": "30天变身计划",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=thirtydays",
+      "bio": "一个月 · 一个新习惯 · Day by day"
+    },
+    {
+      "id": "creator-grandpa",
+      "handle": "@爷爷的退伍档案",
+      "display": "爷爷的退伍档案",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=grandpa",
+      "bio": "记录爷爷的抗美援朝岁月"
+    }
+  ],
+  "intent_signals": [
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-dashan",
+      "video_id": "v-dashan-001",
+      "video_title": "这件磨毛圆领打底 从秋穿到初冬",
+      "signal_type": "comment_intent",
+      "raw_text": "蹲链接姐妹们",
+      "topic": "dashan-knit-top",
+      "days_ago": 21
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-30days",
+      "video_id": "v-30days-d1",
+      "video_title": "30天变身 Day1：我决定开始了",
+      "signal_type": "watch_later",
+      "raw_text": null,
+      "topic": "30days-series",
+      "days_ago": 31
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-grandpa",
+      "video_id": "v-grandpa-002",
+      "video_title": "爷爷在朝鲜冻伤的那只脚，70 年后还会疼",
+      "signal_type": "comment_intent",
+      "raw_text": "蹲后续 爷爷真帅",
+      "topic": "grandpa-archive",
+      "days_ago": 14
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-dashan",
+      "video_id": "v-dashan-002",
+      "video_title": "我的秋冬色盘 · 焦糖褐色专场",
+      "signal_type": "passive_interest",
+      "raw_text": null,
+      "topic": "dashan-knit-top",
+      "days_ago": 10
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-30days",
+      "video_id": "v-30days-search",
+      "video_title": "（搜索）30 天习惯养成",
+      "signal_type": "unsatisfied_search",
+      "raw_text": "30 天习惯养成怎么坚持",
+      "topic": "30days-series",
+      "days_ago": 18
+    }
+  ],
+  "creator_actions": [
+    {
+      "creator_id": "creator-dashan",
+      "action_type": "post_link",
+      "topic": "dashan-knit-top",
+      "hours_ago": 3,
+      "payload": {
+        "video_id": "v-dashan-top-launch",
+        "title": "姐妹们链接来啦！这件上衣的平替我找到了",
+        "cover": "https://picsum.photos/seed/dashan-top/360/640",
+        "product": {
+          "name": "磨毛圆领针织衫",
+          "price": "¥128",
+          "original": "¥189",
+          "shop": "大山的好物柜"
+        },
+        "summary": "30 天前她在评论区蹲的那件 —— 博主自己找到了平替链接"
+      }
+    },
+    {
+      "creator_id": "creator-30days",
+      "action_type": "series_completed",
+      "topic": "30days-series",
+      "hours_ago": 8,
+      "payload": {
+        "video_id": "v-30days-d30",
+        "title": "30天变身 Day30 · 我其实没变 但变得温柔了",
+        "cover": "https://picsum.photos/seed/30days-complete/360/640",
+        "series_thumbnails": [
+          { "day": 1,  "cover": "https://picsum.photos/seed/30d1/200/300",  "title": "Day1 · 我决定开始" },
+          { "day": 7,  "cover": "https://picsum.photos/seed/30d7/200/300",  "title": "Day7 · 第一次想放弃" },
+          { "day": 14, "cover": "https://picsum.photos/seed/30d14/200/300", "title": "Day14 · 撑过了平台期" },
+          { "day": 21, "cover": "https://picsum.photos/seed/30d21/200/300", "title": "Day21 · 有人开始留言鼓励我" },
+          { "day": 30, "cover": "https://picsum.photos/seed/30d30/200/300", "title": "Day30 · 最后一天" }
+        ],
+        "summary": "她真的更完了 · AI 帮你摘好了前情 · 从哪一天续看都行"
+      }
+    },
+    {
+      "creator_id": "creator-grandpa",
+      "action_type": "post_sequel",
+      "topic": "grandpa-archive",
+      "hours_ago": 1,
+      "payload": {
+        "video_id": "v-grandpa-reunion",
+        "title": "爷爷的老战友联系到他了 · 下集",
+        "cover": "https://picsum.photos/seed/grandpa-reunion/360/640",
+        "preview_seconds": 10,
+        "summary": "14 天前你蹲的那集后续 · 爷爷老战友真的找来了"
+      }
+    }
+  ],
+  "feed": [
+    {
+      "id": "feed-filler-1",
+      "kind": "video",
+      "creator": "@街边咖啡图鉴",
+      "title": "这家手冲 我愿意重排 2 小时",
+      "cover": "https://picsum.photos/seed/coffee1/360/640",
+      "likes": "12.4w",
+      "tag": "咖啡"
+    },
+    {
+      "id": "feed-filler-2",
+      "kind": "video",
+      "creator": "@一条猫的日常",
+      "title": "主子今天还是不理我",
+      "cover": "https://picsum.photos/seed/cat1/360/640",
+      "likes": "3.8w",
+      "tag": "萌宠"
+    },
+    {
+      "id": "feed-filler-3",
+      "kind": "video",
+      "creator": "@深夜厨房",
+      "title": "10 分钟搞定一顿饭 · 白菜豆腐汤",
+      "cover": "https://picsum.photos/seed/food1/360/640",
+      "likes": "7.2w",
+      "tag": "美食"
+    },
+    {
+      "id": "feed-filler-4",
+      "kind": "video",
+      "creator": "@城市建筑笔记",
+      "title": "走进外滩源 · 那些没人讲的老建筑",
+      "cover": "https://picsum.photos/seed/city1/360/640",
+      "likes": "2.1w",
+      "tag": "城市"
+    },
+    {
+      "id": "feed-filler-5",
+      "kind": "video",
+      "creator": "@理工科绘画",
+      "title": "用函数画了一只猫",
+      "cover": "https://picsum.photos/seed/math1/360/640",
+      "likes": "9.6w",
+      "tag": "脑洞"
+    },
+    {
+      "id": "feed-filler-6",
+      "kind": "video",
+      "creator": "@徒步阿三",
+      "title": "一个人走完徽杭古道",
+      "cover": "https://picsum.photos/seed/hike1/360/640",
+      "likes": "5.4w",
+      "tag": "户外"
+    }
+  ]
+}

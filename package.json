@@ -1,0 +1,18 @@
+{
+  "name": "dundao-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "蹲到了 · 字节 Hackathon 赛道三双面板展台 Demo",
+  "scripts": {
+    "setup": "npm install && npm --prefix backend install && npm --prefix frontend install && npm --prefix backend run db:seed",
+    "dev": "concurrently -k -n backend,frontend -c blue,magenta \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules frontend/dist backend/data/dundao.db*"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
