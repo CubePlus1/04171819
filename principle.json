@@ -1,0 +1,357 @@
+{
+  "meta": {
+    "product": "蹲到了",
+    "version": "0.1",
+    "date": "2026-04-18",
+    "hackathon": "字节大学生 Hackathon",
+    "track": "赛道三｜AI体验：刷到懂你的瞬间",
+    "team_size": 3,
+    "duration_hours": 40
+  },
+
+  "north_star": {
+    "mission": "让抖音信息流里多一种「你过去未完成的念头回来找你」的瞬间",
+    "slogan": "逆风如解意——把你念念不忘的，接回来",
+    "pass_criterion": "卡片出现的第一秒，用户必须能说出「啊，这是我之前蹲过的」——否则不成立"
+  },
+
+  "concept": {
+    "name": "履约型内容",
+    "definition": "不是发现新内容，是对用户过去某个念头的履约",
+    "time_axis": "过去 → 此刻（非现在时）",
+    "audience_scale": "一张 × 一人（非百万人共看）",
+    "production_path": "用户过去动作 × 创作者新动作 → AI 桥接 → 用户",
+    "emotional_core": ["被记得", "被懂", "闭环满足"],
+    "complement": "与抖音「新刺激」互补，而非替代"
+  },
+
+  "tone": {
+    "primary": "温暜治愈",
+    "secondary": "抖音原生",
+    "keywords_allow": ["被记得", "被懂", "念念不忘", "回响", "人情味", "接回来", "蹲", "+1", "姐妹们", "催更"],
+    "keywords_deny": ["酷", "前沿", "效率", "监控", "精准营销", "科技感", "推送", "算法匹配度"]
+  },
+
+  "card_structure": {
+    "model": "multi_page",
+    "page_flip": "manual_horizontal_swipe",
+    "page_flip_analogy": "类小红书图集",
+    "principle": "P1 必须独立成立；P2/P3 是加深不是补足",
+    "pages": [
+      {
+        "id": "P1",
+        "name": "情景 + 答案",
+        "role": "情感锚点 + 主答案，单独这页就能让卡片成立",
+        "must_deliver_on_swipe_in": true,
+        "sections": {
+          "layer_1_context_line": {
+            "role": "情感锚点——整个产品的灵魂，不可省略",
+            "template": "你 {relative_time} 在 {video_or_creator_desc} {action} 过 {topic}",
+            "action_vocab": ["蹲", "收藏", "搜过", "按了稍后再看", "评论了"],
+            "example": "你 3 周前在「大山的穿搭日记」里蹲过这件上衣"
+          },
+          "layer_2_answer": {
+            "types": ["内嵌视频（静音自动播放）", "商品卡", "系列缩略网格 + AI 一句摘要"],
+            "rule": "卡片即答案，不允许跳出卡片获取答案"
+          },
+          "layer_3_actions": {
+            "primary": ["看", "买", "续看"],
+            "secondary": ["加购", "收藏到蹲到了", "不感兴趣"],
+            "rule": "用动词不用名词，拒绝「详情」「更多」「了解一下」"
+          }
+        }
+      },
+      {
+        "id": "P2",
+        "name": "AI 解释",
+        "role": "前台化 AI 推理，让用户感知「我为什么知道给你这个」",
+        "must_deliver_on_swipe_in": false,
+        "content_elements": [
+          "原始触发信号（哪条评论 / 哪个稍后再看）",
+          "AI 意图识别结果（自然语言叙述，不给冷数字）",
+          "博主新动作的匹配依据",
+          "一句温度摘要：「AI 看到你 X 周前蹲过 Y，现在博主做了 Z」"
+        ]
+      },
+      {
+        "id": "P3",
+        "name": "行为足迹",
+        "role": "再次情感加固，唤起用户对自己旧兴趣的觉察",
+        "must_deliver_on_swipe_in": false,
+        "content_elements": [
+          "3–30 天内用户在同主题下的互动轨迹",
+          "「你这段时间一直在关注 X」的总结",
+          "同主题的其他未履约意图（种下下一颗蹲）"
+        ]
+      }
+    ],
+    "pages_per_script": {
+      "A": ["P1", "P2"],
+      "B": ["P1", "P3"],
+      "C": ["P1", "P2", "P3"]
+    },
+    "gestures": {
+      "swipe_horizontal": "翻页（P1 ↔ P2 ↔ P3）",
+      "swipe_up_on_feed": "不感兴趣（信息流层级，非卡片内部）",
+      "swipe_down_on_feed": "收藏进「我蹲过的」",
+      "tap": "消费内容（看/买/续看）",
+      "long_press": "分享"
+    }
+  },
+
+  "ai_strategy": {
+    "visibility": "前台英雄——标签可见但有温度",
+    "label_allow": ["AI 为你记得", "AI 读了你的 N 条评论", "AI 注意到你蹲过这个"],
+    "label_deny": ["算法匹配度 87%", "神经网络判断", "精准推送"],
+    "tasks": [
+      "评论意图识别（蹲 / +1 / 催更 / 求教程 / 求同款）",
+      "博主新动作与用户旧意图的匹配",
+      "卡片情景还原行的生成",
+      "后续内容的一句话摘要（系列剧本必备）"
+    ],
+    "out_of_scope": [
+      "内容生成（不写假视频或假评论）",
+      "情感判断（不 judge 用户情绪）",
+      "商业推荐（不插平台广告）",
+      "代替用户决策"
+    ]
+  },
+
+  "intent_signals": [
+    { "signal": "评论含蹲/+1/催更/求教程/求同款", "type": "comment_intent" },
+    { "signal": "稍后再看未消费", "type": "watch_later" },
+    { "signal": "收藏未看完", "type": "unfinished_save" },
+    { "signal": "搜索未满足", "type": "unsatisfied_search" },
+    { "signal": "长停留未互动", "type": "passive_interest" }
+  ],
+
+  "trigger_logic": {
+    "condition": "用户闲刷空窗 AND 博主有新动作（发后续/回复含链接/更新系列）",
+    "timing": "被动出现在信息流，不是主动通知"
+  },
+
+  "scripts": [
+    {
+      "id": "A",
+      "name": "蹲链接 → 看介绍 / 加清单",
+      "trigger_chain": "评论「蹲链接」→ 博主置顶链接",
+      "context_line": "你 3 周前在「大山的穿搭日记」里蹲过这件上衣",
+      "answer_type": "商品卡 + 博主视频介绍",
+      "primary_action": "加到「我蹲过的」清单",
+      "emotional_close": "当时蹲的终于放出来了",
+      "pitch_position": "开场",
+      "commercial_rule": "不说「立即购买」「限时优惠」，说「你当时蹲的终于放出来了」"
+    },
+    {
+      "id": "B",
+      "name": "稍后再看 → 系列追更",
+      "trigger_chain": "稍后再看 Day1 → 博主更完 30 天",
+      "context_line": "你一个月前在「30 天变身 Day1」按了稍后再看",
+      "answer_type": "系列缩略网格 + AI 一句摘要",
+      "primary_action": "续看",
+      "emotional_close": "她已经更完了，AI 帮你摘了前情",
+      "pitch_position": "中段"
+    },
+    {
+      "id": "C",
+      "name": "蹲后续 → 博主发了下集",
+      "trigger_chain": "评论「蹲后续爷爷真帅」→ 博主发下集",
+      "context_line": "你 2 周前在「爷爷的退伍档案」下评论了「蹲后续爷爷真帅」",
+      "answer_type": "内嵌下集视频（含 10s 前情提要）",
+      "primary_action": "看",
+      "emotional_close": "爷爷的老战友联系到他了",
+      "pitch_position": "收尾煽情"
+    }
+  ],
+
+  "scoring": {
+    "track": "赛道三",
+    "dimensions": [
+      { "name": "场景洞察", "weight": 0.20, "target": 8.0, "strategy": "蹲是抖音原生词，评委秒懂；讲清触发时机的双向条件" },
+      { "name": "AI能力", "weight": 0.15, "target": 7.5, "strategy": "前台英雄策略 + pitch 拆 4 个 AI 环节" },
+      { "name": "体验完整", "weight": 0.30, "target": 9.0, "strategy": "卡片即答案 + 3 秒懂 + 一键闭环——30% 票仓" },
+      { "name": "用户价值", "weight": 0.20, "target": 7.5, "strategy": "情感闭环 + 小决策完成，不走带货" },
+      { "name": "创新延展", "weight": 0.15, "target": 8.5, "strategy": "履约型内容定义 + 过去×此刻时态 + 一人一张" }
+    ],
+    "weighted_target": 8.05,
+    "critical_buckets": ["体验完整（30%）", "创新延展（15%）"],
+    "critical_buckets_weight_sum": 0.45
+  },
+
+  "readme_mapping": [
+    { "quote": "创造一种新的信息流内容单元", "response": "履约型内容 = 过去×此刻的桥 = 一人一张" },
+    { "quote": "把信息、情绪与选择都刚好准备好", "response": "信息=链接/后续 · 情绪=被记得 · 选择=看/买/加购/划走" },
+    { "quote": "不需要跳转，也不需要理解复杂逻辑", "response": "情景还原 1 秒懂、卡内即播、商品卡即买" },
+    { "quote": "在被刷到的那一瞬间就成立", "response": "第一行「你 3 周前蹲过这条」即成立" },
+    { "quote": "获得答案、被理解的一刻，或激发继续探索的兴趣", "response": "剧本A=答案 · 剧本C=被理解 · 剧本B=继续探索" },
+    { "quote": "被动刷到却刚好需要", "response": "触发条件 = 闲刷空窗 × 博主新动作" },
+    { "quote": "让内容具备持续变化的感觉，让人期待再次遇见", "response": "每条蹲都是一颗种子，随时可能回响" },
+    { "quote": "把多步操作压缩成一次极轻的互动", "response": "翻评论→找博主回复→复制链接→跳淘宝 → 一次点击" }
+  ],
+
+  "tech_phases": [
+    {
+      "phase": 1,
+      "hours": "0–20h",
+      "strategy": "全 mock · 产品面板优先",
+      "deliverable": "产品面板：三剧本 P1 卡片 + 信息流滑动 + 静默播放；Agent 面板：UI 外壳 + mock 响应。双面板能演但 Agent 是伪后端",
+      "critical": false
+    },
+    {
+      "phase": 2,
+      "hours": "20–30h",
+      "strategy": "Agent 工作流 + 数据库（生死线）",
+      "deliverable": "Agent 面板真跑通：输入评论 → LLM 意图识别 → 匹配用户历史 → 入库 → 跨面板事件触发左侧产品面板卡片",
+      "critical": true,
+      "note": "跨面板联动不通，核心记忆点就塌——全员优先级高"
+    },
+    {
+      "phase": 3,
+      "hours": "30–40h",
+      "strategy": "P2/P3 多页 + 样本库加厚",
+      "deliverable": "剧本 C 的 P2/P3 补全；4–6 条预设评论 + 自由输入稳定响应；录屏 Plan B",
+      "critical": false
+    }
+  ],
+
+  "dual_panel": {
+    "layout": "single_screen_split",
+    "left_panel": {
+      "name": "产品面板",
+      "role": "用户视角",
+      "content": [
+        "模拟抖音信息流（上下滑动浏览）",
+        "卡片在流中被刷到的瞬间",
+        "多页卡片结构演绎（P1/P2/P3 手动翻页）"
+      ]
+    },
+    "right_panel": {
+      "name": "Agent 面板",
+      "role": "AI 工作后台",
+      "input": {
+        "mode": "preset_plus_freeform",
+        "preset_sample_count": "4–6",
+        "free_input": true
+      },
+      "realtime_workflow": [
+        { "step": 1, "name": "评论文本入栈" },
+        { "step": 2, "name": "AI 意图识别", "show": "分类 + 置信度" },
+        { "step": 3, "name": "匹配用户历史意图", "show": "命中 or 新建" },
+        { "step": 4, "name": "写入数据库", "show": "记录 ID" },
+        { "step": 5, "name": "触发卡片生成", "effect": "左侧产品面板同步出现卡片" }
+      ],
+      "persona_visible": true,
+      "anti_blackbox": true
+    },
+    "why_split": "单看产品 → 不信是真 AI；单看 Agent → 与体验脱节；两屏同看 → 评委亲手触发 + 亲眼看到 = wow moment 因果闭环",
+    "wow_moment_design": "评委在 Agent 面板亲手输入评论 → 左侧产品面板浮出卡片 = 本次 demo 核心记忆点"
+  },
+
+  "sample_comments": [
+    { "text": "蹲链接姐妹们 上衣链接求！", "route": "剧本 A" },
+    { "text": "一个月前按稍后再看 忘了看", "route": "剧本 B" },
+    { "text": "蹲后续 爷爷真帅", "route": "剧本 C" },
+    { "text": "求教程求教程求教程", "route": "引出「教程型蹲」讨论" },
+    { "text": "+1 +1 +1", "route": "引出「短评论也是意图」" }
+  ],
+
+  "work_priority": ["故事剧本完整度", "卡片视觉与交互", "AI识别准确度", "触发逻辑"],
+
+  "pitch": {
+    "three_min_strategy": "C方案：1 剧本深演 + 2 剧本快闪 + 加厚后半段",
+    "three_min": [
+      { "seg": "0–20s", "duration": 20, "type": "hook", "content": "痛点钩子：评论区蹲链接/蹲后续再也没找到的经历" },
+      { "seg": "20–28s", "duration": 8, "type": "flash_demo_A", "content": "剧本 A 快闪：输入蹲链接评论 → 3 步闪过 → 卡片浮出 → 标签「链接型蹲」" },
+      { "seg": "28–36s", "duration": 8, "type": "flash_demo_B", "content": "剧本 B 快闪：输入稍后再看评论 → 卡片浮出系列缩略 → 标签「系列型蹲」" },
+      { "seg": "36–58s", "duration": 22, "type": "deep_demo_C", "content": "剧本 C 深演：输入蹲后续爷爷真帅 → Agent 5 步完整跑 → 卡片被刷到 → 左右滑 P1→P2→P3 → 情感收束「爷爷的老战友联系到他了」" },
+      { "seg": "58–100s", "duration": 42, "type": "core_definition", "content": "核心定义：履约型内容 = 过去×此刻的桥 · 一人一张 · 抖音里空缺的时态" },
+      { "seg": "100–135s", "duration": 35, "type": "readme_mapping", "content": "readme 8 条承接：一页 slide 一过，重点讲 3-4 条" },
+      { "seg": "135–160s", "duration": 25, "type": "ai_capability", "content": "AI 能力拆 4 环节：意图识别/匹配/情景还原/摘要，每环节 6s" },
+      { "seg": "160–180s", "duration": 20, "type": "closing", "content": "Slogan「逆风如解意——把你念念不忘的，接回来」+ 扫码" }
+    ],
+    "three_min_rhythm": {
+      "first_third_role": "产品体验展示（0-58s）",
+      "middle_third_role": "思想与技术说服（58-160s）",
+      "last_segment_role": "情感收尾 + 记忆点（160-180s）"
+    },
+    "flash_demo_breakdown_seconds": {
+      "preset_click": 1, "agent_3_steps": 3, "card_in": 2, "tag_line": 2
+    },
+    "deep_demo_breakdown_seconds": {
+      "type_comment": 3, "agent_5_steps": 7, "card_in_and_play": 4, "multipage_swipe": 5, "emotional_close": 3
+    },
+    "ten_sec": [
+      { "seg": "0–3s", "content": "「你蹲过的，蹲到了」+ 指屏幕" },
+      { "seg": "3–8s", "content": "「3 周前你在评论区蹲过，今晚它找回来了」+ 卡片动效" },
+      { "seg": "8–10s", "content": "「这是抖音里全新的一种内容」+ 二维码" }
+    ]
+  },
+
+  "team": [
+    {
+      "role": "P",
+      "name": "产品 & 故事 & Pitch",
+      "assignee": "队员 P",
+      "owns": [
+        "三剧本情景细节打磨",
+        "全部文案",
+        "3min 评委 pitch + 10s 路人话术",
+        "评委问答准备",
+        "4–6 条预设评论撰写"
+      ]
+    },
+    {
+      "role": "D",
+      "name": "视觉 & 交互设计",
+      "assignee": "队员 D",
+      "owns": [
+        "卡片 P1/P2/P3 多页视觉",
+        "动效与手势规范",
+        "双面板布局",
+        "展台物料（易拉宝、二维码、slide）",
+        "视觉规范落地到交付物"
+      ]
+    },
+    {
+      "role": "U",
+      "name": "全栈 + AI 集成",
+      "assignee": "用户本人",
+      "owns": [
+        "产品面板：信息流模拟 / 卡片多页渲染 / 动效落地",
+        "Agent 面板：输入框 / LLM 意图识别接口 / 匹配逻辑 / 数据库",
+        "跨面板事件联动",
+        "AI prompt 设计 + 模型调用封装"
+      ]
+    }
+  ],
+
+  "team_collaboration": {
+    "sync_cadence": {
+      "P_and_D": "每 4 小时对齐一次（文案×视觉）",
+      "U_demo_lock": "每 8 小时锁一次可演版本"
+    },
+    "conflict_rule": "故事 > 视觉 > 技术（MEMORY 原则）",
+    "lifeline": "H30 跨面板联动未通 → 全员让路给 U，P/D 暂停新工作项"
+  },
+
+  "checkpoints": [
+    { "hour": 0, "milestone": "principle.md / principle.json 落地" },
+    { "hour": 4, "milestone": "可行性分析完成" },
+    { "hour": 8, "milestone": "双面板 UI 外壳可跑通 · P1 一剧本可演" },
+    { "hour": 20, "milestone": "三剧本 P1 + 双面板 mock 闭环（Phase 1 deadline）" },
+    { "hour": 30, "milestone": "Agent 工作流 + 数据库 + 跨面板联动打通（Phase 2 deadline 生死线）" },
+    { "hour": 36, "milestone": "P2/P3 多页视觉补齐 · 全员 pitch 演练 2 遍" },
+    { "hour": 38, "milestone": "最终 demo + 录屏 Plan B" },
+    { "hour": 40, "milestone": "提交 deadline" }
+  ],
+
+  "out_of_scope": [
+    "接真实抖音 API",
+    "跨 app 跳转（淘宝/微信）",
+    "多人社交层",
+    "推荐算法调优",
+    "情绪识别/脸部追踪"
+  ],
+
+  "decision_rule": "故事 > 系统 > 技术；体验完整 > 其他维度；情感锚点 > 功能丰富；mock 演到位 > 真技术打折演"
+}
