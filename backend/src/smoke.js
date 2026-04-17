@@ -4,6 +4,7 @@ import WebSocket from 'ws';
 
 const BASE = process.env.BASE ?? 'http://localhost:4000';
 const WS_URL = BASE.replace(/^http/, 'ws') + '/ws';
+const ORIGIN = process.env.SMOKE_ORIGIN ?? 'http://localhost:5173';
 
 const CASES = [
   { script: 'A', text: '蹲链接姐妹们 上衣链接求！', expectPages: ['P1', 'P2'] },
@@ -22,7 +23,10 @@ function assert(cond, msg) {
 }
 
 async function resetDemo() {
-  const res = await fetch(`${BASE}/api/reset`, { method: 'POST' });
+  const res = await fetch(`${BASE}/api/reset`, {
+    method: 'POST',
+    headers: { Origin: ORIGIN },
+  });
   assert(res.ok, 'reset endpoint 返回 2xx');
 }
 
@@ -61,7 +65,7 @@ function waitForFrames(ws, { matchEnd }) {
 
 function openWs() {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(WS_URL, { origin: ORIGIN });
     const timer = setTimeout(() => reject(new Error('ws open timeout')), 5000);
     ws.once('open', () => {
       clearTimeout(timer);
@@ -98,7 +102,7 @@ async function main() {
 
     const resp = await fetch(`${BASE}/api/comment`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
       body: JSON.stringify({ text: tc.text }),
     });
     const respJson = await resp.json();
@@ -136,7 +140,7 @@ async function main() {
   // 边界：空评论应返回 400
   const badResp = await fetch(`${BASE}/api/comment`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
     body: JSON.stringify({ text: '' }),
   });
   assert(badResp.status === 400, '空评论返回 400');
@@ -144,10 +148,31 @@ async function main() {
   // 边界：超长评论应返回 400
   const longResp = await fetch(`${BASE}/api/comment`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
     body: JSON.stringify({ text: 'x'.repeat(141) }),
   });
   assert(longResp.status === 400, '超长评论（>140）返回 400');
+
+  // 边界：非法 JSON 应返回 400 JSON（不是 HTML）
+  const junk = await fetch(`${BASE}/api/comment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
+    body: '{not json',
+  });
+  assert(junk.status === 400, '非法 JSON 返回 400');
+  const junkCt = junk.headers.get('content-type') || '';
+  assert(junkCt.includes('application/json'), `非法 JSON 返回 application/json（实际 ${junkCt}）`);
+
+  // 边界：不在 allowlist 的 origin 应被 CORS 阻断
+  const badOriginResp = await fetch(`${BASE}/api/bootstrap`, {
+    headers: { Origin: 'https://evil.example.com' },
+  });
+  assert(badOriginResp.status === 500 || badOriginResp.status === 403 || badOriginResp.status === 200,
+    `未知 origin 的响应（status=${badOriginResp.status}）`);
+  // 更关键的：检查 CORS header — 不应该包含 evil.example.com
+  const acao = badOriginResp.headers.get('access-control-allow-origin');
+  assert(!acao || !acao.includes('evil.example.com'),
+    `未知 origin 不在 CORS 允许列表（ACAO=${acao}）`);
 
   // 并发去重：reset 后同一时刻发两条相同评论，仅应产生 1 张卡片，第二条返回 signal-already-fulfilled
   await resetDemo();
