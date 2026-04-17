@@ -4,22 +4,27 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"PingFang SC"', '"Source Han Sans SC"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', '"PingFang SC"', '"Source Han Sans SC"', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
-        stage:  '#0b0b0f',
-        panel:  '#15151d',
-        ink:    '#1f1f2a',
-        warmth: '#f4cf83',
-        ember:  '#ff5a5f',
-        kiss:   '#ffb3c0',
-        hintA:  '#f9a8d4',
-        hintB:  '#c4b5fd',
-        hintC:  '#fcd34d',
+        // 所有主题 token 以 CSS 变量形式发布，切换风格 = 切换 <html data-theme>
+        stage:  'var(--color-stage)',
+        panel:  'var(--color-panel)',
+        ink:    'var(--color-ink)',
+        warmth: 'var(--color-warmth)',
+        ember:  'var(--color-ember)',
+        kiss:   'var(--color-kiss)',
+        hintA:  'var(--color-hintA)',
+        hintB:  'var(--color-hintB)',
+        hintC:  'var(--color-hintC)',
+      },
+      borderRadius: {
+        card: 'var(--radius-card)',
+        pill: 'var(--radius-pill)',
       },
       boxShadow: {
-        card: '0 18px 48px -16px rgba(255, 91, 95, 0.35)',
-        soft: '0 8px 32px -8px rgba(0, 0, 0, 0.45)',
+        card: 'var(--shadow-card)',
+        soft: 'var(--shadow-soft)',
       },
       animation: {
         'pulse-soft': 'pulse 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite',

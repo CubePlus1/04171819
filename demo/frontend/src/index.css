@@ -2,21 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* 默认风格：暖色治愈（Dundao Original）—— 若 theme 未加载，样式不塌 */
+  --color-stage:      #0b0b0f;
+  --color-panel:      #15151d;
+  --color-ink:        #1f1f2a;
+  --color-text:       #f5f5f4;
+  --color-text-muted: #a8a29e;
+  --color-warmth:     #f4cf83;
+  --color-ember:      #ff5a5f;
+  --color-kiss:       #ffb3c0;
+  --color-hintA:      #f9a8d4;
+  --color-hintB:      #c4b5fd;
+  --color-hintC:      #fcd34d;
+
+  --font-sans: 'PingFang SC', 'Source Han Sans SC', Inter, system-ui, sans-serif;
+  --radius-card: 1rem;
+  --radius-pill: 9999px;
+  --shadow-card: 0 18px 48px -16px rgba(255, 91, 95, 0.35);
+  --shadow-soft: 0 8px 32px -8px rgba(0, 0, 0, 0.45);
+  --card-border: 1px solid rgba(255, 255, 255, 0.08);
+  --surface-glow:
+    radial-gradient(1200px 600px at 10% -10%, rgba(249, 168, 212, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(196, 181, 253, 0.08), transparent 55%),
+    #0b0b0f;
+}
+
 html, body, #root {
   height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: 'PingFang SC', 'Source Han Sans SC', Inter, system-ui, sans-serif;
+  font-family: var(--font-sans);
+  color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(249, 168, 212, 0.10), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(196, 181, 253, 0.08), transparent 55%),
-    #0b0b0f;
+  background: var(--surface-glow);
   overflow: hidden;
 }
+
+/* 浅色风格根据 data-surface=light 反转一些默认 */
+html[data-surface='light'] body {
+  color: var(--color-text);
+}
+
+/* 排版尺度变种 */
+html[data-type-scale='compact'] { font-size: 14px; }
+html[data-type-scale='normal']  { font-size: 15px; }
+html[data-type-scale='airy']    { font-size: 16px; letter-spacing: 0.01em; }
 
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
@@ -34,17 +68,30 @@ body {
 }
 
 .pill {
-  @apply inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] text-stone-300 backdrop-blur;
+  @apply inline-flex items-center gap-1 rounded-pill border px-2.5 py-0.5 text-[11px] backdrop-blur;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+}
+
+html[data-surface='light'] .pill {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .glass {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: var(--card-border);
   backdrop-filter: blur(12px);
 }
 
+html[data-surface='light'] .glass {
+  background: linear-gradient(160deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.02));
+}
+
 .step-line {
-  background: linear-gradient(180deg, rgba(244, 207, 131, 0.55), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(180deg, var(--color-warmth), transparent);
+  opacity: 0.55;
 }
 
 .heartbeat::before {
@@ -85,5 +132,7 @@ body {
 }
 
 .focus-ring {
-  @apply outline-none ring-0 focus-visible:ring-2 focus-visible:ring-warmth/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ink;
+  @apply outline-none ring-0 focus-visible:ring-2 focus-visible:ring-offset-2;
+  --tw-ring-color: color-mix(in srgb, var(--color-warmth) 60%, transparent);
+  --tw-ring-offset-color: var(--color-ink);
 }
