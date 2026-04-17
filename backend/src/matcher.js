@@ -1,5 +1,6 @@
 // 历史匹配：拿意图分类结果 + 用户历史信号 + 博主新动作 → 找到 (signal, action) 配对
 import { getDb } from './db.js';
+import { SUPPORTED_INTENTS } from './intent.js';
 
 const INTENT_TO_ACTION = {
   link_request:    ['post_link'],
@@ -18,6 +19,16 @@ const INTENT_TO_SCRIPT = {
   plus_one:         'A',
   passive_interest: 'A',
 };
+
+// 启动自检：classifier 支持的意图必须在 matcher 的两张映射里都出现
+const missing = SUPPORTED_INTENTS.filter(
+  (i) => !(i in INTENT_TO_ACTION) || !(i in INTENT_TO_SCRIPT),
+);
+if (missing.length > 0) {
+  throw new Error(
+    `matcher: intent(s) supported by classifier are missing mapping: ${missing.join(', ')}`,
+  );
+}
 
 /**
  * @param {{intent, topic_hint}} intentResult

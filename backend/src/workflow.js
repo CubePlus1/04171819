@@ -5,6 +5,7 @@ import { classifyIntent } from './intent.js';
 import { matchHistory } from './matcher.js';
 import { buildCard } from './cardBuilder.js';
 import { createLogger } from './logger.js';
+import { REASON_CODES } from '../../shared/contracts.js';
 
 const log = createLogger('workflow');
 
@@ -79,7 +80,7 @@ export async function runWorkflow({
       hit: false,
       reason: '未找到与该意图配对的历史信号 × 博主新动作',
     }));
-    return { ok: false, runId, reason: 'no-match', intent, match: null };
+    return { ok: false, runId, reason: REASON_CODES.NO_MATCH, intent, match: null };
   }
   onStep?.(stepFrame(runId, 3, '匹配用户历史', {
     hit: true,
@@ -133,7 +134,7 @@ export async function runWorkflow({
         reason: '该历史信号已被更快的请求抢先履约（防并发重复卡片）',
         intent_signal_id: card.intent_signal_id,
       }));
-      return { ok: false, runId, reason: 'signal-already-fulfilled', intent, match: { scriptId: match.scriptId } };
+      return { ok: false, runId, reason: REASON_CODES.SIGNAL_ALREADY_FULFILLED, intent, match: { scriptId: match.scriptId } };
     }
     throw err;
   }

@@ -73,15 +73,9 @@ const RULES = [
     rationale: '短评论也是意图：用户在给别人蹲的事打 +1',
     topic_hint: null,
   },
-  {
-    intent: 'catch_up_request',
-    label: '催更',
-    aliases: [],
-    patterns: [/催更/, /快更/, /更得太慢/],
-    priority: 60,
-    rationale: '用户希望博主更新速度加快',
-    topic_hint: null,
-  },
+  // NOTE: 删除了 `catch_up_request` 意图 —— 没有对应的 creator_action 类型与之匹配，
+  //       classifier 命中后会悄悄落到 no-match。demo 范围内直接下线，
+  //       真要做时需要在 matcher.INTENT_TO_ACTION 同步映射并补 seed 素材。
 ];
 
 const FALLBACK = {
@@ -92,7 +86,7 @@ const FALLBACK = {
   topic_hint: null,
 };
 
-export const SUPPORTED_INTENTS = [...RULES.map((r) => r.intent), FALLBACK.intent];
+export const SUPPORTED_INTENTS = Object.freeze([...RULES.map((r) => r.intent), FALLBACK.intent]);
 
 /**
  * @param {string} text 评论原文

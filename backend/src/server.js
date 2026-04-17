@@ -11,6 +11,7 @@ import { runWorkflow, newRunId } from './workflow.js';
 import { createRateLimiter } from './rateLimit.js';
 import { createLogger } from './logger.js';
 import { seed } from './seed.js';
+import { WS_EVENTS, REASON_CODES } from '../../shared/contracts.js';
 
 const log = createLogger('server');
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -140,7 +141,7 @@ function createApp(broadcast, state) {
     if (++pruneCounter % 64 === 0) commentLimiter.prune();
     if (!rl.ok) {
       res.set('Retry-After', String(rl.retryAfter));
-      return res.status(429).json({ ok: false, error: 'rate-limited', retry_after: rl.retryAfter });
+      return res.status(429).json({ ok: false, error: REASON_CODES.RATE_LIMITED, retry_after: rl.retryAfter });
     }
     const text = typeof req.body?.text === 'string' ? req.body.text.trim() : '';
     const rawUserId = req.body?.userId;
@@ -154,19 +155,19 @@ function createApp(broadcast, state) {
 
     const runId = newRunId();
     state.inFlight.add(runId);
-    broadcast('workflow.begin', { run_id: runId, text, userId });
+    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, text, userId });
     try {
       const result = await runWorkflow({
         comment: text,
         userId,
         runId,
-        onStep: (frame) => broadcast('workflow.step', frame),
+        onStep: (frame) => broadcast(WS_EVENTS.WORKFLOW_STEP, frame),
       });
       if (result.ok) {
-        broadcast('card.generated', { run_id: runId, card: result.card });
-        broadcast('workflow.end', { run_id: runId, ok: true, cardId: result.card.id });
+        broadcast(WS_EVENTS.CARD_GENERATED, { run_id: runId, card: result.card });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: true, cardId: result.card.id });
       } else {
-        broadcast('workflow.end', { run_id: runId, ok: false, reason: result.reason });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: false, reason: result.reason });
       }
       res.json({
         ok: result.ok,
@@ -175,7 +176,7 @@ function createApp(broadcast, state) {
       });
     } catch (err) {
       log.error('workflow failed', { run_id: runId, err: err.message, stack: err.stack });
-      broadcast('workflow.end', { run_id: runId, ok: false, reason: 'server-error' });
+      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: false, reason: REASON_CODES.SERVER_ERROR });
       res.status(500).json({ ok: false, runId, error: 'internal' });
     } finally {
       state.inFlight.delete(runId);
@@ -195,13 +196,13 @@ function createApp(broadcast, state) {
       }
       if (state.inFlight.size > 0) {
         log.warn('reset blocked by in-flight workflows', { in_flight: state.inFlight.size });
-        return res.status(409).json({ ok: false, error: 'in-flight-workflow' });
+        return res.status(409).json({ ok: false, error: REASON_CODES.IN_FLIGHT_WORKFLOW });
       }
     }
     log.info('reset requested');
     closeDb();
     seed();
-    broadcast('demo.reset', {});
+    broadcast(WS_EVENTS.DEMO_RESET, {});
     res.json({ ok: true });
   });
 
@@ -234,7 +235,7 @@ function main() {
     log.info(`received ${signal}, shutting down`);
 
     // 1. 先告别所有 WS 客户端，让 httpServer.close() 能收到它们的断开事件
-    const farewell = JSON.stringify({ type: 'server.shutdown', ts: Date.now() });
+    const farewell = JSON.stringify({ type: WS_EVENTS.SERVER_SHUTDOWN, ts: Date.now() });
     for (const client of wss.clients) {
       try { if (client.readyState === client.OPEN) client.send(farewell); } catch {/* ignore */}
       try { client.terminate(); } catch {/* ignore */}

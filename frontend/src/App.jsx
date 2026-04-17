@@ -6,6 +6,7 @@ import Toast from './components/Toast.jsx';
 import { useDemoStore } from './store/useDemoStore.js';
 import { bootstrap, resetDemo } from './api/client.js';
 import { connectWs } from './api/ws.js';
+import { WS_EVENTS } from '@shared/contracts.js';
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -70,13 +71,13 @@ export default function App() {
       onMessage: (msg) => {
         const p = msg.payload ?? {};
         switch (msg.type) {
-          case 'workflow.begin':
+          case WS_EVENTS.WORKFLOW_BEGIN:
             beginWorkflow(p.run_id);
             break;
-          case 'workflow.step':
+          case WS_EVENTS.WORKFLOW_STEP:
             applyStep(p);
             break;
-          case 'workflow.end':
+          case WS_EVENTS.WORKFLOW_END:
             endWorkflow({
               ok: p.ok,
               cardId: p.cardId,
@@ -85,10 +86,10 @@ export default function App() {
               runId: p.run_id,
             });
             break;
-          case 'card.generated':
+          case WS_EVENTS.CARD_GENERATED:
             onCardGenerated(p.card, p.run_id);
             break;
-          case 'demo.reset':
+          case WS_EVENTS.DEMO_RESET:
             resetStore();
             boot();
             break;
