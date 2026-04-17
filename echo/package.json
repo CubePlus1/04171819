@@ -10,7 +10,9 @@
     "dev:server": "node --watch server/server.mjs",
     "dev:web": "npm --prefix web run dev",
     "build": "npm --prefix web run build",
-    "smoke": "node server/smoke.mjs"
+    "smoke": "node server/smoke.mjs",
+    "test": "node server/echo.test.mjs",
+    "test:caps": "node server/caps.test.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"
