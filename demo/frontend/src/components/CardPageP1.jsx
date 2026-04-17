@@ -89,14 +89,14 @@ function Answer({ answer }) {
 }
 
 const ACTION_FEEDBACK = {
-  add_wish: '已加到「我蹲过的」清单',
-  view:     '播放中...（demo 演示，不跳转）',
-  resume:   '续看 · 从 Day1 接着来',
-  recap:    'AI 摘要：她其实没变，只是变得温柔了',
-  play:     '播放中 · 含 10s 前情提要',
-  share:    '已复制分享链接到剪贴板',
-  save:     '收藏到「我蹲过的」',
-  not_now:  '已告诉 AI：这次划过',
+  add_wish: '已加到「我蹲过的」· 不让它再错过',
+  view:     '先替你留在这儿，不让它再溜走',
+  resume:   '从 Day1 接着给你看',
+  recap:    '前情替你捋好了，她的心意也接上了',
+  play:     '放给你看 · 含 10s 前情提要',
+  share:    '这份惦记，替你带给爷爷了',
+  save:     '收藏到「我蹲过的」· 等下次相遇',
+  not_now:  '好，这次先放过它',
 };
 
 export default function CardPageP1({ page, scriptId, onAction }) {

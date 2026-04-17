@@ -7,6 +7,13 @@ const STATUS_COLORS = {
   fail:   'bg-red-900/30 text-red-300  border-red-500/40',
 };
 
+const ACTION_VERB_CN = {
+  post_link:        '把你蹲的链接放出来了',
+  post_sequel:      '发了那集的后续',
+  series_completed: '把你收藏过的系列更完了',
+  reply_tutorial:   '在回复里带上了你求的教程',
+};
+
 function Detail({ step, detail }) {
   if (!detail) return null;
 
@@ -34,21 +41,21 @@ function Detail({ step, detail }) {
   }
   if (step === 3) {
     if (!detail.hit) {
-      return <div className="mt-2 text-[12px] text-red-300">未命中 · {detail.reason}</div>;
+      return <div className="mt-2 text-[12px] text-red-300">这一次没找到你曾惦记的那条</div>;
     }
     return (
       <div className="mt-2 space-y-1 text-[12px] text-stone-300">
         <div>
-          <span className="text-stone-400">历史信号：</span>
+          <span className="text-stone-400">你当时说过：</span>
           {detail.signal?.text ? `「${detail.signal.text}」` : `《${detail.signal?.video_title}》`}
         </div>
         <div>
-          <span className="text-stone-400">博主：</span>{detail.creator}
+          <span className="text-stone-400">她这次给了回音：</span>{detail.creator}
           <span className="mx-2 text-stone-600">·</span>
-          <span className="text-stone-400">博主动作：</span>{detail.action_type}
+          {ACTION_VERB_CN[detail.action_type] ?? detail.action_type}
         </div>
         <div>
-          <span className="text-stone-400">落在剧本：</span>
+          <span className="text-stone-400">该用哪种方式接回来：</span>
           <span className="text-warmth">{detail.script}</span>
         </div>
       </div>
@@ -57,10 +64,10 @@ function Detail({ step, detail }) {
   if (step === 4) {
     return (
       <div className="mt-2 text-[12px] text-stone-300">
-        <span className="text-stone-400">入库 ID：</span>{' '}
+        <span className="text-stone-400">这次被接住的：</span>{' '}
         <code className="rounded bg-black/40 px-1.5 py-0.5 text-[11px] text-warmth">{detail.card_id}</code>
-        <span className="ml-2 text-stone-400">剧本：</span>
-        <span className="text-warmth">{detail.script}</span>
+        <span className="ml-2 text-stone-400">·</span>
+        <span className="ml-1 text-warmth">{detail.script}</span>
       </div>
     );
   }
@@ -107,8 +114,8 @@ export default function AgentStep({ step, index, isLast }) {
       >
         <div className="flex items-center justify-between">
           <div className="text-[13px] font-medium">{step.name}</div>
-          <div className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
-            {step.status === 'active' ? 'RUNNING' : step.status === 'done' ? 'DONE' : step.status === 'fail' ? 'FAIL' : 'IDLE'}
+          <div className="text-[10px] tracking-[0.18em] text-stone-400">
+            {step.status === 'active' ? '记起中…' : step.status === 'done' ? '已接住' : step.status === 'fail' ? '暂时落空' : '等你一句话'}
           </div>
         </div>
         <AnimatePresence>

@@ -16,10 +16,11 @@ const SCRIPT_TO_PAGES = { A: ['P1', 'P2'], B: ['P1', 'P3'], C: ['P1', 'P2', 'P3'
 function buildContextLine({ signal, creator }) {
   const relative = RELATIVE_TIME_CN(signal.occurred_at);
   const verb = ACTION_VERB_BY_SIGNAL[signal.signal_type] ?? '关注过';
-  const topicDesc = signal.raw_text
-    ? `「${creator.display}」里${verb}「${signal.raw_text}」`
-    : `「${creator.display}」里的《${signal.video_title}》${verb}`;
-  return `你 ${relative} 在 ${topicDesc}`;
+  // 从 "log 行" 重构成 "想起来了" 的句式：主语前置 + 创作者收束
+  const tail = signal.raw_text
+    ? `「${signal.raw_text}」`
+    : `《${signal.video_title}》`;
+  return `你 ${relative} 在「${creator.display}」那儿${verb} ${tail}`;
 }
 
 function buildAnswer({ scriptId, action }) {
@@ -69,20 +70,20 @@ function buildP2({ intentResult, signal, creator, action }) {
     ? `你在《${signal.video_title}》下评论「${signal.raw_text}」`
     : `你${ACTION_VERB_BY_SIGNAL[signal.signal_type] ?? '关注过'}《${signal.video_title}》`;
   const matchedBasis = {
-    post_link:        '博主把你蹲的款式放出了平替链接',
-    post_sequel:      '博主更新了你蹲的那集的后续',
-    series_completed: '博主把你收藏过的系列更完了',
-    reply_tutorial:   '博主回复里带上了你求的教程',
-  }[action.action_type] ?? '博主有了新的动作';
+    post_link:        '她把你蹲的款式放出了平替链接',
+    post_sequel:      '她更新了你蹲的那集的后续',
+    series_completed: '她把你收藏过的系列更完了',
+    reply_tutorial:   '她在回复里带上了你求的教程',
+  }[action.action_type] ?? '她有了新的动作';
 
   return {
     id: 'P2',
-    name: 'AI 解释',
+    name: '为什么这次会记得你',
     trigger_signal: triggerSignal,
-    ai_intent: `${intentResult.label} · 置信度 ${(intentResult.confidence * 100).toFixed(0)}%`,
+    ai_intent: `${intentResult.label} · 把握度 ${(intentResult.confidence * 100).toFixed(0)}%`,
     rationale: intentResult.rationale,
     matched_basis: matchedBasis,
-    warm_summary: `AI 看到你蹲过「${creator.display}」，现在博主${matchedBasis.slice(2)}`,
+    warm_summary: `你惦记过的这件事，这次终于有回音了`,
   };
 }
 
@@ -119,8 +120,8 @@ export function buildCard({ match, intentResult, userId }) {
     name: '情景 + 答案',
     context_line: buildContextLine({ signal, creator }),
     emotional_close: {
-      A: '当时蹲的终于放出来了',
-      B: '她已经更完了，AI 帮你摘了前情',
+      A: '当时蹲的，这次替你接住了',
+      B: '你没来得及追完的，这次替你接上了',
       C: '爷爷的老战友联系到他了',
     }[scriptId] ?? '你念念不忘的，接回来',
     answer: buildAnswer({ scriptId, action }),

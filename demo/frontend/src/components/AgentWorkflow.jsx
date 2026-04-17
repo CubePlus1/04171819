@@ -19,12 +19,12 @@ export default function AgentWorkflow() {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span id="workflow-heading" className="pill bg-hintB/15 text-hintB">
-            AI 工作后台
+            它怎么把你记起来
           </span>
-          <span className="text-[12px] text-stone-400">前台英雄 · 不是黑盒</span>
+          <span className="text-[12px] text-stone-400">不是黑盒 · 是把那句惦记慢慢接回来</span>
         </div>
         <div className="text-[11px] text-stone-400" aria-hidden="true">
-          {running ? '管线运行中...' : lastReason ? `已结束 · ${lastReason}` : '等待输入'}
+          {running ? '正在帮你接回来…' : lastReason ? `这次没接住 · ${lastReason}` : '等你一句话'}
         </div>
       </div>
 

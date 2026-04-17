@@ -13,7 +13,7 @@ export default function CardPageP2({ page }) {
   return (
     <div className="flex h-full flex-col gap-3 p-4">
       <div className="flex items-center gap-2">
-        <span className="pill bg-hintB/15 text-hintB">AI 解释</span>
+        <span className="pill bg-hintB/15 text-hintB">它怎么记起你的</span>
         <span className="pill">P2</span>
       </div>
 
@@ -29,10 +29,10 @@ export default function CardPageP2({ page }) {
         className="glass divide-y divide-white/5 rounded-2xl px-4"
       >
         {[
-          { label: '原始触发信号', value: page.trigger_signal },
-          { label: 'AI 意图识别',  value: page.ai_intent },
-          { label: '识别理由',     value: page.rationale },
-          { label: '匹配依据',     value: page.matched_basis },
+          { label: '你当时留下的',   value: page.trigger_signal },
+          { label: 'AI 读懂的意思', value: page.ai_intent },
+          { label: '为什么这么判',   value: page.rationale },
+          { label: '这次的回音',     value: page.matched_basis },
         ].map((row) => (
           <motion.div
             key={row.label}
@@ -44,7 +44,7 @@ export default function CardPageP2({ page }) {
       </motion.div>
 
       <div className="mt-auto text-center text-[11px] text-stone-400">
-        — 前台化的 AI 推理 · 为什么是这张卡 —
+        — 它为什么会在这一刻回来找你 —
       </div>
     </div>
   );
