@@ -107,6 +107,25 @@ async function main() {
       `收到 5 步（实际 ${JSON.stringify(steps)}）`);
     assert(run.every((f) => f.payload.ambient === true), '所有 step 都带 ambient:true 标记');
 
+    // 每一条 workflow.step 都必须带 mind.phase（契约）
+    const phasesActual = run.map((f) => f.payload.mind?.phase);
+    const phasesExpect = ['scan', 'recall', 'match', 'seal', 'emit'];
+    assert(
+      JSON.stringify(phasesActual) === JSON.stringify(phasesExpect),
+      `mind.phase 序列正确（实际 ${JSON.stringify(phasesActual)}）`,
+    );
+    const scanFrame = run.find((f) => f.payload.step === 1);
+    assert(
+      Array.isArray(scanFrame?.payload.mind?.nodes) && scanFrame.payload.mind.nodes.length > 0,
+      `mind.nodes 在 step 1 下发完整快照（实际 ${scanFrame?.payload.mind?.nodes?.length}）`,
+    );
+    const matchFrame = run.find((f) => f.payload.step === 3);
+    assert(
+      matchFrame?.payload.mind?.focus_signal_id?.startsWith('signal:') &&
+        matchFrame?.payload.mind?.focus_action_id?.startsWith('action:'),
+      'match 阶段携带 focus_signal_id / focus_action_id',
+    );
+
     const cardFrame = frames.find((f) => f.type === 'card.generated' && f.payload.run_id === r.runId);
     assert(!!cardFrame, `topic=${tc.topic} · 收到 card.generated`);
     const card = cardFrame.payload.card;

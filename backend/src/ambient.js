@@ -5,7 +5,7 @@
 import { getDb } from './db.js';
 import { buildCard } from './cardBuilder.js';
 import { createLogger } from './logger.js';
-import { REASON_CODES } from '../../shared/contracts.js';
+import { REASON_CODES, MIND_PHASES } from '../../shared/contracts.js';
 import { newRunId } from './workflow.js';
 
 const log = createLogger('ambient');
@@ -88,8 +88,47 @@ function pickNextCandidate(db, { userId, topic = null, signalId = null }) {
   `).get(userId);
 }
 
-function stepFrame(runId, step, name, detail) {
-  return { run_id: runId, step, name, detail };
+function stepFrame(runId, step, name, detail, mind) {
+  return { run_id: runId, step, name, detail, mind };
+}
+
+/**
+ * 为一次 runAmbient 快照 mind 的完整节点集合。
+ * - signals：该用户未/已履约信号
+ * - actions：所有博主新动作
+ * 只在 step 1 下发完整 nodes，后续 step 下发 focus_* / phase 减小 wire 体积
+ */
+function snapshotMindNodes(db, userId) {
+  const signals = db
+    .prepare(
+      `SELECT id, topic, raw_text, video_title, signal_type, occurred_at, fulfilled
+         FROM intent_signals WHERE user_id = ?`,
+    )
+    .all(userId);
+  const actions = db
+    .prepare(
+      `SELECT id, topic, action_type, occurred_at FROM creator_actions`,
+    )
+    .all();
+
+  return [
+    ...signals.map((s) => ({
+      id: `signal:${s.id}`,
+      kind: 'signal',
+      topic: s.topic,
+      label: s.raw_text || s.video_title,
+      signal_type: s.signal_type,
+      fulfilled: Boolean(s.fulfilled),
+      occurred_at: s.occurred_at,
+    })),
+    ...actions.map((a) => ({
+      id: `action:${a.id}`,
+      kind: 'action',
+      topic: a.topic,
+      action_type: a.action_type,
+      occurred_at: a.occurred_at,
+    })),
+  ];
 }
 
 /**
@@ -114,27 +153,36 @@ export async function runAmbient({
   }
   const db = getDb();
 
-  // Step 1 · 后台扫描她还惦记着的
+  // Step 1 · 后台扫描她还惦记着的 · mind.phase=scan，下发完整 nodes 快照
   const scan = db.prepare(
     `SELECT COUNT(*) AS total,
             SUM(CASE WHEN fulfilled = 0 THEN 1 ELSE 0 END) AS open
        FROM intent_signals WHERE user_id = ?`,
   ).get(userId);
+  const mindNodes = snapshotMindNodes(db, userId);
   onStep?.(stepFrame(runId, 1, '她还惦记着的', {
     total: scan.total,
     open: scan.open,
     note: scan.open > 0
       ? `${scan.open} 件事还没接回来`
       : '都已经替她接回来了',
+  }, {
+    phase: MIND_PHASES.SCAN,
+    nodes: mindNodes,
+    open_count: scan.open,
   }));
   await sleep(stepDelayMs);
 
-  // Step 2 · 挑中这一条（未履约 × 刚好有匹配动作）
+  // Step 2 · 挑中这一条（未履约 × 刚好有匹配动作）· mind.phase=recall
   const pick = pickNextCandidate(db, { userId, topic, signalId });
   if (!pick) {
     onStep?.(stepFrame(runId, 2, '挑中这一条', {
       hit: false,
       reason: '这一次还没找到能接回来的',
+    }, {
+      phase: MIND_PHASES.RECALL,
+      focus_signal_id: null,
+      reason: REASON_CODES.NO_MATCH,
     }));
     return { ok: false, runId, reason: REASON_CODES.NO_MATCH };
   }
@@ -158,6 +206,8 @@ export async function runAmbient({
     occurred_at: pick.occurred_at,
     fulfilled: 0,
   };
+  const focusSignalId = `signal:${signal.id}`;
+  const focusActionId = `action:${pick.action_id}`;
   onStep?.(stepFrame(runId, 2, '挑中这一条', {
     hit: true,
     signal: { id: signal.id, text: signal.raw_text, video_title: signal.video_title, occurred_at: signal.occurred_at },
@@ -165,16 +215,26 @@ export async function runAmbient({
     recall: signal.raw_text
       ? `她在「${creator.display}」下${SIGNAL_VERB_CN[signal.signal_type] ?? '留下过一条'}「${signal.raw_text}」`
       : `她${SIGNAL_VERB_CN[signal.signal_type] ?? '看过'}《${signal.video_title}》`,
+  }, {
+    phase: MIND_PHASES.RECALL,
+    focus_signal_id: focusSignalId,
+    topic: signal.topic,
   }));
   await sleep(stepDelayMs);
 
-  // Step 3 · 博主今天的新动作
+  // Step 3 · 博主今天的新动作 · mind.phase=match
   const actionPayload = JSON.parse(pick.payload_json);
   const scriptId = ACTION_TO_SCRIPT[pick.action_type] ?? 'A';
   onStep?.(stepFrame(runId, 3, '博主今天的新动作', {
     creator: creator.display,
     action_type: pick.action_type,
     action_summary: actionPayload.summary ?? actionPayload.title ?? '博主有了新动作',
+    script: scriptId,
+  }, {
+    phase: MIND_PHASES.MATCH,
+    focus_signal_id: focusSignalId,
+    focus_action_id: focusActionId,
+    topic: signal.topic,
     script: scriptId,
   }));
   await sleep(stepDelayMs);
@@ -247,6 +307,13 @@ export async function runAmbient({
       onStep?.(stepFrame(runId, 4, '记到她的履约里', {
         ok: false,
         reason: '这条刚刚被抢先接走了',
+      }, {
+        phase: MIND_PHASES.SEAL,
+        focus_signal_id: focusSignalId,
+        focus_action_id: focusActionId,
+        topic: signal.topic,
+        ok: false,
+        reason: REASON_CODES.SIGNAL_ALREADY_FULFILLED,
       }));
       return { ok: false, runId, reason: REASON_CODES.SIGNAL_ALREADY_FULFILLED };
     }
@@ -257,14 +324,26 @@ export async function runAmbient({
     card_id: card.id,
     script: card.script_id,
     fulfilled_signal_id: card.intent_signal_id,
+  }, {
+    phase: MIND_PHASES.SEAL,
+    focus_signal_id: focusSignalId,
+    focus_action_id: focusActionId,
+    topic: signal.topic,
+    card_id: card.id,
   }));
   await sleep(stepDelayMs);
 
-  // Step 5 · 浮到信息流
+  // Step 5 · 浮到信息流 · mind.phase=emit
   onStep?.(stepFrame(runId, 5, '浮到她的信息流', {
     card_id: card.id,
     pages: card.pages.map((p) => p.id),
     preview_context: card.pages[0]?.context_line,
+  }, {
+    phase: MIND_PHASES.EMIT,
+    focus_signal_id: focusSignalId,
+    focus_action_id: focusActionId,
+    topic: signal.topic,
+    card_id: card.id,
   }));
   log.info('ambient finished', { run_id: runId, card_id: card.id, script: card.script_id });
 
