@@ -2,6 +2,13 @@
 import { useCallback, useRef, useState } from 'react';
 import { SSE_EVENTS, REASONS, REASON_TEXT_CN } from '@shared/contracts.mjs';
 
+const MAX_BUBBLES = 120;
+
+function pushBounded(prev, ev) {
+  const next = [...prev, ev];
+  return next.length > MAX_BUBBLES ? next.slice(next.length - MAX_BUBBLES) : next;
+}
+
 export function useEcho() {
   const [events, setEvents] = useState([]);
   const [running, setRunning] = useState(false);
@@ -31,7 +38,7 @@ export function useEcho() {
 
     setError(null);
     setRunning(true);
-    setEvents((prev) => [...prev, { kind: 'me', text: trimmed, id: `me-${myId}` }]);
+    setEvents((prev) => pushBounded(prev, { kind: 'me', text: trimmed, id: `me-${myId}` }));
 
     try {
       const resp = await fetch('/api/echo', {
@@ -67,27 +74,33 @@ export function useEcho() {
           try {
             const payload = JSON.parse(data);
             if (event === SSE_EVENTS.BUBBLE) {
-              setEvents((prev) => [...prev, { kind: 'echo', id: `b-${payload.run_id}-${payload.id}`, ...payload }]);
+              setEvents((prev) => pushBounded(prev, { kind: 'echo', id: `b-${payload.run_id}-${payload.id}`, ...payload }));
             } else if (event === SSE_EVENTS.POSTCARD) {
-              setEvents((prev) => [...prev, { kind: 'postcard', id: `c-${payload.run_id}`, ...payload }]);
+              setEvents((prev) => pushBounded(prev, { kind: 'postcard', id: `c-${payload.run_id}`, ...payload }));
             } else if (event === SSE_EVENTS.END) {
               if (payload.ok === false) {
-                setEvents((prev) => [...prev, {
+                setEvents((prev) => pushBounded(prev, {
                   kind: 'echo',
                   id: `end-${payload.run_id ?? Date.now()}`,
                   voice: reasonText(payload.reason),
-                }]);
+                }));
               }
             }
           } catch {/* ignore malformed frame */}
         }
       }
+      return true; // send 完整走完
     } catch (err) {
-      if (err.name !== 'AbortError' && inFlightIdRef.current === myId) {
-        setError(err.message || '没接住');
+      if (err.name === 'AbortError') return false;
+      if (inFlightIdRef.current === myId) {
+        // 网络层错误（TypeError: Failed to fetch）统一折成一句友好文案
+        const msg = err instanceof TypeError
+          ? '好像没有连线 · 等网络回来再说一次？'
+          : (err.message || '没接住');
+        setError(msg);
       }
+      return false;
     } finally {
-      // 只清理"自己这次"的状态，避免后发请求被前一次的 finally 擦掉
       if (inFlightIdRef.current === myId) {
         setRunning(false);
         abortRef.current = null;

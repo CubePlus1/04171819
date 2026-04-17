@@ -48,7 +48,7 @@ function useBootstrap() {
 }
 
 export default function App() {
-  const { events, running, error, send } = useEcho();
+  const { events, running, error, send, reset } = useEcho();
   const { value: boot, error: bootErr, refresh } = useBootstrap();
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
@@ -79,9 +79,12 @@ export default function App() {
     e.preventDefault();
     const v = text.trim();
     if (!v || running) return;
-    await send(v);
-    setText('');        // 成功或失败后再清空；失败时用户可 ↑ 键在浏览器历史里找到
-    refresh();          // 抓最新 memories
+    const ok = await send(v);
+    if (ok) {
+      setText('');
+      refresh();
+    }
+    // 失败时保留输入，避免草稿丢失；用户可以直接再回车一次
   };
 
   const presets = boot?.presets ?? [];
@@ -98,6 +101,21 @@ export default function App() {
       <header className="header">
         <h1>回响 · Echo</h1>
         <div className="sub">把你念念不忘的 · 轻轻说一句</div>
+        {events.length > 0 && (
+          <button
+            type="button"
+            onClick={reset}
+            aria-label="清空对话 · 重新开始"
+            style={{
+              marginTop: 12, padding: '4px 14px', fontSize: 12,
+              border: '1px solid var(--border)', background: 'transparent',
+              color: 'var(--muted)', borderRadius: 999, cursor: 'pointer',
+              fontFamily: 'inherit', letterSpacing: '0.06em',
+            }}
+          >
+            轻轻合上这一页
+          </button>
+        )}
       </header>
 
       {boot && <Memories boot={boot} />}
