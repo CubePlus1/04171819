@@ -61,9 +61,13 @@ export function creator(id) {
 }
 
 export function relativeTimeCn(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return '';
+  const diff = Date.now() - t;
+  if (diff < 0)        return '刚刚';   // 未来时间不会发生，但防御性处理
+  if (diff < 60_000)   return '刚刚';
   const MIN = 60_000, HOUR = 3_600_000, DAY = 86_400_000;
-  if (diff < HOUR) return `${Math.max(1, Math.floor(diff / MIN))} 分钟前`;
+  if (diff < HOUR) return `${Math.floor(diff / MIN)} 分钟前`;
   if (diff < DAY)  return `${Math.floor(diff / HOUR)} 小时前`;
   const days = Math.floor(diff / DAY);
   if (days === 1) return '昨天';

@@ -1,7 +1,23 @@
 // 对话式 5 步生成器：把主 demo 的 "workflow step" 改写成"她在自言自语"的气泡
 import { getState, claimFulfillment, creator, relativeTimeCn } from './store.mjs';
 
-const SLEEP = (ms) => new Promise((r) => setTimeout(r, ms));
+const SLEEP = (ms, signal) =>
+  new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(new AbortError());
+    const t = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(t);
+      reject(new AbortError());
+    };
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+
+class AbortError extends Error {
+  constructor() { super('aborted'); this.name = 'AbortError'; }
+}
 
 const INTENT_RULES = [
   { intent: 'link_request',   label: '蹲链接', topic: 'knit-top',      patterns: [/蹲.*链接/, /链接.*求/, /求.*链接/, /同款/] },
@@ -60,19 +76,21 @@ function postcardFor({ match, signal, script }) {
  * 一次 echo 生成器：yield 一系列事件对象
  * @param {object} params
  * @param {string} params.text 用户输入
- * @param {(ms:number)=>Promise<void>} [params.sleep] 可注入的等待（便于测试）
+ * @param {AbortSignal} [params.signal] 取消信号：断连 / shutdown 时由调用方 abort
+ * @param {(ms:number, sig?:AbortSignal)=>Promise<void>} [params.sleep] 可注入的等待
  * @returns {AsyncIterable<{type:string, payload:any}>}
  */
-export async function* runEcho({ text, sleep = SLEEP }) {
+export async function* runEcho({ text, signal: abortSignal, sleep = SLEEP }) {
+  const doSleep = (ms) => sleep(ms, abortSignal);
   const rid = `echo_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   yield { type: 'begin', payload: { run_id: rid, text } };
 
   // 1 · 听到
-  await sleep(380);
+  await doSleep(380);
   yield { type: 'bubble', payload: { run_id: rid, id: 1, voice: '听到了…' } };
 
   // 2 · 认识
-  await sleep(520);
+  await doSleep(520);
   const m = classify(text);
   const intent = m?.intent ?? 'passive_interest';
   const label  = m?.label  ?? '淡淡的念头';
@@ -86,7 +104,7 @@ export async function* runEcho({ text, sleep = SLEEP }) {
   };
 
   // 3 · 翻出老物件
-  await sleep(520);
+  await doSleep(520);
   if (!m) {
     yield { type: 'bubble', payload: { run_id: rid, id: 3, voice: '等等，我在你的记忆里翻一翻… 好像没有能接住的那条。' } };
     yield { type: 'end', payload: { run_id: rid, ok: false, reason: 'no-match' } };
@@ -110,7 +128,7 @@ export async function* runEcho({ text, sleep = SLEEP }) {
   };
 
   // 4 · 发现博主有了新动作
-  await sleep(520);
+  await doSleep(520);
   const action = state.actions.find((a) => a.topic === m.topic);
   if (!action) {
     yield { type: 'bubble', payload: { run_id: rid, id: 4, voice: `${c.display} 那边暂时还没新动作 · 先把这件事记下了` } };
@@ -131,7 +149,7 @@ export async function* runEcho({ text, sleep = SLEEP }) {
   };
 
   // 5 · 明信片
-  await sleep(620);
+  await doSleep(620);
   const claimed = claimFulfillment(signal.id);
   if (!claimed) {
     yield { type: 'bubble', payload: { run_id: rid, id: 5, voice: '啊，这条刚刚被另一股念头接走了。' } };

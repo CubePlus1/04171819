@@ -107,6 +107,51 @@ async function main() {
   });
   assert(junk.status === 400, '非法 JSON → 400');
 
+  // 边界：超大 body → 413 JSON（body 用 x 填满超过 MAX_BODY_BYTES=4096）
+  const oversize = await fetch(`${BASE}/api/echo`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: 'x'.repeat(5000) }),
+  });
+  assert(oversize.status === 413, `超大 body → 413（实际 ${oversize.status}）`);
+  const oversizeCt = oversize.headers.get('content-type') || '';
+  assert(oversizeCt.includes('application/json'), '超大 body 响应是 JSON');
+
+  // 边界：不在 allowlist 的 origin → 403 JSON，不带 ACAO
+  const evil = await fetch(`${BASE}/api/state`, {
+    headers: { Origin: 'https://evil.example.com' },
+  });
+  assert(evil.status === 403, `恶意 origin → 403（实际 ${evil.status}）`);
+  assert(!evil.headers.get('access-control-allow-origin'),
+    '恶意 origin · 不带 ACAO 头');
+
+  // 断连取消：开一条流，begin 刚到就中止，后续再发同一条 → 仍可成功（未消耗履约）
+  await fetch(`${BASE}/api/reset`, { method: 'POST' });
+  const ctrl = new AbortController();
+  const abortable = fetch(`${BASE}/api/echo`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: '蹲链接姐妹们 上衣链接求！' }),
+    signal: ctrl.signal,
+  });
+  // 让 begin 过来，然后切断
+  await new Promise((r) => setTimeout(r, 250));
+  ctrl.abort();
+  await abortable.catch(() => {/* expected */});
+  // 等至少 2.5s 保证服务端已经跑到履约前且能感知到 abort
+  await new Promise((r) => setTimeout(r, 2800));
+  const retryResp = await fetch(`${BASE}/api/echo`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: '蹲链接姐妹们 上衣链接求！' }),
+  });
+  const retryEvents = await parseSse(retryResp);
+  const retryEnd = retryEvents[retryEvents.length - 1];
+  assert(
+    retryEnd.event === 'end' && retryEnd.data.ok === true,
+    `断连取消 · 再次发送可成功（实际 end=${JSON.stringify(retryEnd.data)}）`,
+  );
+
   console.log('\n🎉 echo smoke all green');
 }
 
