@@ -44,3 +44,42 @@ export const INTENTS = Object.freeze({
   PLUS_ONE:         'plus_one',
   PASSIVE_INTEREST: 'passive_interest',
 });
+
+export const MAX_COMMENT_GRAPHEMES = 140;
+
+/**
+ * 情景锚点统一用 floor-based 阈值，让后端 P1 文案和前端历史列表的相对时间保持一致
+ */
+export function relativeTimeCn(iso) {
+  if (!iso) return '';
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  const diffMs = now - then;
+  if (!Number.isFinite(diffMs) || diffMs < 0) return '刚刚';
+  const MIN = 60_000, HOUR = 3_600_000, DAY = 86_400_000;
+  if (diffMs < MIN) return '刚刚';
+  if (diffMs < HOUR) return `${Math.floor(diffMs / MIN)} 分钟前`;
+  if (diffMs < DAY)  return `${Math.floor(diffMs / HOUR)} 小时前`;
+  const days = Math.floor(diffMs / DAY);
+  if (days === 1) return '昨天';
+  if (days < 7)   return `${days} 天前`;
+  if (days < 31)  return `${Math.floor(days / 7)} 周前`;
+  if (days < 365) return `${Math.floor(days / 30)} 个月前`;
+  return `${Math.floor(days / 365)} 年前`;
+}
+
+/**
+ * 用书写字符数而非 UTF-16 code unit 数计算长度，兼容 emoji 与 CJK
+ */
+export function graphemeLength(text) {
+  if (typeof text !== 'string') return 0;
+  if (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function') {
+    try {
+      const seg = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+      let count = 0;
+      for (const _ of seg.segment(text)) count += 1;
+      return count;
+    } catch {/* fallthrough */}
+  }
+  return Array.from(text).length;
+}

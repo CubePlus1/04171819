@@ -11,7 +11,10 @@ import { runWorkflow, newRunId } from './workflow.js';
 import { createRateLimiter } from './rateLimit.js';
 import { createLogger } from './logger.js';
 import { seed } from './seed.js';
-import { WS_EVENTS, REASON_CODES } from '../../shared/contracts.js';
+import { WS_EVENTS, REASON_CODES, MAX_COMMENT_GRAPHEMES, graphemeLength } from '../../shared/contracts.js';
+
+// 服务器实例 epoch：每次进程启动或 reset 时递增，帮助前端发现「后端重启了 → 清掉本地 stale 卡片」
+let SERVER_EPOCH = Date.now().toString(36);
 
 const log = createLogger('server');
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -100,6 +103,10 @@ function createApp(broadcast, state) {
     res.json({ ok: true, ts: Date.now() });
   });
 
+  app.get('/api/epoch', (_req, res) => {
+    res.json({ ok: true, epoch: SERVER_EPOCH });
+  });
+
   app.get('/api/bootstrap', (_req, res) => {
     const db = getDb();
     const fixtures = loadFixtures();
@@ -122,6 +129,7 @@ function createApp(broadcast, state) {
       .map((row) => ({ ...row, pages: JSON.parse(row.pages_json) }));
 
     res.json({
+      server_epoch: SERVER_EPOCH,
       user,
       feed: fixtures.feed,
       presets: [
@@ -146,16 +154,18 @@ function createApp(broadcast, state) {
     const text = typeof req.body?.text === 'string' ? req.body.text.trim() : '';
     const rawUserId = req.body?.userId;
     const userId = typeof rawUserId === 'string' && rawUserId ? rawUserId : DEMO_USER_ID;
+    const rawClientId = req.body?.clientId;
+    const clientId = typeof rawClientId === 'string' && rawClientId ? rawClientId : null;
     if (!text) {
       return res.status(400).json({ ok: false, error: 'text required' });
     }
-    if (text.length > 140) {
-      return res.status(400).json({ ok: false, error: 'text too long (max 140)' });
+    if (graphemeLength(text) > MAX_COMMENT_GRAPHEMES) {
+      return res.status(400).json({ ok: false, error: `text too long (max ${MAX_COMMENT_GRAPHEMES})` });
     }
 
     const runId = newRunId();
     state.inFlight.add(runId);
-    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, text, userId });
+    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, client_id: clientId, text, userId });
     try {
       const result = await runWorkflow({
         comment: text,
@@ -164,10 +174,10 @@ function createApp(broadcast, state) {
         onStep: (frame) => broadcast(WS_EVENTS.WORKFLOW_STEP, frame),
       });
       if (result.ok) {
-        broadcast(WS_EVENTS.CARD_GENERATED, { run_id: runId, card: result.card });
-        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: true, cardId: result.card.id });
+        broadcast(WS_EVENTS.CARD_GENERATED, { run_id: runId, client_id: clientId, card: result.card });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ok: true, cardId: result.card.id });
       } else {
-        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: false, reason: result.reason });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ok: false, reason: result.reason });
       }
       res.json({
         ok: result.ok,
@@ -176,7 +186,7 @@ function createApp(broadcast, state) {
       });
     } catch (err) {
       log.error('workflow failed', { run_id: runId, err: err.message, stack: err.stack });
-      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: false, reason: REASON_CODES.SERVER_ERROR });
+      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ok: false, reason: REASON_CODES.SERVER_ERROR });
       res.status(500).json({ ok: false, runId, error: 'internal' });
     } finally {
       state.inFlight.delete(runId);
@@ -202,8 +212,9 @@ function createApp(broadcast, state) {
     log.info('reset requested');
     closeDb();
     seed();
-    broadcast(WS_EVENTS.DEMO_RESET, {});
-    res.json({ ok: true });
+    SERVER_EPOCH = Date.now().toString(36);
+    broadcast(WS_EVENTS.DEMO_RESET, { epoch: SERVER_EPOCH });
+    res.json({ ok: true, epoch: SERVER_EPOCH });
   });
 
   // 兜底：任何未命中的 API 返回 404 JSON（不要返回 html）

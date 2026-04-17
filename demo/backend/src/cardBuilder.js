@@ -9,17 +9,7 @@ const ACTION_VERB_BY_SIGNAL = {
   passive_interest:  '反复刷到过',
 };
 
-const RELATIVE_TIME_CN = (occurredAtIso) => {
-  const occurred = new Date(occurredAtIso).getTime();
-  const now = Date.now();
-  const days = Math.max(0, Math.round((now - occurred) / 86400_000));
-  if (days === 0) return '今天';
-  if (days === 1) return '昨天';
-  if (days < 7)   return `${days} 天前`;
-  if (days < 31)  return `${Math.round(days / 7)} 周前`;
-  if (days < 365) return `${Math.round(days / 30)} 个月前`;
-  return `${Math.round(days / 365)} 年前`;
-};
+import { relativeTimeCn as RELATIVE_TIME_CN } from '../../shared/contracts.js';
 
 const SCRIPT_TO_PAGES = { A: ['P1', 'P2'], B: ['P1', 'P3'], C: ['P1', 'P2', 'P3'] };
 
