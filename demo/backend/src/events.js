@@ -4,8 +4,17 @@ import { createLogger } from './logger.js';
 
 const log = createLogger('ws');
 
-export function createBroadcaster(httpServer, { path = '/ws' } = {}) {
-  const wss = new WebSocketServer({ server: httpServer, path });
+export function createBroadcaster(httpServer, { path = '/ws', isOriginAllowed } = {}) {
+  const wss = new WebSocketServer({
+    server: httpServer,
+    path,
+    verifyClient(info, cb) {
+      const origin = info.origin || info.req.headers['origin'] || null;
+      if (!isOriginAllowed || isOriginAllowed(origin)) return cb(true);
+      log.warn('ws rejected (origin)', { origin });
+      return cb(false, 403, 'origin not allowed');
+    },
+  });
 
   wss.on('connection', (socket, req) => {
     log.info('client connected', { remote: req.socket.remoteAddress, count: wss.clients.size });

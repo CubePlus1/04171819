@@ -8,6 +8,7 @@ import cors from 'cors';
 import { DB_PATH, getDb, runSchema, closeDb } from './db.js';
 import { createBroadcaster } from './events.js';
 import { runWorkflow, newRunId } from './workflow.js';
+import { createRateLimiter } from './rateLimit.js';
 import { createLogger } from './logger.js';
 import { seed } from './seed.js';
 
@@ -27,6 +28,26 @@ function isLocalRequest(req) {
   return LOCAL_ONLY_HOSTS.has(ip);
 }
 
+// CORS & WS origin：默认只信 localhost / 本机网络；可通过 env 追加
+const DEFAULT_ALLOWED_ORIGINS = [
+  /^https?:\/\/localhost(:\d+)?$/,
+  /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
+  /^https?:\/\/\[::1\](:\d+)?$/,
+  /^https?:\/\/192\.168\.\d+\.\d+(:\d+)?$/,
+  /^https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/,
+  /^https?:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+(:\d+)?$/,
+];
+const EXTRA_ORIGINS = (process.env.ALLOWED_ORIGINS ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+export function isOriginAllowed(origin) {
+  if (!origin) return true; // curl / smoke / server-to-server
+  if (EXTRA_ORIGINS.includes(origin) || EXTRA_ORIGINS.includes('*')) return true;
+  return DEFAULT_ALLOWED_ORIGINS.some((re) => re.test(origin));
+}
+
 function ensureDb() {
   mkdirSync(dirname(DB_PATH), { recursive: true });
   const fresh = !existsSync(DB_PATH);
@@ -42,11 +63,35 @@ function loadFixtures() {
   return JSON.parse(readFileSync(FIXTURES_PATH, 'utf8'));
 }
 
-function createApp(broadcast) {
+function createApp(broadcast, state) {
   const app = express();
   app.set('trust proxy', 'loopback');
-  app.use(cors());
+
+  app.use(
+    cors({
+      origin(origin, cb) {
+        if (isOriginAllowed(origin)) cb(null, true);
+        else cb(new Error(`origin not allowed: ${origin}`));
+      },
+      credentials: false,
+    }),
+  );
+
   app.use(express.json({ limit: '64kb' }));
+
+  // 统一处理 body-parser 错误为 JSON（否则默认 HTML）
+  app.use((err, _req, res, next) => {
+    if (err && (err.type === 'entity.parse.failed' || err.type === 'entity.too.large')) {
+      const status = err.status || (err.type === 'entity.too.large' ? 413 : 400);
+      return res.status(status).json({ ok: false, error: err.type });
+    }
+    return next(err);
+  });
+
+  const commentLimiter = createRateLimiter({
+    capacity: Number(process.env.RATE_LIMIT_CAPACITY ?? 12),
+    refillPerSec: Number(process.env.RATE_LIMIT_REFILL ?? 3),
+  });
 
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true, ts: Date.now() });
@@ -84,6 +129,11 @@ function createApp(broadcast) {
   });
 
   app.post('/api/comment', async (req, res) => {
+    const rl = commentLimiter.take(req.ip || 'unknown');
+    if (!rl.ok) {
+      res.set('Retry-After', String(rl.retryAfter));
+      return res.status(429).json({ ok: false, error: 'rate-limited', retry_after: rl.retryAfter });
+    }
     const text = typeof req.body?.text === 'string' ? req.body.text.trim() : '';
     const rawUserId = req.body?.userId;
     const userId = typeof rawUserId === 'string' && rawUserId ? rawUserId : DEMO_USER_ID;
@@ -95,6 +145,7 @@ function createApp(broadcast) {
     }
 
     const runId = newRunId();
+    state.inFlight.add(runId);
     broadcast('workflow.begin', { run_id: runId, text, userId });
     try {
       const result = await runWorkflow({
@@ -118,13 +169,26 @@ function createApp(broadcast) {
       log.error('workflow failed', { run_id: runId, err: err.message, stack: err.stack });
       broadcast('workflow.end', { run_id: runId, ok: false, reason: 'server-error' });
       res.status(500).json({ ok: false, runId, error: 'internal' });
+    } finally {
+      state.inFlight.delete(runId);
     }
   });
 
-  app.post('/api/reset', (req, res) => {
+  app.post('/api/reset', async (req, res) => {
     if (!isLocalRequest(req)) {
       log.warn('reset rejected (non-local)', { ip: req.ip });
       return res.status(403).json({ ok: false, error: 'reset is local-only' });
+    }
+    if (state.inFlight.size > 0) {
+      // 排空 in-flight：最长等 3 秒
+      const deadline = Date.now() + 3000;
+      while (state.inFlight.size > 0 && Date.now() < deadline) {
+        await new Promise((r) => setTimeout(r, 50));
+      }
+      if (state.inFlight.size > 0) {
+        log.warn('reset blocked by in-flight workflows', { in_flight: state.inFlight.size });
+        return res.status(409).json({ ok: false, error: 'in-flight-workflow' });
+      }
     }
     log.info('reset requested');
     closeDb();
@@ -142,8 +206,12 @@ function createApp(broadcast) {
 function main() {
   ensureDb();
   const httpServer = createServer();
-  const { wss, broadcast } = createBroadcaster(httpServer, { path: '/ws' });
-  const app = createApp(broadcast);
+  const { wss, broadcast } = createBroadcaster(httpServer, {
+    path: '/ws',
+    isOriginAllowed,
+  });
+  const state = { inFlight: new Set() };
+  const app = createApp(broadcast, state);
   httpServer.on('request', app);
 
   httpServer.listen(PORT, () => {
