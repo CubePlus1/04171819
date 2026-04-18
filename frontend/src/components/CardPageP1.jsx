@@ -88,15 +88,76 @@ function Answer({ answer }) {
   return <AnswerInline answer={answer} />;
 }
 
+/**
+ * 主按钮组：
+ * - 单按钮时全宽大块
+ * - 两个按钮：第一个全宽抖音粉 · 第二个白底次级（保持情感主导 + 分流操作）
+ */
+function PrimaryButtons({ actions, onAction }) {
+  if (actions.length === 0) return null;
+  const [lead, ...rest] = actions;
+  return (
+    <>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onAction(lead.id, lead.label);
+        }}
+        className="focus-ring w-full rounded-2xl bg-[color:var(--color-warmth)] px-5 py-3.5 text-[15px] font-black text-white shadow-lg shadow-[color:var(--color-warmth)]/25 transition-all hover:brightness-110 active:scale-[0.97]"
+      >
+        {lead.label}
+      </button>
+      {rest.length > 0 && (
+        <div className="grid grid-cols-1 gap-2" style={{ gridTemplateColumns: `repeat(${rest.length}, minmax(0, 1fr))` }}>
+          {rest.map((a) => (
+            <button
+              key={a.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAction(a.id, a.label);
+              }}
+              className="focus-ring rounded-2xl border border-[color:var(--color-warmth)]/30 bg-[color:var(--color-warmth)]/8 px-4 py-3 text-[13px] font-bold text-[color:var(--color-warmth)] transition-all hover:bg-[color:var(--color-warmth)]/15 active:scale-[0.97]"
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+// 每个 action id 对应的回显文案 · 缺失则直接回显 label
 const ACTION_FEEDBACK = {
+  // 默认旧 id（保留兼容）
   add_wish: '已加到「我蹲过的」· 不让它再错过',
   view:     '先替你留在这儿，不让它再溜走',
   resume:   '从 Day1 接着给你看',
   recap:    '前情替你捋好了，她的心意也接上了',
-  play:     '放给你看 · 含 10s 前情提要',
-  share:    '这份惦记，替你带给爷爷了',
+  play:     '放给你看',
   save:     '收藏到「我蹲过的」· 等下次相遇',
+  save_later: '好，下次她再冒出来',
   not_now:  '好，这次先放过它',
+  // 剧本特化 id
+  view_link:        '链接已为你打开 · 平替同款',
+  view_outfit:      '她的搭配灵感替你整理了',
+  resume_d1:        '从 Day1 开始 · 帮你接回来',
+  play_sequel:      '下集已备好 · 含 10 秒前情',
+  share_grandpa:    '这份惦记，替你带给爷爷了',
+  claim_template:   '模板已归入你的笔记 · 免费可复制',
+  view_method:      '笔记方法已展开',
+  start_day1:       '从第一天开始做起 · 清单在手',
+  save_menu:        '菜单存到「我蹲过的」',
+  play_music:       '这版已为你循环播放',
+  share_friend:     '已转给和你一起追的朋友',
+  play_travel:      '下集开播 · 替你补上前情',
+  save_route:       '这条路线存好了',
+  start_training_d1:'Day1 开始 · 训练计划已就位',
+  save_plan:        '训练表存到「我蹲过的」',
+  follow_tutorial:  '分步已展开 · 画一张吧',
+  save_tutorial:    '教程已收藏',
+  claim_kit:        '新手包链接已为你打开',
+  view_plants:      '种什么好 · 已整理给你',
 };
 
 export default function CardPageP1({ page, scriptId, onAction }) {
@@ -122,28 +183,28 @@ export default function CardPageP1({ page, scriptId, onAction }) {
 
       <Answer answer={page.answer} />
 
-      <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
-        {page.actions?.primary?.map((a) => (
-          <button
-            key={a.id}
-            onClick={() => handleAction(a.id, a.label)}
-            className="focus-ring rounded-full bg-ember px-4 py-1.5 text-[13px] font-medium text-white shadow-card transition hover:translate-y-[-1px]"
-          >
-            {a.label}
-          </button>
-        ))}
-        {page.actions?.secondary?.map((a) => (
-          <button
-            key={a.id}
-            onClick={() => handleAction(a.id, a.label)}
-            className="focus-ring rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[12px] text-stone-200 hover:bg-white/10"
-          >
-            {a.label}
-          </button>
-        ))}
+      {/* CTA 区 · 抖音风按钮组：主按钮大块粉 + 次按钮分列白底 */}
+      <div className="mt-auto flex flex-col gap-2 pt-2">
+        <PrimaryButtons actions={page.actions?.primary ?? []} onAction={handleAction} />
+        {page.actions?.secondary?.length > 0 && (
+          <div className="grid grid-cols-2 gap-2">
+            {page.actions.secondary.map((a) => (
+              <button
+                key={a.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAction(a.id, a.label);
+                }}
+                className="focus-ring rounded-2xl border border-black/5 bg-black/[0.03] px-3 py-3 text-[13px] font-bold text-[color:var(--color-text)] transition-all hover:bg-black/[0.06] active:scale-[0.97]"
+              >
+                {a.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="text-center text-[12px] italic text-warmth/90">
+      <div className="text-center text-[12px] italic text-[color:var(--color-warmth)]/90">
         {page.emotional_close}
       </div>
     </div>
