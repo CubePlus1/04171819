@@ -128,12 +128,19 @@ export function buildCard({ match, intentResult, userId }) {
     C: '你蹲过的那条 · 她替你接回来了',
   }[scriptId] ?? '你念念不忘的 · 接回来了';
 
+  const occurredRelative = RELATIVE_TIME_CN(signal.occurred_at);
+  // Figma 顶端大标题：action.payload.headline 里的 {time} 用相对时间替换
+  const headlineTpl = action?.payload?.headline
+    ?? `我 {time} 蹲的那件事 · 它来了`;
+  const headline = headlineTpl.replace('{time}', occurredRelative);
+
   const p1 = {
     id: 'P1',
     name: '情景 + 答案',
     // Figma 轻卡：我原评论 + 相对时间 + 原视频行 + 作者标签
     my_comment: signal.raw_text ?? '',
-    occurred_relative: RELATIVE_TIME_CN(signal.occurred_at),
+    occurred_relative: occurredRelative,
+    headline,
     context_line: buildContextLine({ signal, creator }),
     emotional_close: action?.payload?.emotional_close ?? defaultClose,
     answer: buildAnswer({ scriptId, action }),
