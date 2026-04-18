@@ -16,7 +16,7 @@ export default function TriggerPicker({ onPick, disabled }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-[11px] uppercase tracking-[0.18em] text-stone-400">
+      <div className="text-[11px] uppercase tracking-[0.18em] text-stone-200">
         展台控制 · 让下一条优先接哪类
       </div>
       <div className="grid grid-cols-1 gap-2">
@@ -32,7 +32,7 @@ export default function TriggerPicker({ onPick, disabled }) {
           >
             <div className="flex min-w-0 flex-col">
               <span className="truncate font-medium">{t.label}</span>
-              <span className="truncate text-[11px] text-stone-400">{t.hint}</span>
+              <span className="truncate text-[11px] text-stone-200">{t.hint}</span>
             </div>
             <span className="shrink-0 rounded-full bg-black/30 px-2 py-0.5 text-[10px] tracking-widest text-stone-300">
               剧本 {t.script}

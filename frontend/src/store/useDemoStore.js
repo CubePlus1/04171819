@@ -8,7 +8,9 @@ const STEP_TEMPLATE = [
   { step: 5, name: '触发卡片生成', status: 'idle', detail: null },
 ];
 
-const MAX_CARDS_IN_UI = 40;
+// 展台循环模式下刷过的卡需要腾走 · 只保留最近 6 张
+// （MAX_CARDS_IN_UI 既约束渲染又约束内存 · 超过会从末尾自然淘汰）
+const MAX_CARDS_IN_UI = 6;
 
 const initialState = {
   connected: false,

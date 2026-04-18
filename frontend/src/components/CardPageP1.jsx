@@ -21,17 +21,17 @@ function AnswerProduct({ answer }) {
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-lg font-semibold text-ember">{product.price}</span>
                 {product.original && (
-                  <span className="text-[11px] text-stone-400 line-through">{product.original}</span>
+                  <span className="text-[11px] text-stone-200 line-through">{product.original}</span>
                 )}
               </div>
-              <div className="mt-1 text-[11px] text-stone-400">来自 {product.shop}</div>
+              <div className="mt-1 text-[11px] text-stone-200">来自 {product.shop}</div>
             </div>
           </div>
         </div>
       )}
 
       {summary && (
-        <div className="text-[12px] leading-relaxed text-stone-300/90">
+        <div className="text-[12px] leading-relaxed text-stone-100">
           {summary}
         </div>
       )}
@@ -59,7 +59,7 @@ function AnswerSeries({ answer }) {
           </div>
         ))}
       </div>
-      {summary && <div className="text-[12px] leading-relaxed text-stone-300/90">{summary}</div>}
+      {summary && <div className="text-[12px] leading-relaxed text-stone-100">{summary}</div>}
     </div>
   );
 }
@@ -77,7 +77,7 @@ function AnswerInline({ answer }) {
           含 {video.preview_seconds}s 前情提要
         </span>
       </div>
-      {summary && <div className="text-[12px] leading-relaxed text-stone-300/90">{summary}</div>}
+      {summary && <div className="text-[12px] leading-relaxed text-stone-100">{summary}</div>}
     </div>
   );
 }

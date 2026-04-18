@@ -21,7 +21,7 @@ export default function CardPageP3({ page }) {
               className="relative pb-3"
             >
               <span className="absolute -left-[9px] top-1 h-2 w-2 rounded-full bg-warmth" />
-              <div className="text-[11px] text-stone-400">
+              <div className="text-[11px] text-stone-200">
                 {it.relative_time} · {it.signal_label}
               </div>
               <div className="text-[13px] text-stone-100">{it.video_title}</div>

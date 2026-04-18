@@ -196,7 +196,7 @@ export default function App() {
 
 function Header({ connected, user, onReset, themes, theme, onPickTheme }) {
   return (
-    <header className="flex items-center justify-between px-6 pt-5 pb-3 no-select">
+    <header className="relative flex items-center justify-between px-6 pt-5 pb-3 no-select bg-[color:var(--color-stage)]/90 backdrop-blur-md">
       <div className="flex items-center gap-3">
         <div className="relative h-7 w-7 rounded-full bg-gradient-to-br from-ember to-kiss shadow-card">
           <span className="absolute inset-0 rounded-full bg-ember/20 blur-md" />
@@ -205,8 +205,8 @@ function Header({ connected, user, onReset, themes, theme, onPickTheme }) {
           <div className="text-[15px] font-semibold tracking-[0.18em] text-[var(--color-text)]">
             蹲到了 · DUNDAO
           </div>
-          <div className="text-[11px] text-[var(--color-text-muted)]">
-            字节 Hackathon · 赛道三｜履约型内容 · 过去 × 此刻的桥
+          <div className="text-[11px] font-medium text-[var(--color-text-muted)]">
+            逆风如解意 · 把你念念不忘的，接回来
           </div>
         </div>
       </div>

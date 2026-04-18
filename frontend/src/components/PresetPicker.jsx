@@ -11,7 +11,7 @@ export default function PresetPicker({ onPick, disabled }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-[11px] uppercase tracking-[0.18em] text-stone-500">预设评论 · 评委一键触发</div>
+      <div className="text-[11px] uppercase tracking-[0.18em] text-stone-300">预设评论 · 评委一键触发</div>
       <div className="grid grid-cols-1 gap-2">
         {presets.map((p) => (
           <button

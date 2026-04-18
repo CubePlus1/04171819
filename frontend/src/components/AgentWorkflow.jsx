@@ -21,9 +21,9 @@ export default function AgentWorkflow() {
           <span id="workflow-heading" className="pill bg-hintB/15 text-hintB">
             它怎么把你记起来
           </span>
-          <span className="text-[12px] text-stone-400">不是黑盒 · 是把那句惦记慢慢接回来</span>
+          <span className="text-[12px] text-stone-200">不是黑盒 · 是把那句惦记慢慢接回来</span>
         </div>
-        <div className="text-[11px] text-stone-400" aria-hidden="true">
+        <div className="text-[11px] text-stone-200" aria-hidden="true">
           {running ? '正在帮你接回来…' : lastReason ? `这次没接住 · ${lastReason}` : '等你一句话'}
         </div>
       </div>
