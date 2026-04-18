@@ -47,11 +47,10 @@ html[data-surface='light'] body {
   color: var(--color-text);
 }
 
-/* 浅色下 · 组件里写死的 text-stone-* 在白底不可见 · 统一映射到 var 文字色 */
-html[data-surface='light'] .text-stone-50,
-html[data-surface='light'] .text-white {
-  color: var(--color-text) !important;
-}
+/* 浅色下 · 组件里写死的 text-stone-* 在白底不可见 · 统一映射到 var 文字色
+   · text-white / text-stone-50 是组件明确表达"我要纯白"的意图（通常叠在图片/黑底上）
+     不 override · 保持原样
+   · text-stone-100..400 是弱化文字 · 在浅色白底上才成问题 · 需要映射 */
 html[data-surface='light'] .text-stone-100,
 html[data-surface='light'] .text-stone-200 {
   color: var(--color-text) !important;
