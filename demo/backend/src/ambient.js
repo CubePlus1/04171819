@@ -132,6 +132,20 @@ function snapshotMindNodes(db, userId) {
 }
 
 /**
+ * 展台循环模式的"软 reset"：
+ *   - 清空 cards（前端 MAX_CARDS_IN_UI 自然淘汰旧卡 · 不会看到面板被抹空）
+ *   - 把所有 intent_signals 的 fulfilled 重置为 0
+ *   - creator_actions 保持不动
+ * 只在展台循环模式下由 runAmbient 内部兜底调用 · 不暴露 HTTP 入口
+ */
+function softResetForLoop(db) {
+  db.transaction(() => {
+    db.prepare('DELETE FROM cards').run();
+    db.prepare('UPDATE intent_signals SET fulfilled = 0').run();
+  })();
+}
+
+/**
  * @param {object} params
  * @param {string}  params.userId
  * @param {string}  [params.runId]
@@ -139,6 +153,7 @@ function snapshotMindNodes(db, userId) {
  * @param {number}  [params.signalId]      - 手动指定信号 id
  * @param {function} [params.onStep]       - 每步广播回调
  * @param {number}  [params.stepDelayMs]
+ * @param {boolean} [params.loopMode]      - 展台循环：所有剧本接完后自动软 reset 重演
  */
 export async function runAmbient({
   userId,
@@ -147,6 +162,7 @@ export async function runAmbient({
   signalId = null,
   onStep,
   stepDelayMs = DEFAULT_STEP_DELAY_MS,
+  loopMode = false,
 }) {
   if (typeof userId !== 'string' || !userId) {
     throw new TypeError('runAmbient: userId must be a non-empty string');
@@ -174,7 +190,17 @@ export async function runAmbient({
   await sleep(stepDelayMs);
 
   // Step 2 · 挑中这一条（未履约 × 刚好有匹配动作）· mind.phase=recall
-  const pick = pickNextCandidate(db, { userId, topic, signalId });
+  let pick = pickNextCandidate(db, { userId, topic, signalId });
+
+  // 展台循环：若一轮剧本接完（含手动指定 topic/signalId 的情况），软 reset 重演
+  // 这样前端永远看不到 pending=false，卡片持续浮入，重复剧本对观众是"下一波履约"
+  let didLoopReset = false;
+  if (!pick && loopMode) {
+    softResetForLoop(db);
+    didLoopReset = true;
+    pick = pickNextCandidate(db, { userId, topic, signalId });
+  }
+
   if (!pick) {
     onStep?.(stepFrame(runId, 2, '挑中这一条', {
       hit: false,
@@ -352,9 +378,21 @@ export async function runAmbient({
 
 /**
  * 是否还有主题未被接回来？主题级聚合，避免同一 topic 重复生成卡片。
+ *
+ * loopMode 下只要 fixtures 里还有可匹配的 (signal × action) 对就视为 pending：
+ * 真正跑 runAmbient 时若取不到会软 reset 再取，前端观感是永远有得接。
  */
-export function hasPendingAmbient(userId) {
+export function hasPendingAmbient(userId, { loopMode = false } = {}) {
   const db = getDb();
+  if (loopMode) {
+    const row = db.prepare(`
+      SELECT COUNT(*) AS c
+        FROM intent_signals s
+        JOIN creator_actions ca ON ca.topic = s.topic
+       WHERE s.user_id = ?
+    `).get(userId);
+    return row.c > 0;
+  }
   const row = db.prepare(`
     SELECT COUNT(DISTINCT s.topic) AS c
       FROM intent_signals s

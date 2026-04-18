@@ -25,6 +25,10 @@ const PORT = Number(process.env.PORT ?? 4000);
 const DEMO_USER_ID = 'demo-user';
 const BOOTSTRAP_CARDS_LIMIT = Number(process.env.BOOTSTRAP_CARDS_LIMIT ?? 30);
 
+// 展台循环模式：pending 永远为 true · runAmbient 在剧本接完后软 reset 重演
+// 默认关闭（保护 smoke 契约）· npm run dev 会自动设 1 · 生产/测试不设
+const LOOP_MODE = process.env.LOOP_MODE === '1' || process.env.DEMO_LOOP === '1';
+
 // 仅本机可触发破坏性操作（reset）；部署到真机/云端时可通过 env 显式放开
 const LOCAL_ONLY_HOSTS = new Set(['127.0.0.1', '::1', 'localhost', '::ffff:127.0.0.1']);
 
@@ -136,7 +140,7 @@ function createApp(broadcast, state) {
       { id: 'trigger-B', label: '稍后再看 · 系列型',   script: 'B', topic: '30days-series',     hint: '把她一个月前按稍后再看的系列接上' },
       { id: 'trigger-C', label: '蹲后续 · 情感收尾',   script: 'C', topic: 'grandpa-archive',   hint: '把她蹲过的那集后续接过来' },
     ];
-    const pending = hasPendingAmbient(DEMO_USER_ID);
+    const pending = hasPendingAmbient(DEMO_USER_ID, { loopMode: LOOP_MODE });
 
     res.json({
       server_epoch: SERVER_EPOCH,
@@ -144,6 +148,7 @@ function createApp(broadcast, state) {
       feed: fixtures.feed,
       triggers,
       pending,
+      loop_mode: LOOP_MODE,
       history,
       cards,
     });
@@ -221,6 +226,7 @@ function createApp(broadcast, state) {
     try {
       const result = await runAmbient({
         userId, runId, topic, signalId,
+        loopMode: LOOP_MODE,
         onStep: (frame) => broadcast(WS_EVENTS.WORKFLOW_STEP, { ...frame, ambient: true }),
       });
       if (result.ok) {
@@ -232,7 +238,7 @@ function createApp(broadcast, state) {
       res.json({
         ok: result.ok,
         runId,
-        pending: hasPendingAmbient(userId),
+        pending: hasPendingAmbient(userId, { loopMode: LOOP_MODE }),
         ...(result.ok ? { cardId: result.card.id } : { reason: result.reason }),
       });
     } catch (err) {

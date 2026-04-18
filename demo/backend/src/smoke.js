@@ -136,15 +136,26 @@ async function main() {
     assert(card.pages[0].context_line?.startsWith('你'), 'P1 情景锚点以 "你" 开头');
   }
 
-  // 三条都接完后，pending 应为 false
-  const afterAll = await (await fetch(`${BASE}/api/bootstrap`)).json();
-  assert(afterAll.pending === false, '三条全接完后 pending=false');
-  assert(afterAll.cards.length === 3, 'bootstrap 返回 3 张卡片');
+  // 三个指定剧本接完后，fixture 仍有其他 topic 未履约 · pending 应仍为 true
+  const afterThree = await (await fetch(`${BASE}/api/bootstrap`)).json();
+  assert(afterThree.pending === true, '指定 3 topic 接完后仍有其他 topic · pending=true');
+  assert(afterThree.cards.length === 3, '当前 bootstrap 返回 3 张卡片');
 
-  // ========== ambient 无可接时 · 返回 no-match ==========
-  const noMore = await ambientTick({});
-  assert(noMore.body.ok === false, 'ambient · 无可接时 ok=false');
-  assert(noMore.body.reason === 'no-match', 'ambient · reason=no-match');
+  // ========== 把剩余所有 topic 跑干 · 直到 no-match ==========
+  let drained = 0;
+  for (let i = 0; i < 20; i += 1) {
+    const r = await ambientTick({});
+    if (!r.body.ok) {
+      assert(r.body.reason === 'no-match', `drain 终止 reason=no-match（实际 ${r.body.reason}）`);
+      break;
+    }
+    drained += 1;
+  }
+  assert(drained >= 1, `至少还有 1 个 topic 可以接（实际 drain ${drained}）`);
+
+  const afterAll = await (await fetch(`${BASE}/api/bootstrap`)).json();
+  assert(afterAll.pending === false, '所有 topic 接完后 pending=false');
+  assert(afterAll.cards.length >= 3 + drained, `bootstrap 返回 >=${3 + drained} 张卡片（实际 ${afterAll.cards.length}）`);
 
   // ========== 自动 ambient（无 topic）· reset 后应能挑到第一条 ==========
   await resetDemo();

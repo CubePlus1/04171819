@@ -6,8 +6,9 @@
   "description": "蹲到了 Demo 后端：评论入栈 → 意图识别 → 匹配历史 → 入库 → 生成卡片",
   "main": "src/server.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
+    "dev": "DEMO_LOOP=1 node --watch src/server.js",
     "start": "node src/server.js",
+    "start:loop": "DEMO_LOOP=1 node src/server.js",
     "db:seed": "node src/seed.js",
     "smoke": "node src/smoke.js",
     "test": "node src/cardBuilder.test.js"
