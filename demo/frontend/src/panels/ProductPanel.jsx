@@ -6,6 +6,9 @@ export default function ProductPanel({ bootStatus, onAction }) {
   const user = useDemoStore((s) => s.user);
   const cards = useDemoStore((s) => s.cards);
   const spotlightCardId = useDemoStore((s) => s.spotlightCardId);
+  const advanceCount = useDemoStore((s) => s.advanceCount);
+  const interactionCount = useDemoStore((s) => s.interactionCount);
+  const queueLen = useDemoStore((s) => s.queue.length);
 
   const [liveMsg, setLiveMsg] = useState('');
   const lastSpotlightRef = useRef(null);
@@ -21,14 +24,32 @@ export default function ProductPanel({ bootStatus, onAction }) {
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <span className="pill bg-kiss/15 text-kiss">产品面板</span>
           <span className="text-[12px] text-stone-200">
             用户视角 · 抖音信息流模拟
           </span>
         </div>
-        <div className="flex items-center gap-2 text-[11px] text-stone-200">
+
+        {/* 进度条 + 统计 · 从视频上挪到这里 · 不再遮挡主内容 */}
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2 text-[11px] text-stone-200">
+          <ProgressDots advanced={advanceCount} />
+          <span className="whitespace-nowrap font-medium text-[color:var(--color-text)]">
+            刷 {advanceCount}
+          </span>
+          <span className="opacity-40">·</span>
+          <span className="whitespace-nowrap text-[color:var(--color-text-muted)]">
+            互动 {interactionCount}
+          </span>
+          {queueLen > 0 && (
+            <>
+              <span className="opacity-40">·</span>
+              <span className="whitespace-nowrap font-bold text-[color:var(--color-warmth)]">
+                队列+{queueLen}
+              </span>
+            </>
+          )}
           <span>已蹲 {cards.length}</span>
           {spotlightCardId && (
             <span className="pill bg-ember/15 text-kiss animate-pulse-soft">新卡片浮现中</span>
@@ -76,6 +97,26 @@ function EmptyState({ title, tip }) {
     <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-stone-300">
       <div className="text-[14px] font-medium">{title}</div>
       <div className="text-[12px] text-stone-200">{tip}</div>
+    </div>
+  );
+}
+
+// 进度条：展示最近 10 格 · 反映已刷条数
+function ProgressDots({ advanced }) {
+  const slots = 10;
+  const filled = Math.min(advanced, slots);
+  return (
+    <div className="flex items-center gap-1">
+      {Array.from({ length: slots }).map((_, i) => (
+        <span
+          key={i}
+          className={`h-1 rounded-full transition-all ${
+            i < filled
+              ? 'w-4 bg-[color:var(--color-warmth)]'
+              : 'w-2 bg-black/15'
+          }`}
+        />
+      ))}
     </div>
   );
 }
