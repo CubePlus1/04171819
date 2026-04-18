@@ -75,14 +75,27 @@ export default function AgentPanel({ onToast }) {
 
   return (
     <div className="flex h-full flex-col gap-3">
+      {/* AI 记忆引擎 · douyin-style header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="pill bg-hintB/15 text-hintB">念头后台</span>
-          <span className="text-[12px] text-stone-200">被动刷到即成立 · 无须输入</span>
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-lg border border-[color:var(--color-kiss)]/40 bg-[color:var(--color-kiss)]/10 text-xl text-[color:var(--color-kiss)]">
+            🧠
+          </div>
+          <div className="leading-tight">
+            <div className="text-[16px] font-black italic tracking-tight text-[color:var(--color-ink)]">
+              AI 为你记得
+            </div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[color:var(--color-kiss)]/80">
+              Memory Retrieval Engine //&nbsp;
+              <span className="text-[color:var(--color-warmth)]">
+                {connected ? 'Ready' : 'Offline'}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="text-[11px] text-stone-200">
-          {connected ? '正陪着她' : '等她上线…'}
-        </div>
+        <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1 font-mono text-[10px] text-[color:var(--color-text)] backdrop-blur">
+          BETA v0.1
+        </span>
       </div>
 
       <div className="flex-1 min-h-0 overflow-hidden rounded-3xl border border-white/5 bg-[color:var(--color-panel)] p-4">

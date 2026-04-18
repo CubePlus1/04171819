@@ -3,30 +3,29 @@
 @tailwind utilities;
 
 :root {
-  /* 默认风格：暖色治愈（Dundao Original）—— 若 theme 未加载，样式不塌 */
-  --color-stage:      #0b0b0f;
-  --color-panel:      #15151d;
-  --color-ink:        #1f1f2a;
-  --color-text:       #fafaf9;
-  --color-text-muted: #d6d3d1;
-  --color-text-dim:   #a8a29e;
-  --color-warmth:     #f4cf83;
-  --color-ember:      #ff5a5f;
-  --color-kiss:       #ffb3c0;
-  --color-hintA:      #f9a8d4;
-  --color-hintB:      #c4b5fd;
-  --color-hintC:      #fcd34d;
+  /* 默认风格：抖音浅色（Douyin Light）—— theme 未加载时的 fallback */
+  --color-stage:      #f6f6f8;
+  --color-panel:      #ffffff;
+  --color-ink:        #0f1115;
+  --color-text:       #1a1d24;
+  --color-text-muted: #5b606b;
+  --color-text-dim:   #8a8f99;
+  --color-warmth:     #fe2c55;   /* 抖音粉 · 主 CTA */
+  --color-ember:      #fe2c55;
+  --color-kiss:       #25f4ee;   /* 抖音青 · 副 accent */
+  --color-hintA:      #fe2c55;
+  --color-hintB:      #25f4ee;
+  --color-hintC:      #ffd60a;
 
-  --font-sans: 'PingFang SC', 'Source Han Sans SC', Inter, system-ui, sans-serif;
-  --radius-card: 1rem;
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Source Han Sans SC', Inter, system-ui, sans-serif;
+  --radius-card: 28px;
   --radius-pill: 9999px;
-  --shadow-card: 0 18px 48px -16px rgba(255, 91, 95, 0.35);
-  --shadow-soft: 0 8px 32px -8px rgba(0, 0, 0, 0.45);
-  --card-border: 1px solid rgba(255, 255, 255, 0.08);
+  --shadow-card: 0 18px 48px -18px rgba(254,44,85,0.18), 0 4px 14px -8px rgba(0,0,0,0.12);
+  --shadow-soft: 0 6px 20px -8px rgba(0,0,0,0.08);
+  --card-border: 1px solid rgba(15,17,21,0.08);
   --surface-glow:
-    radial-gradient(1200px 600px at 10% -10%, rgba(249, 168, 212, 0.10), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(196, 181, 253, 0.08), transparent 55%),
-    #0b0b0f;
+    radial-gradient(ellipse 900px 500px at 50% 110%, rgba(254,44,85,0.05), transparent 70%),
+    #f6f6f8;
 }
 
 html, body, #root {
@@ -46,6 +45,33 @@ body {
 /* 浅色风格根据 data-surface=light 反转一些默认 */
 html[data-surface='light'] body {
   color: var(--color-text);
+}
+
+/* 浅色下 · 组件里写死的 text-stone-* 在白底不可见 · 统一映射到 var 文字色 */
+html[data-surface='light'] .text-stone-50,
+html[data-surface='light'] .text-white {
+  color: var(--color-text) !important;
+}
+html[data-surface='light'] .text-stone-100,
+html[data-surface='light'] .text-stone-200 {
+  color: var(--color-text) !important;
+}
+html[data-surface='light'] .text-stone-300,
+html[data-surface='light'] .text-stone-400 {
+  color: var(--color-text-muted) !important;
+}
+
+/* 浅色下 · 深色主题惯用的 border-white/X / bg-white/X 需要反向（变暗） */
+html[data-surface='light'] .border-white\/5,
+html[data-surface='light'] .border-white\/10 {
+  border-color: rgba(15,17,21,0.10) !important;
+}
+html[data-surface='light'] .border-white\/20 {
+  border-color: rgba(15,17,21,0.18) !important;
+}
+html[data-surface='light'] .bg-white\/5,
+html[data-surface='light'] .bg-white\/10 {
+  background-color: rgba(15,17,21,0.04) !important;
 }
 
 /* 排版尺度变种 */

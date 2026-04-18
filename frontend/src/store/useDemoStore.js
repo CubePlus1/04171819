@@ -32,6 +32,8 @@ const initialState = {
   currentItem: null,
   queue: [],
   fillerCursor: 0,
+  advanceCount: 0,     // 已刷过多少条（键盘/滑动触发）
+  interactionCount: 0, // 鼠标在卡片上做过多少次互动（加到清单/看/收藏…）
 
   // Workflow UI 只跟踪 App 层已判定为「本标签页发起」的事件
   running: false,
@@ -187,11 +189,13 @@ export const useDemoStore = create((set) => ({
    */
   advance: () =>
     set((state) => {
+      const nextAdvanceCount = state.advanceCount + 1;
       if (state.queue.length > 0) {
         const [next, ...rest] = state.queue;
         return {
           currentItem: next,
           queue: rest,
+          advanceCount: nextAdvanceCount,
           spotlightCardId: next.kind === 'card' ? next.id : state.spotlightCardId,
         };
       }
@@ -201,8 +205,11 @@ export const useDemoStore = create((set) => ({
       return {
         currentItem: fillerItem(filler, state.fillerCursor),
         fillerCursor: state.fillerCursor + 1,
+        advanceCount: nextAdvanceCount,
       };
     }),
+
+  trackInteraction: () => set((state) => ({ interactionCount: state.interactionCount + 1 })),
 
   clearSpotlight: () => set({ spotlightCardId: null }),
 
