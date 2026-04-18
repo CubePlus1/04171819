@@ -102,10 +102,25 @@ function SeriesStrip({ thumbnails }) {
   );
 }
 
-export default function CardPageP1({ page, scriptId }) {
+const OPEN_FEEDBACK = {
+  A: '链接已为你打开 · 同款已备好',
+  B: 'Day1-Day5 的后续已按顺序接上',
+  C: '教程已开播 · 分步拆解已展开',
+};
+
+export default function CardPageP1({ page, scriptId, onAction }) {
   const { answer, creator } = page;
   const videoTitle = answer?.video?.title ?? '';
   const cover = answer?.video?.cover;
+
+  const handleDismiss = (e) => {
+    e.stopPropagation();
+    onAction?.('那先不打扰了 · 你随时叫我回来');
+  };
+  const handleOpen = (e) => {
+    e.stopPropagation();
+    onAction?.(OPEN_FEEDBACK[scriptId] ?? '为你打开了');
+  };
 
   // 珍珠条/条目 显示规则
   const isA = scriptId === 'A';
@@ -157,6 +172,24 @@ export default function CardPageP1({ page, scriptId }) {
         {isA && product && <ProductPearl product={product} />}
         {isB && seriesThumbs.length > 0 && <SeriesStrip thumbnails={seriesThumbs} />}
         <AuthorRow display={creator?.display ?? ''} avatar={creator?.avatar} />
+
+        {/* Figma 底部双按钮 · 不用了（退出功能）· 去看看（算法自信 · 直达） */}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <button
+            type="button"
+            onClick={handleDismiss}
+            className="focus-ring h-10 rounded-2xl border border-white/20 bg-white/10 text-[14px] font-semibold text-white/85 backdrop-blur-md transition hover:bg-white/15 active:scale-[0.97]"
+          >
+            不用了
+          </button>
+          <button
+            type="button"
+            onClick={handleOpen}
+            className="focus-ring h-10 rounded-2xl border border-white/40 bg-white/90 text-[14px] font-semibold text-black shadow-[0_6px_16px_-8px_rgba(0,0,0,0.4)] transition hover:bg-white active:scale-[0.97]"
+          >
+            去看看
+          </button>
+        </div>
       </motion.article>
     </div>
   );
