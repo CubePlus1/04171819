@@ -2,6 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import Feed from '../components/Feed.jsx';
 import { useDemoStore } from '../store/useDemoStore.js';
 
+// 从当前 item 里挑一张 cover 做模糊背景层 · 液态玻璃的色彩源泉
+function pickCoverUrl(item) {
+  if (!item) return null;
+  if (item.kind === 'feed') return item.data?.cover ?? null;
+  if (item.kind === 'card') {
+    const p1 = item.data?.pages?.find((p) => p.id === 'P1');
+    return p1?.answer?.video?.cover ?? null;
+  }
+  return null;
+}
+
 export default function ProductPanel({ bootStatus, onAction }) {
   const user = useDemoStore((s) => s.user);
   const cards = useDemoStore((s) => s.cards);
@@ -9,6 +20,8 @@ export default function ProductPanel({ bootStatus, onAction }) {
   const advanceCount = useDemoStore((s) => s.advanceCount);
   const interactionCount = useDemoStore((s) => s.interactionCount);
   const queueLen = useDemoStore((s) => s.queue.length);
+  const currentItem = useDemoStore((s) => s.currentItem);
+  const coverUrl = pickCoverUrl(currentItem);
 
   const [liveMsg, setLiveMsg] = useState('');
   const lastSpotlightRef = useRef(null);
@@ -62,8 +75,21 @@ export default function ProductPanel({ bootStatus, onAction }) {
       </span>
 
       <div className="relative flex-1 min-h-0 overflow-hidden rounded-3xl border border-white/5 bg-[color:var(--color-panel)]">
-        <div className="absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-[color:var(--color-panel)] to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-[color:var(--color-panel)] to-transparent pointer-events-none" />
+        {/* 液态玻璃氛围底：当前 cover 图模糊放大 · 玻璃卡就吃这个色彩 */}
+        {coverUrl && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-0 transition-[background-image] duration-700"
+            style={{
+              backgroundImage: `url(${coverUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              filter: 'blur(42px) saturate(140%)',
+              transform: 'scale(1.25)',
+            }}
+          />
+        )}
+        <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-black/10 via-transparent to-black/25" />
 
         <div className="h-full px-4 py-6">
           <div className="mx-auto h-full w-full max-w-[380px]">
