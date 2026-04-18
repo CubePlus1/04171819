@@ -129,10 +129,10 @@ export default function CardPageP1({ page, scriptId, onAction }) {
           transition={{ duration: 0.45 }}
           className="w-[342px] max-w-full self-center"
         >
-          <div className="text-[12px] font-medium tracking-[0.28em] text-white/75">
+          <div className="text-[32px] font-black leading-[1] tracking-[0.08em] text-white drop-shadow-[0_3px_14px_rgba(0,0,0,0.45)]">
             蹲到了
           </div>
-          <div className="mt-1 text-[22px] font-semibold leading-[1.35] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
+          <div className="mt-2 text-[20px] font-semibold leading-[1.35] text-white/95 drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
             {page.headline}
           </div>
         </motion.header>
