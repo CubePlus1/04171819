@@ -43,9 +43,15 @@ export default function DunCard({ card, spotlight, onAction }) {
           : '0 18px 48px -16px rgba(255, 91, 95, 0.35)',
       }}
       transition={{ type: 'spring', stiffness: 180, damping: 22 }}
-      className="feed-snap focus-ring relative h-full w-full overflow-hidden rounded-2xl border border-white/10 bg-panel"
+      className="lg-card feed-snap focus-ring relative h-full w-full overflow-hidden"
     >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-ember/10 via-kiss/5 to-transparent" />
+      {/* 顶部反光高光 · 玻璃厚度感 */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-24 rounded-t-[26px] opacity-70"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.35), transparent)',
+        }}
+      />
 
       <div className="absolute right-2 top-2 z-10 flex gap-0.5" role="tablist" aria-label="卡片分页">
         {pages.map((p, i) => (

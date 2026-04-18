@@ -95,28 +95,44 @@ function Answer({ answer }) {
  */
 function PrimaryButtons({ actions, onAction }) {
   if (actions.length === 0) return null;
-  const [lead, ...rest] = actions;
+  // 液态玻璃卡里 · 主 CTA 抖音粉（带玻璃反光）· 次要 CTA 白玻璃
+  if (actions.length === 1) {
+    const a = actions[0];
+    return (
+      <button
+        onClick={(e) => { e.stopPropagation(); onAction(a.id, a.label); }}
+        className="focus-ring lg-btn lg-btn-pink w-full px-5 py-3.5 text-[15px] font-black"
+      >
+        {a.label}
+      </button>
+    );
+  }
+  // 两个主按钮 · 并排 · 左侧玻璃白（次级）· 右侧抖音粉（主级）
+  // 参考液态玻璃稿里底部"不用了 · 去看看"双列布局
+  const [first, second, ...more] = actions;
   return (
     <>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onAction(lead.id, lead.label);
-        }}
-        className="focus-ring w-full rounded-2xl bg-[color:var(--color-warmth)] px-5 py-3.5 text-[15px] font-black text-white shadow-lg shadow-[color:var(--color-warmth)]/25 transition-all hover:brightness-110 active:scale-[0.97]"
-      >
-        {lead.label}
-      </button>
-      {rest.length > 0 && (
-        <div className="grid grid-cols-1 gap-2" style={{ gridTemplateColumns: `repeat(${rest.length}, minmax(0, 1fr))` }}>
-          {rest.map((a) => (
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          onClick={(e) => { e.stopPropagation(); onAction(first.id, first.label); }}
+          className="focus-ring lg-btn px-4 py-3.5 text-[14px] font-bold"
+        >
+          {first.label}
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onAction(second.id, second.label); }}
+          className="focus-ring lg-btn lg-btn-pink px-4 py-3.5 text-[14px] font-black"
+        >
+          {second.label}
+        </button>
+      </div>
+      {more.length > 0 && (
+        <div className="grid" style={{ gridTemplateColumns: `repeat(${more.length}, minmax(0, 1fr))`, gap: '0.5rem' }}>
+          {more.map((a) => (
             <button
               key={a.id}
-              onClick={(e) => {
-                e.stopPropagation();
-                onAction(a.id, a.label);
-              }}
-              className="focus-ring rounded-2xl border border-[color:var(--color-warmth)]/30 bg-[color:var(--color-warmth)]/8 px-4 py-3 text-[13px] font-bold text-[color:var(--color-warmth)] transition-all hover:bg-[color:var(--color-warmth)]/15 active:scale-[0.97]"
+              onClick={(e) => { e.stopPropagation(); onAction(a.id, a.label); }}
+              className="focus-ring lg-btn px-3 py-3 text-[13px]"
             >
               {a.label}
             </button>
@@ -183,8 +199,13 @@ export default function CardPageP1({ page, scriptId, onAction }) {
 
       <Answer answer={page.answer} />
 
-      {/* CTA 区 · 抖音风按钮组：主按钮大块粉 + 次按钮分列白底 */}
-      <div className="mt-auto flex flex-col gap-2 pt-2">
+      {/* 情感收束放到按钮组上方 · 液态玻璃卡的标志性节奏 */}
+      <div className="mt-auto text-center text-[12px] italic text-[color:var(--color-warmth)]/95 font-medium pt-2">
+        {page.emotional_close}
+      </div>
+
+      {/* CTA · 液态玻璃按钮组（参考液态玻璃设计稿底部双列）*/}
+      <div className="flex flex-col gap-2 pt-1">
         <PrimaryButtons actions={page.actions?.primary ?? []} onAction={handleAction} />
         {page.actions?.secondary?.length > 0 && (
           <div className="grid grid-cols-2 gap-2">
@@ -195,17 +216,13 @@ export default function CardPageP1({ page, scriptId, onAction }) {
                   e.stopPropagation();
                   handleAction(a.id, a.label);
                 }}
-                className="focus-ring rounded-2xl border border-black/5 bg-black/[0.03] px-3 py-3 text-[13px] font-bold text-[color:var(--color-text)] transition-all hover:bg-black/[0.06] active:scale-[0.97]"
+                className="focus-ring lg-btn px-3 py-3 text-[13px]"
               >
                 {a.label}
               </button>
             ))}
           </div>
         )}
-      </div>
-
-      <div className="text-center text-[12px] italic text-[color:var(--color-warmth)]/90">
-        {page.emotional_close}
       </div>
     </div>
   );
