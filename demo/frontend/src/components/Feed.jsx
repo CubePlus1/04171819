@@ -1,120 +1,110 @@
-import { useMemo, useEffect, useRef, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import FeedItem from './FeedItem.jsx';
 import DunCard from './DunCard.jsx';
 import { useDemoStore } from '../store/useDemoStore.js';
 
-// 每张履约卡后面跟多少条 filler 视频 · 让信息流"有东西可刷"
-const FILLERS_AFTER_EACH_CARD = 3;
-// 首屏纯 filler 铺垫（还没接回来第一张卡时）
-const BOOT_FILLER_COUNT = 9;
-// filler 循环最大总量（跨所有卡后缀之和 + 首屏）· 防止 DOM 爆炸
-const MAX_FILLERS_TOTAL = 60;
+// 单卡轮播：视口里任何时刻只渲染一条
+// - 备选池：store.queue（后端推送进来的履约卡）+ store.feed 的 filler 视频
+// - 触发：用户上/下滑 · 按 ↑/↓/Space · 点击视口 · 或右面板"接下一条"按钮
+// - 不保留历史 · 不整流渲染 · 用户感受："我滑一下，它给我下一条"
+const SWIPE_THRESHOLD = 40; // 拖动超过 40px 才算滑
 
 export default function Feed({ onAction }) {
-  const feed = useDemoStore((s) => s.feed);
-  const cards = useDemoStore((s) => s.cards);
+  const currentItem = useDemoStore((s) => s.currentItem);
   const spotlightCardId = useDemoStore((s) => s.spotlightCardId);
-  const viewportRef = useRef(null);
-  const spotlightRef = useRef(null);
+  const queueLen = useDemoStore((s) => s.queue.length);
+  const advance = useDemoStore((s) => s.advance);
+  const reduce = useReducedMotion();
+  const rootRef = useRef(null);
 
-  /**
-   * 合成策略：
-   * - 最新卡在最前（cards 来自 store，已是 newest-first）
-   * - 每张卡后跟 N 条 filler（循环使用 fixtures.feed）
-   * - 无卡时用 BOOT_FILLER_COUNT 条 filler 保底 · 看起来像个真实信息流
-   * - filler 的 key 带循环计数 · 避免 key 重复导致 AnimatePresence 紊乱
-   */
-  const items = useMemo(() => {
-    if (!feed.length) return [];
-    const merged = [];
-    let fillerIdx = 0;
-
-    const pushFiller = (scope, scopeIdx) => {
-      const f = feed[fillerIdx % feed.length];
-      const loop = Math.floor(fillerIdx / feed.length);
-      merged.push({
-        kind: 'feed',
-        id: `${f.id}-${scope}${scopeIdx}-l${loop}`,
-        data: f,
-      });
-      fillerIdx += 1;
-    };
-
-    if (cards.length === 0) {
-      for (let i = 0; i < BOOT_FILLER_COUNT; i += 1) pushFiller('boot', i);
-      return merged;
-    }
-
-    cards.forEach((card, idx) => {
-      merged.push({ kind: 'card', id: card.id, data: card });
-      for (let k = 0; k < FILLERS_AFTER_EACH_CARD; k += 1) {
-        if (fillerIdx >= MAX_FILLERS_TOTAL) return;
-        pushFiller(`c${idx}`, k);
+  // 键盘触发下一条
+  const onKey = useCallback(
+    (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        advance();
+        e.preventDefault();
       }
-    });
+    },
+    [advance],
+  );
 
-    // 尾部再补 3 条 filler · 保证用户滚到底还能再滑一下
-    for (let i = 0; i < 3 && fillerIdx < MAX_FILLERS_TOTAL; i += 1) {
-      pushFiller('tail', i);
-    }
+  // 点击视口任意位置也切下一条（展台用户/评委不需要先对齐按钮）
+  const onClick = useCallback(() => advance(), [advance]);
 
-    return merged;
-  }, [feed, cards]);
+  // 上滑下滑（轻量手势）
+  const onDragEnd = useCallback(
+    (_e, info) => {
+      if (Math.abs(info.offset.y) >= SWIPE_THRESHOLD) advance();
+    },
+    [advance],
+  );
 
-  // 新卡到 → 视口滚到那张卡的位置（spotlight 在顶部附近，符合抖音"下一条"直觉）
+  // 挂载后 focus · 键盘可直接用
   useEffect(() => {
-    if (!spotlightCardId) return;
-    const vp = viewportRef.current;
-    const el = spotlightRef.current;
-    if (!vp || !el) return;
-    vp.scrollTo({ top: el.offsetTop - vp.offsetTop - 4, behavior: 'smooth' });
-  }, [spotlightCardId]);
-
-  const onKey = useCallback((e) => {
-    const vp = viewportRef.current;
-    if (!vp) return;
-    const step = vp.clientHeight * 0.9;
-    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
-      vp.scrollBy({ top: step, behavior: 'smooth' });
-      e.preventDefault();
-    }
-    if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-      vp.scrollBy({ top: -step, behavior: 'smooth' });
-      e.preventDefault();
-    }
-    if (e.key === 'Home') { vp.scrollTo({ top: 0, behavior: 'smooth' }); e.preventDefault(); }
-    if (e.key === 'End')  { vp.scrollTo({ top: vp.scrollHeight, behavior: 'smooth' }); e.preventDefault(); }
+    rootRef.current?.focus();
   }, []);
+
+  if (!currentItem) {
+    return (
+      <div className="flex h-full items-center justify-center text-stone-200">
+        <div className="text-center">
+          <div className="text-[14px] font-medium">信息流加载中…</div>
+          <div className="text-[12px] text-stone-300 mt-1">正在把她的念头请进来</div>
+        </div>
+      </div>
+    );
+  }
+
+  const isCard = currentItem.kind === 'card';
+  const isSpotlightCard = isCard && currentItem.id === spotlightCardId;
 
   return (
     <div
-      ref={viewportRef}
+      ref={rootRef}
       tabIndex={0}
       role="region"
       aria-label="抖音信息流模拟"
       onKeyDown={onKey}
-      className="feed-viewport focus-ring scrollbar-none no-select"
+      onClick={onClick}
+      className="feed-viewport focus-ring scrollbar-none no-select relative h-full w-full overflow-hidden"
     >
-      <AnimatePresence initial={false}>
-        {items.map((it) => (
-          <div
-            key={`${it.kind}-${it.id}`}
-            ref={it.kind === 'card' && it.id === spotlightCardId ? spotlightRef : null}
-            className="mb-4 h-[640px] w-full"
-          >
-            {it.kind === 'feed' ? (
-              <FeedItem item={it.data} />
-            ) : (
-              <DunCard
-                card={it.data}
-                spotlight={it.id === spotlightCardId}
-                onAction={onAction}
-              />
-            )}
-          </div>
-        ))}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={`${currentItem.kind}-${currentItem.id}`}
+          initial={{ opacity: 0, y: reduce ? 0 : 80 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: reduce ? 0 : -80, transition: { duration: 0.3, ease: 'easeIn' } }}
+          transition={{ duration: reduce ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
+          drag={reduce ? false : 'y'}
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={0.3}
+          onDragEnd={onDragEnd}
+          className="absolute inset-0 px-2 py-2"
+        >
+          {isCard ? (
+            <DunCard
+              card={currentItem.data}
+              spotlight={isSpotlightCard}
+              onAction={onAction}
+            />
+          ) : (
+            <FeedItem item={currentItem.data} />
+          )}
+        </motion.div>
       </AnimatePresence>
+
+      {/* 右下角操作提示 · 让用户知道怎么看下一条 */}
+      <div className="pointer-events-none absolute right-3 bottom-3 flex items-center gap-2 text-[11px] text-stone-200">
+        <span className="rounded-full border border-white/10 bg-black/40 px-2 py-0.5 backdrop-blur">
+          上/下滑 · 或空格 · 切下一条
+        </span>
+        {queueLen > 0 && (
+          <span className="rounded-full bg-warmth/20 px-2 py-0.5 text-warmth font-medium backdrop-blur">
+            队列 +{queueLen}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
