@@ -59,7 +59,11 @@ export default function ProductPanel({ bootStatus, onAction }) {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute left-4 top-4 text-[11px] tracking-[0.2em] text-stone-200">
+        {/* 浮在视频封面上的左上角状态条 · 必须白色 · 不受浅色主题 override 影响 */}
+        <div
+          className="pointer-events-none absolute left-4 top-4 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-medium tracking-[0.2em] backdrop-blur"
+          style={{ color: '#ffffff' }}
+        >
           {user?.nickname ? `${user.nickname} · 闲刷空窗` : '闲刷空窗'}
         </div>
       </div>
