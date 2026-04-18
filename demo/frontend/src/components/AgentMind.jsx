@@ -240,13 +240,18 @@ export default function AgentMind() {
             background: phase === MIND_PHASES.IDLE ? 'var(--color-text-muted)' : colorOf(focusTopic),
           }}
         />
-        <span className="text-[11px] tracking-[0.2em] text-stone-300">{phaseLabel}</span>
+        <span className="text-[11px] font-medium tracking-[0.2em] text-stone-100">{phaseLabel}</span>
       </div>
 
       {/* 无节点时的占位（initial mount） */}
       {positioned.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center text-[11px] text-stone-500 tracking-[0.2em]">
-          等她那边的新动作过来…
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-center">
+          <div className="text-[13px] font-medium tracking-[0.2em] text-stone-100">
+            后台正在扫描她的念头
+          </div>
+          <div className="text-[11px] text-stone-200">
+            下一条履约卡片即将浮到左边的信息流…
+          </div>
         </div>
       )}
     </div>

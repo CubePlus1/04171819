@@ -97,7 +97,7 @@ export default function DunCard({ card, spotlight, onAction }) {
       </motion.div>
 
       {pages.length > 1 && (
-        <div className="absolute inset-x-0 bottom-1 flex items-center justify-center gap-2 text-[10px] text-stone-400 no-select">
+        <div className="absolute inset-x-0 bottom-1 flex items-center justify-center gap-2 text-[10px] text-stone-200 no-select">
           ← 左右滑或 ← → 键 · P1 / P2 / P3 →
         </div>
       )}

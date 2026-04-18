@@ -24,11 +24,11 @@ export default function ProductPanel({ bootStatus, onAction }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="pill bg-kiss/15 text-kiss">产品面板</span>
-          <span className="text-[12px] text-stone-400">
+          <span className="text-[12px] text-stone-200">
             用户视角 · 抖音信息流模拟
           </span>
         </div>
-        <div className="flex items-center gap-2 text-[11px] text-stone-400">
+        <div className="flex items-center gap-2 text-[11px] text-stone-200">
           <span>已蹲 {cards.length}</span>
           {spotlightCardId && (
             <span className="pill bg-ember/15 text-kiss animate-pulse-soft">新卡片浮现中</span>
@@ -40,9 +40,9 @@ export default function ProductPanel({ bootStatus, onAction }) {
         {liveMsg}
       </span>
 
-      <div className="relative flex-1 min-h-0 overflow-hidden rounded-3xl border border-white/5 bg-ink">
-        <div className="absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-ink to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-ink to-transparent pointer-events-none" />
+      <div className="relative flex-1 min-h-0 overflow-hidden rounded-3xl border border-white/5 bg-[color:var(--color-panel)]">
+        <div className="absolute inset-x-0 top-0 z-10 h-16 bg-gradient-to-b from-[color:var(--color-panel)] to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-[color:var(--color-panel)] to-transparent pointer-events-none" />
 
         <div className="h-full px-4 py-6">
           <div className="mx-auto h-full w-full max-w-[380px]">
@@ -59,7 +59,7 @@ export default function ProductPanel({ bootStatus, onAction }) {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute left-4 top-4 text-[11px] tracking-[0.2em] text-stone-400">
+        <div className="pointer-events-none absolute left-4 top-4 text-[11px] tracking-[0.2em] text-stone-200">
           {user?.nickname ? `${user.nickname} · 闲刷空窗` : '闲刷空窗'}
         </div>
       </div>
@@ -71,7 +71,7 @@ function EmptyState({ title, tip }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-stone-300">
       <div className="text-[14px] font-medium">{title}</div>
-      <div className="text-[12px] text-stone-400">{tip}</div>
+      <div className="text-[12px] text-stone-200">{tip}</div>
     </div>
   );
 }

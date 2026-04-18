@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 function Row({ label, value }) {
   return (
     <div className="flex flex-col gap-1 py-2">
-      <div className="text-[11px] uppercase tracking-[0.2em] text-stone-500">{label}</div>
+      <div className="text-[11px] uppercase tracking-[0.2em] text-stone-300">{label}</div>
       <div className="text-[13px] leading-relaxed text-stone-100">{value}</div>
     </div>
   );
@@ -43,7 +43,7 @@ export default function CardPageP2({ page }) {
         ))}
       </motion.div>
 
-      <div className="mt-auto text-center text-[11px] text-stone-400">
+      <div className="mt-auto text-center text-[11px] text-stone-200">
         — 它为什么会在这一刻回来找你 —
       </div>
     </div>

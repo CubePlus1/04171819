@@ -19,7 +19,7 @@ export default function CommentInput({ onSubmit, disabled }) {
     <form onSubmit={submit} className="flex flex-col gap-2">
       <label
         id={labelId}
-        className="text-[11px] uppercase tracking-[0.18em] text-stone-400"
+        className="text-[11px] uppercase tracking-[0.18em] text-stone-200"
       >
         评委亲手输入
       </label>
@@ -31,7 +31,7 @@ export default function CommentInput({ onSubmit, disabled }) {
           onChange={(e) => setText(e.target.value.slice(0, MAX))}
           disabled={disabled}
           placeholder="把你心里的「蹲」打出来，比如：蹲后续 爷爷真帅"
-          className="flex-1 bg-transparent text-[14px] text-stone-100 placeholder:text-stone-500 focus:outline-none disabled:opacity-50"
+          className="flex-1 bg-transparent text-[14px] text-stone-100 placeholder:text-stone-300 focus:outline-none disabled:opacity-50"
         />
         <button
           type="submit"
@@ -41,7 +41,7 @@ export default function CommentInput({ onSubmit, disabled }) {
           触发
         </button>
       </div>
-      <div id={helpId} className="flex justify-end text-[10px] text-stone-400">
+      <div id={helpId} className="flex justify-end text-[10px] text-stone-200">
         {text.length}/{MAX}
       </div>
     </form>

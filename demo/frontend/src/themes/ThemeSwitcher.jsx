@@ -60,9 +60,9 @@ export default function ThemeSwitcher({ themes, current, onPick }) {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
                         <span className="text-[13px] font-medium text-stone-100">{t.name}</span>
-                        <span className="text-[10px] text-stone-400">{t.surface}</span>
+                        <span className="text-[10px] text-stone-200">{t.surface}</span>
                       </div>
-                      <div className="truncate text-[11px] text-stone-400">{t.tagline}</div>
+                      <div className="truncate text-[11px] text-stone-200">{t.tagline}</div>
                     </div>
                     {active && (
                       <span className="ml-1 rounded-full bg-[var(--color-warmth)]/20 px-2 py-0.5 text-[10px] text-[var(--color-warmth)]">
@@ -73,7 +73,7 @@ export default function ThemeSwitcher({ themes, current, onPick }) {
                 );
               })}
             </div>
-            <div className="border-t border-white/5 px-4 py-2 text-[10px] text-stone-500">
+            <div className="border-t border-white/5 px-4 py-2 text-[10px] text-stone-300">
               共 {themes.length} 套风格 · 支持 ← → 或 [ ] 键快切
             </div>
           </motion.div>
