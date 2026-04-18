@@ -182,19 +182,23 @@ export default function CardPageP1({ page, scriptId, onAction }) {
     onAction?.(feedback);
   };
   return (
-    <div className="flex h-full flex-col gap-3 p-4">
-      <div className="flex items-center gap-2">
-        <span className="pill bg-warmth/15 text-warmth">AI 为你记得</span>
-        <span className="pill">剧本 {scriptId}</span>
-      </div>
-
+    <div className="flex h-full flex-col gap-3 px-4 pt-14 pb-14">
+      {/* Hero 区 · 替你守候 + 蹲到了 + 本次上下文 · 主语是我们/AI 不是用户 */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="text-[15px] font-medium leading-relaxed text-stone-50"
+        className="flex flex-col gap-1.5"
       >
-        {page.context_line}
+        <div className="brand-eyebrow">替你守候</div>
+        <div className="brand-title">蹲到了</div>
+        <div className="mt-1 text-[14px] font-medium leading-relaxed text-stone-50/95">
+          {page.context_line}
+        </div>
+        <div className="mt-1 flex items-center gap-1.5 opacity-80">
+          <span className="pill bg-warmth/15 text-warmth">AI 为你记得</span>
+          <span className="pill">剧本 {scriptId}</span>
+        </div>
       </motion.div>
 
       <Answer answer={page.answer} />
