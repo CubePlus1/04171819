@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 | 刷到懂你的瞬间</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --milk-white: #FFFBF7;
+            --coral-pink: #FF6B9D;
+            --soft-pink: #FFE5EC;
+            --pastel-beige: #FCF8F3;
+            --soft-brown: #D4A5A5;
+            --text-dark: #4A4A4A;
+            --text-gray: #8E8E8E;
+            --card-shadow: 0 10px 30px rgba(255, 107, 157, 0.12);
+            --transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            --radius-lg: 32px;
+            --radius-md: 24px;
+            --radius-sm: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Varela Round', 'Noto Sans SC', sans-serif;
+            background-color: var(--pastel-beige);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            letter-spacing: -0.01em;
+        }
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding: 24px;
+            gap: 24px;
+        }
+
+        /* Left: Product Panel / Mock Feed */
+        .feed-panel {
+            flex: 1.2;
+            background: var(--milk-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 0;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+        .feed-panel::-webkit-scrollbar { display: none; }
+
+        .feed-item {
+            width: 90%;
+            max-width: 420px;
+            background: white;
+            border-radius: var(--radius-md);
+            margin-bottom: 28px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: var(--transition);
+        }
+
+        .feed-image {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .feed-content { padding: 20px; }
+        .feed-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; line-height: 1.5; }
+        .feed-footer { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-gray); }
+        .user-info { display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 28px; height: 28px; border-radius: 50%; background: #f0f0f0; border: 1.5px solid var(--soft-pink); }
+
+        /* "Dundao" Special Card */
+        .dundao-card {
+            border: 2px solid var(--soft-pink);
+            position: relative;
+            background: #fff;
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .dundao-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+
+        .context-line {
+            background: var(--soft-pink);
+            color: var(--coral-pink);
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid rgba(255, 107, 157, 0.1);
+        }
+
+        .card-body { position: relative; overflow: hidden; }
+        .swipe-viewport { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .swipe-viewport::-webkit-scrollbar { display: none; }
+
+        .page {
+            min-width: 100%;
+            scroll-snap-align: start;
+            padding: 24px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* P1: Scenario + Answer */
+        .ans-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+        .ans-tag { background: var(--coral-pink); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .ans-title { font-size: 20px; font-weight: 700; color: var(--text-dark); margin-top: 8px; }
+        .ans-desc { font-size: 14px; color: var(--text-gray); line-height: 1.6; margin-top: 4px; }
+
+        .ans-content { flex: 1; margin: 16px 0; border-radius: var(--radius-sm); overflow: hidden; background: var(--pastel-beige); display: flex; align-items: center; justify-content: center; position: relative; }
+        .ans-content img { width: 100%; height: 100%; object-fit: cover; }
+        .ans-video-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+        
+        .ans-footer { display: flex; gap: 10px; margin-top: auto; }
+        .btn-main { flex: 1; background: var(--coral-pink); color: white; border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-sub { background: var(--soft-pink); color: var(--coral-pink); border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-main:hover, .btn-sub:hover { filter: brightness(0.95); transform: translateY(-1px); }
+
+        /* P2: AI Explanation */
+        .ai-title { font-size: 15px; font-weight: 700; color: var(--coral-pink); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+        .ai-message { background: var(--pastel-beige); padding: 18px; border-radius: 18px; border-bottom-left-radius: 4px; font-size: 14px; line-height: 1.7; color: #555; position: relative; margin-bottom: 20px; }
+        .ai-message::after { content: ''; position: absolute; left: -8px; bottom: 0; border-width: 10px 10px 0 0; border-style: solid; border-color: var(--pastel-beige) transparent transparent transparent; }
+        .ai-summary { font-size: 13px; font-weight: 600; color: var(--text-dark); background: white; padding: 12px; border: 1px dashed var(--soft-brown); border-radius: 12px; }
+
+        /* P3: Footprint */
+        .p3-title { font-size: 15px; font-weight: 700; color: var(--soft-brown); margin-bottom: 20px; }
+        .timeline { border-left: 2px dashed var(--soft-pink); padding-left: 24px; margin-left: 10px; }
+        .t-item { position: relative; margin-bottom: 24px; }
+        .t-item::before { content: ''; position: absolute; left: -31px; top: 6px; width: 12px; height: 12px; background: var(--coral-pink); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .t-time { font-size: 12px; color: var(--text-gray); margin-bottom: 4px; }
+        .t-desc { font-size: 13px; font-weight: 500; color: var(--text-dark); line-height: 1.4; }
+
+        /* Navigation */
+        .nav-controls { display: flex; justify-content: space-between; align-items: center; padding: 0 16px 16px; }
+        .dots { display: flex; gap: 6px; }
+        .dot { width: 6px; height: 6px; background: #E5E5E5; border-radius: 50%; transition: 0.3s; }
+        .dot.active { width: 16px; background: var(--coral-pink); border-radius: 4px; }
+        .nav-arrow { width: 32px; height: 32px; border-radius: 50%; background: var(--milk-white); border: 1px solid var(--soft-pink); color: var(--coral-pink); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .nav-arrow:hover { background: var(--soft-pink); }
+
+        /* Right: Agent Panel */
+        .agent-panel {
+            width: 440px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            padding: 36px;
+            position: relative;
+        }
+
+        .agent-title { font-size: 24px; font-weight: 800; color: var(--coral-pink); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .agent-subtitle { font-size: 14px; color: var(--text-gray); margin-bottom: 32px; }
+
+        .input-box { background: var(--pastel-beige); border-radius: 20px; padding: 20px; margin-bottom: 24px; border: 1px solid transparent; transition: 0.3s; }
+        .input-box:focus-within { border-color: var(--soft-pink); background: white; box-shadow: 0 4px 12px rgba(255,107,157,0.05); }
+        .input-box textarea { width: 100%; border: none; background: transparent; resize: none; outline: none; font-family: inherit; font-size: 15px; color: var(--text-dark); height: 50px; line-height: 1.6; }
+
+        .preset-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+        .preset-tag { background: white; border: 1.5px solid var(--soft-pink); padding: 12px 18px; border-radius: 16px; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); color: var(--text-dark); text-align: left; display: flex; align-items: center; justify-content: space-between; }
+        .preset-tag:hover { border-color: var(--coral-pink); color: var(--coral-pink); transform: translateX(4px); background: var(--milk-white); }
+        .preset-tag i { opacity: 0; transform: translateX(-10px); transition: 0.3s; }
+        .preset-tag:hover i { opacity: 1; transform: translateX(0); }
+
+        .workflow { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+        .step { display: flex; align-items: center; gap: 14px; opacity: 0.3; transition: 0.5s; }
+        .step.active { opacity: 1; transform: translateX(8px); }
+        .step.done { opacity: 0.6; }
+        .step-icon { width: 36px; height: 36px; background: var(--soft-pink); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--coral-pink); transition: 0.3s; }
+        .step.active .step-icon { background: var(--coral-pink); color: white; box-shadow: 0 4px 12px rgba(255,107,157,0.3); animation: softBounce 2s infinite; }
+        .step-label { font-size: 14px; font-weight: 600; }
+
+        @keyframes softBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+        .cta-trigger { background: var(--coral-pink); color: white; border: none; padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: var(--transition); }
+        .cta-trigger:hover { background: #ff528d; box-shadow: 0 8px 24px rgba(255, 107, 157, 0.4); transform: translateY(-2px); }
+        .cta-trigger:disabled { background: #E5E5E5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Soft Floating Decor */
+        .sparkle { position: absolute; pointer-events: none; z-index: 10; font-size: 20px; opacity: 0.6; }
+
+        @media (max-width: 1024px) {
+            .app-container { flex-direction: column; overflow-y: auto; }
+            .agent-panel, .feed-panel { width: 100%; height: auto; }
+            .feed-panel { min-height: 800px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left: Product Feed Panel -->
+        <div class="feed-panel" id="feedPanel">
+            <!-- Mock Feed Item 1 -->
+            <div class="feed-item">
+                <div class="feed-image" style="background-image: url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800');"></div>
+                <div class="feed-content">
+                    <div class="feed-title">今日份多巴胺穿搭，这件亮粉色毛衣真的绝绝子！✨</div>
+                    <div class="feed-footer">
+                        <div class="user-info">
+                            <div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=sunny'); background-size: cover;"></div>
+                            <span>小小苏的碎碎念</span>
+                        </div>
+                        <div>❤️ 1.2k</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- "蹲到了" Dynamic Fulfillment Card -->
+            <div id="dundaoCard" class="feed-item dundao-card">
+                <div class="context-line" id="contextLine">
+                    <i data-lucide="sparkles" size="14"></i>
+                    <span>你 3 周前在「大山的穿搭日记」里蹲过这件上衣</span>
+                </div>
+                
+                <div class="card-body">
+                    <div class="swipe-viewport" id="swipeViewport">
+                        <!-- P1: 情景+答案 -->
+                        <div class="page" id="p1">
+                            <div class="ans-header">
+                                <div>
+                                    <div class="ans-tag" id="p1Tag">✨ 蹲到了</div>
+                                    <h3 class="ans-title" id="p1Title">Mardi Mercredi 卫衣</h3>
+                                </div>
+                                <div style="color: var(--coral-pink); font-size: 22px; font-weight: 800;" id="p1Price">¥459</div>
+                            </div>
+                            <p class="ans-desc" id="p1Desc">你之前在找的浅灰色蓝花款，博主刚才在评论区置顶了官方链接。</p>
+                            
+                            <div class="ans-content" id="p1Media">
+                                <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=600" alt="product">
+                            </div>
+                            
+                            <div class="ans-footer">
+                                <button class="btn-main" id="ctaMain" onclick="event.stopPropagation()">去看看</button>
+                                <button class="btn-sub" id="ctaSub" onclick="event.stopPropagation()">收藏</button>
+                            </div>
+                        </div>
+
+                        <!-- P2: AI Natural Language Explanation -->
+                        <div class="page" id="p2">
+                            <div class="ai-title"><i data-lucide="brain-circuit" size="16"></i> AI 为你记得</div>
+                            <div class="ai-message" id="p2Msg">
+                                你 3 周前在穿搭视频下评论了「蹲链接」，AI 识别到你对这款灰色卫衣有强烈的购买意向。
+                            </div>
+                            <div class="ai-summary" id="p2Summary">
+                                当时蹲的终于放出来了，博主回复了该单品的最新渠道。
+                            </div>
+                        </div>
+
+                        <!-- P3: Behavioral Footprint -->
+                        <div class="page" id="p3">
+                            <div class="p3-title">你的意图回响</div>
+                            <div id="p3Summary" style="background:var(--soft-pink);color:var(--coral-pink);padding:10px 14px;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:18px;line-height:1.5;">
+                                你过去 30 天在 5 条穿搭视频下留过蹲链接
+                            </div>
+                            <div class="timeline" id="p3Timeline">
+                                <!-- Timeline items injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-controls">
+                    <div class="nav-arrow" onclick="scrollPage(-1); event.stopPropagation()"><i data-lucide="chevron-left" size="18"></i></div>
+                    <div class="dots" id="dots">
+                        <div class="dot active"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <div class="nav-arrow" onclick="scrollPage(1); event.stopPropagation()"><i data-lucide="chevron-right" size="18"></i></div>
+                </div>
+            </div>
+
+            <!-- Mock Feed Item 2 -->
+            <div class="feed-item">
+                <div class="feed-image" style="background-image: url('https://images.unsplash.com/photo-1540331547168-8b63109225b7?auto=format&fit=crop&q=80&w=800');"></div>
+                <div class="feed-content">
+                    <div class="feed-title">终于去打卡了这家法式复古面包店，可露丽太好吃了 🥯🤎</div>
+                    <div class="feed-footer">
+                        <div class="user-info">
+                            <div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=bread'); background-size: cover;"></div>
+                            <span>爱吃可露丽的Lu</span>
+                        </div>
+                        <div>❤️ 892</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Agent Workflow Panel -->
+        <div class="agent-panel">
+            <div class="agent-title"><i data-lucide="sparkles" size="28"></i> 蹲到了 Agent</div>
+            <p class="agent-subtitle">把念念不忘的，接回来</p>
+
+            <div class="input-box">
+                <textarea id="userInput" placeholder="输入评论意图，例如：蹲链接、稍后再看、蹲后续..."></textarea>
+            </div>
+
+            <div class="preset-group">
+                <div class="preset-tag" onclick="selectScript('A')">
+                    <span>A 剧本：蹲链接 → 看介绍</span>
+                    <i data-lucide="arrow-right" size="16"></i>
+                </div>
+                <div class="preset-tag" onclick="selectScript('B')">
+                    <span>B 剧本：稍后再看 → 系列追更</span>
+                    <i data-lucide="arrow-right" size="16"></i>
+                </div>
+                <div class="preset-tag" onclick="selectScript('C')">
+                    <span>C 剧本：蹲后续 → 博主发了下集</span>
+                    <i data-lucide="arrow-right" size="16"></i>
+                </div>
+            </div>
+
+            <div class="workflow" id="workflow">
+                <div class="step" id="step1">
+                    <div class="step-icon"><i data-lucide="message-square" size="18"></i></div>
+                    <div class="step-label">评论文本入栈</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-icon"><i data-lucide="fingerprint" size="18"></i></div>
+                    <div class="step-label">AI 意图识别 (中文自然语言)</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-icon"><i data-lucide="link" size="18"></i></div>
+                    <div class="step-label">匹配用户历史意图</div>
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-icon"><i data-lucide="save" size="18"></i></div>
+                    <div class="step-label">写入记忆数据库</div>
+                </div>
+                <div class="step" id="step5">
+                    <div class="step-icon"><i data-lucide="zap" size="18"></i></div>
+                    <div class="step-label">触发履约卡片</div>
+                </div>
+            </div>
+
+            <button class="cta-trigger" id="triggerBtn" onclick="runAgent()">
+                <i data-lucide="play-circle" size="20"></i>
+                同步触发履约
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const scripts = {
+            'A': {
+                context: "你 3 周前在「大山的穿搭日记」里蹲过这件上衣",
+                footprintSummary: "你过去 30 天在 5 条穿搭视频下留过蹲链接",
+                tag: "✨ 蹲到了",
+                title: "Mardi Mercredi 卫衣",
+                desc: "你当时蹲的终于放出来了，博主刚更新了介绍。这款灰色蓝花款目前「得物」已补货。",
+                price: "¥459",
+                media: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=600",
+                mainBtn: "看介绍",
+                subBtn: "加到我蹲过的",
+                aiMsg: "识别到你对「Mardi 卫衣」的求链接意图。AI 监测到博主今日在评论区置顶了该单品的购买入口。",
+                aiSummary: "履约成功：你过去想买的，现在有货了。",
+                timeline: [
+                    { time: "10分钟前", text: "AI 匹配到博主置顶了最新链接" },
+                    { time: "3周前", text: "你在「大山的穿搭日记」下评论：蹲链接" },
+                    { time: "1个月前", text: "你搜索过：Mardi Mercredi 尺码" }
+                ]
+            },
+            'B': {
+                context: "你一个月前在「30 天变身 Day1」里按了稍后再看",
+                footprintSummary: "你过去 60 天按了 3 次「稍后再看」，这是第一条被接回来的",
+                tag: "📚 系列追更",
+                title: "30天自律变身挑战",
+                desc: "她已经全部更完了！AI 帮你摘取了过去 30 天的核心精华内容。",
+                price: "系列完结",
+                media: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=600",
+                mainBtn: "续看精华",
+                subBtn: "收藏系列",
+                aiMsg: "你在 Day1 时标记了「稍后再看」。AI 注意到该博主已完成 30 天全集更新，现为你生成系列摘要。",
+                aiSummary: "念念不忘：当初想看的挑战，现在可以一口气看完了。",
+                timeline: [
+                    { time: "1小时前", text: "博主更新了挑战第 30 天（完结）" },
+                    { time: "1个月前", text: "你在挑战第 1 天按了：稍后再看" },
+                    { time: "2个月前", text: "你关注了博主「自律小马」" }
+                ]
+            },
+            'C': {
+                context: "你 2 周前在「爷爷的退伍档案」里评论了「蹲后续爷爷真帅」",
+                footprintSummary: "你过去 21 天在 2 位老兵故事博主下留过蹲后续",
+                tag: "🎬 后续来了",
+                title: "爷爷的老战友找到了！",
+                desc: "爷爷的老战友在评论区看到了你的留言，他们终于联系上并重逢了。",
+                price: "温暖回响",
+                media: "https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?auto=format&fit=crop&q=80&w=600",
+                mainBtn: "看重逢瞬间",
+                subBtn: "分享感动",
+                aiMsg: "识别到你对「爷爷的故事」的情感关注。AI 匹配到博主刚刚发布的寻人成功后续视频。",
+                aiSummary: "回响：你关心的那个故事，有了一个圆满的结局。",
+                timeline: [
+                    { time: "20分钟前", text: "博主发布了：爷爷与老战友重逢全过程" },
+                    { time: "2周前", text: "你评论：蹲后续，爷爷太帅了，希望找到战友" },
+                    { time: "3周前", text: "你点赞了爷爷的退伍照片视频" }
+                ]
+            }
+        };
+
+        let currentScript = 'A';
+        let isRunning = false;
+        const viewport = document.getElementById('swipeViewport');
+        const dots = document.querySelectorAll('.dot');
+
+        function selectScript(id) {
+            currentScript = id;
+            document.getElementById('userInput').value = id === 'A' ? "蹲链接姐妹们，求这件上衣链接！" : (id === 'B' ? "这个系列挺好的，先按个稍后再看" : "爷爷太不容易了，必须蹲一个后续");
+        }
+
+        function routeManualInput(text) {
+            const t = String(text || '');
+            if (/稍后再看|稍后看|追更|月前|系列|续看|30\s*天/.test(t)) return 'B';
+            if (/蹲后续|后续|下集|下一集|催更|坐等|等更/.test(t)) return 'C';
+            return 'A';
+        }
+
+        async function runAgent() {
+            if (isRunning) return;
+            isRunning = true;
+            const btn = document.getElementById('triggerBtn');
+            const card = document.getElementById('dundaoCard');
+            btn.disabled = true;
+
+            // Manual input overrides preset: let typed text drive the script
+            const userText = document.getElementById('userInput').value.trim();
+            if (userText) currentScript = routeManualInput(userText);
+
+            // Reset state
+            card.classList.remove('visible');
+            resetCard();
+
+            // Run Steps
+            for(let i=1; i<=5; i++) {
+                const step = document.getElementById('step' + i);
+                step.classList.add('active');
+                await new Promise(r => setTimeout(r, 600));
+                step.classList.remove('active');
+                step.classList.add('done');
+            }
+
+            // Update UI with script data
+            const data = scripts[currentScript];
+            document.getElementById('contextLine').querySelector('span').innerText = data.context;
+            document.getElementById('p1Tag').innerText = data.tag;
+            document.getElementById('p1Title').innerText = data.title;
+            document.getElementById('p1Desc').innerText = data.desc;
+            document.getElementById('p1Price').innerText = data.price;
+            document.getElementById('p1Media').querySelector('img').src = data.media;
+            document.getElementById('ctaMain').innerText = data.mainBtn;
+            document.getElementById('ctaSub').innerText = data.subBtn;
+            document.getElementById('p2Msg').innerText = data.aiMsg;
+            document.getElementById('p2Summary').innerText = data.aiSummary;
+            document.getElementById('p3Summary').innerText = data.footprintSummary || '';
+
+            // Build timeline via DOM (XSS-safe, no innerHTML with string interpolation)
+            const tl = document.getElementById('p3Timeline');
+            tl.innerHTML = '';
+            data.timeline.forEach(item => {
+                const wrap = document.createElement('div');
+                wrap.className = 't-item';
+                const t = document.createElement('div');
+                t.className = 't-time';
+                t.textContent = item.time;
+                const d = document.createElement('div');
+                d.className = 't-desc';
+                d.textContent = item.text;
+                wrap.appendChild(t);
+                wrap.appendChild(d);
+                tl.appendChild(wrap);
+            });
+
+            // Reveal
+            card.classList.add('visible');
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            btn.disabled = false;
+            isRunning = false;
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('done'));
+        }
+
+        function resetCard() {
+            viewport.scrollTo({ left: 0 });
+            updateDots(0);
+        }
+
+        function scrollPage(dir) {
+            const width = viewport.clientWidth;
+            const target = Math.max(0, Math.min(width * 2, viewport.scrollLeft + (dir * width)));
+            viewport.scrollTo({ left: target, behavior: 'smooth' });
+        }
+
+        viewport.addEventListener('scroll', () => {
+            const idx = Math.round(viewport.scrollLeft / viewport.clientWidth);
+            updateDots(idx);
+        });
+
+        function updateDots(idx) {
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
+
+        // Horizontal Swipe Support (Basic)
+        let touchStart = 0;
+        viewport.addEventListener('touchstart', e => touchStart = e.touches[0].clientX);
+        viewport.addEventListener('touchend', e => {
+            const diff = touchStart - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) scrollPage(diff > 0 ? 1 : -1);
+        });
+    </script>
+</body>
+</html>

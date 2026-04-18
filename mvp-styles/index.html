@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>蹲到了 · 10 种风格 MVP · Gallery</title>
+<style>
+  :root {
+    --bg: #0e0e12;
+    --fg: #f5f2ee;
+    --muted: #a0a0a8;
+    --accent: #ff6b6b;
+    --card: #17171d;
+    --border: #2a2a33;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    padding: 40px 24px 80px;
+    min-height: 100vh;
+  }
+  header {
+    max-width: 1280px;
+    margin: 0 auto 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .subtitle strong { color: var(--fg); }
+  .grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-decoration: none;
+    color: var(--fg);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+    min-height: 140px;
+  }
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .num {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+  .name {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .swatch {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .swatch span {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  footer {
+    max-width: 1280px;
+    margin: 48px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  footer code {
+    background: var(--card);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--fg);
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>蹲到了 · 10 种风格 MVP Gallery</h1>
+  <p class="subtitle">字节 Hackathon 赛道三 · 逆风如解意——把你念念不忘的，接回来。<br>
+  选择一种风格点进去看完整的 <strong>双面板 + 多页卡片 + Agent 5 步工作流</strong> demo。后期选定后再做 vibe coding 打磨。</p>
+</header>
+
+<div class="grid">
+  <a class="card" href="./style-01-douyin-native/index.html">
+    <span class="num">S1</span>
+    <span class="name">抖音原生</span>
+    <span class="desc">黑底 × 霓虹粉青 · 短视频节奏感 · 年轻高能</span>
+    <div class="swatch"><span style="background:#000"></span><span style="background:#FE2C55"></span><span style="background:#25F4EE"></span></div>
+  </a>
+  <a class="card" href="./style-02-xhs-cozy/index.html">
+    <span class="num">S2</span>
+    <span class="name">小红书软萌</span>
+    <span class="desc">奶白 × 珊瑚粉 · 圆角软卡片 · 生活感</span>
+    <div class="swatch"><span style="background:#FFFBF7"></span><span style="background:#FF6B9D"></span><span style="background:#FFE5EC"></span></div>
+  </a>
+  <a class="card" href="./style-03-apple-air/index.html">
+    <span class="num">S3</span>
+    <span class="name">苹果空气感</span>
+    <span class="desc">纯白 × 毛玻璃 · 大间距 · iOS 18 风</span>
+    <div class="swatch"><span style="background:#FFFFFF"></span><span style="background:#F5F5F7"></span><span style="background:#007AFF"></span></div>
+  </a>
+  <a class="card" href="./style-04-oriental-ink/index.html">
+    <span class="num">S4</span>
+    <span class="name">新中式宣纸</span>
+    <span class="desc">宣纸米 × 墨黑 × 印泥红 · 东方文人意境</span>
+    <div class="swatch"><span style="background:#F5F0E6"></span><span style="background:#2C2C2C"></span><span style="background:#AF2E2E"></span></div>
+  </a>
+  <a class="card" href="./style-05-washi-journal/index.html">
+    <span class="num">S5</span>
+    <span class="name">手账治愈</span>
+    <span class="desc">奶油黄 × 和纸胶带 · 手绘贴纸 · 日式童趣</span>
+    <div class="swatch"><span style="background:#FFF8E1"></span><span style="background:#FFD6A5"></span><span style="background:#A5D6FF"></span></div>
+  </a>
+  <a class="card" href="./style-06-cyberpunk/index.html">
+    <span class="num">S6</span>
+    <span class="name">赛博朋克</span>
+    <span class="desc">黑紫 × 荧光霓虹 · 扫描线 + 故障美学 · 2077</span>
+    <div class="swatch"><span style="background:#0A0A0F"></span><span style="background:#FF00E5"></span><span style="background:#00FFE5"></span></div>
+  </a>
+  <a class="card" href="./style-07-bento-grid/index.html">
+    <span class="num">S7</span>
+    <span class="name">Bento Grid</span>
+    <span class="desc">白底 × 多彩便当格 · 严谨栅格 · 信息块化</span>
+    <div class="swatch"><span style="background:#FFE4B5"></span><span style="background:#B5D4FF"></span><span style="background:#D4FFB5"></span></div>
+  </a>
+  <a class="card" href="./style-08-editorial/index.html">
+    <span class="num">S8</span>
+    <span class="name">杂志排版</span>
+    <span class="desc">奶白纸 × 粗衬线 × 红色强调 · 时尚杂志感</span>
+    <div class="swatch"><span style="background:#F7F7F2"></span><span style="background:#000000"></span><span style="background:#E63946"></span></div>
+  </a>
+  <a class="card" href="./style-09-pixel-retro/index.html">
+    <span class="num">S9</span>
+    <span class="name">8-bit 像素</span>
+    <span class="desc">深蓝 × NES 调色板 · 像素字 × 对话框 · RPG 感</span>
+    <div class="swatch"><span style="background:#1A1B3A"></span><span style="background:#F8B74A"></span><span style="background:#E74A66"></span></div>
+  </a>
+  <a class="card" href="./style-10-notion-minimal/index.html">
+    <span class="num">S10</span>
+    <span class="name">Notion 灰白</span>
+    <span class="desc">纯白 × 细灰线 · emoji 强调 · 生产力工具感</span>
+    <div class="swatch"><span style="background:#FFFFFF"></span><span style="background:#F7F6F3"></span><span style="background:#E03E3E"></span></div>
+  </a>
+</div>
+
+<footer>
+  本地预览：<code>cd main/mvp-styles && python3 -m http.server 8765</code>，然后访问 <code>http://localhost:8765/</code>。<br>
+  或直接双击 <code>main/mvp-styles/index.html</code> 在浏览器打开（file:// 也能正常跳转）。
+</footer>
+</body>
+</html>

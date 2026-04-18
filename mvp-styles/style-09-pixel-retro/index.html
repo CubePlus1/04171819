@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了！| Context Capsule MVP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1A1B3A;
+            --nes-gold: #F8B74A;
+            --nes-red: #E74A66;
+            --nes-green: #2DD179;
+            --nes-grey: #D4D4D4;
+            --nes-blue: #4A90E2;
+            --pixel-size: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'VT323', 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Scanline Effect */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .screen {
+            width: 1000px;
+            height: 700px;
+            background-color: var(--bg-color);
+            border: var(--pixel-size) solid #000;
+            box-shadow: 0 0 0 var(--pixel-size) var(--nes-grey), 0 0 40px rgba(0,0,0,0.5);
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dual Panel Layout */
+        .left-panel {
+            flex: 1.2;
+            border-right: var(--pixel-size) double var(--nes-grey);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: repeating-linear-gradient(0deg, #1A1B3A, #1A1B3A 2px, #161730 2px, #161730 4px);
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: #0c0d1f;
+        }
+
+        /* Typography */
+        h1, h2, .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin: 0;
+            color: var(--nes-gold);
+            line-height: 1.5;
+        }
+
+        .ch-font {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* Left Panel: Feed */
+        .feed-header {
+            margin-bottom: 20px;
+            border-bottom: var(--pixel-size) solid var(--nes-gold);
+            padding-bottom: 10px;
+        }
+
+        .feed-container {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feed-container::-webkit-scrollbar { display: none; }
+
+        .card {
+            background-color: #25264d;
+            border: var(--pixel-size) solid #000;
+            box-shadow: inset -2px -2px 0 #000, inset 2px 2px 0 #4e50a3;
+            padding: 15px;
+            position: relative;
+        }
+
+        .card-standard { opacity: 0.6; }
+
+        .card-capsule {
+            border-color: var(--nes-gold);
+            box-shadow: inset -2px -2px 0 #000, inset 2px 2px 0 var(--nes-gold);
+            animation: card-entry 0.5s steps(4) forwards;
+            display: none; /* Hidden until triggered */
+        }
+
+        @keyframes card-entry {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .card-title {
+            color: var(--nes-green);
+            margin-bottom: 10px;
+        }
+
+        .item-box {
+            display: flex;
+            gap: 15px;
+        }
+
+        .pixel-art-placeholder {
+            width: 80px;
+            height: 80px;
+            background-color: #000;
+            border: 2px solid var(--nes-grey);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .pixel-art-placeholder::after {
+            content: "👕";
+            font-size: 40px;
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .page-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #555;
+        }
+
+        .dot.active {
+            background-color: var(--nes-gold);
+            box-shadow: 0 0 5px var(--nes-gold);
+        }
+
+        /* Right Panel: Agent */
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #1a1b3a;
+            padding: 10px;
+            border: 2px solid var(--nes-grey);
+        }
+
+        .agent-portrait {
+            width: 60px;
+            height: 60px;
+            background-color: var(--nes-blue);
+            border: 2px solid #fff;
+            position: relative;
+        }
+
+        .agent-portrait::before {
+            content: "🤖";
+            font-size: 30px;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .agent-status {
+            flex: 1;
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #000;
+            border: 1px solid var(--nes-grey);
+            margin-top: 5px;
+            position: relative;
+        }
+
+        .status-fill {
+            height: 100%;
+            background-color: var(--nes-green);
+            width: 30%;
+            transition: width 0.3s steps(5);
+        }
+
+        .dialog-box {
+            flex: 1;
+            background-color: #000;
+            border: var(--pixel-size) double var(--nes-grey);
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .dialog-text {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #fff;
+            margin: 0;
+            min-height: 100px;
+        }
+
+        .dialog-cursor {
+            width: 12px;
+            height: 12px;
+            background-color: var(--nes-gold);
+            display: inline-block;
+            margin-left: 5px;
+            animation: blink 0.5s steps(2) infinite;
+        }
+
+        @keyframes blink {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-pixel {
+            background-color: #333;
+            border: var(--pixel-size) solid #000;
+            box-shadow: inset -4px -4px 0 #1a1a1a, inset 4px 4px 0 #555;
+            color: #fff;
+            padding: 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.1s steps(2);
+        }
+
+        .btn-pixel:active {
+            box-shadow: inset 4px 4px 0 #1a1a1a, inset -4px -4px 0 #555;
+            transform: translate(2px, 2px);
+        }
+
+        .btn-pixel.active {
+            background-color: var(--nes-blue);
+            border-color: #fff;
+        }
+
+        .trigger-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .a-button {
+            width: 60px;
+            height: 60px;
+            background-color: var(--nes-red);
+            border-radius: 50%;
+            border: 4px solid #000;
+            box-shadow: 0 4px 0 #8e2b3d;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .a-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #8e2b3d;
+        }
+
+        .btn-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--nes-grey);
+        }
+
+        /* Workflow steps */
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+            color: #888;
+        }
+
+        .workflow-step.active {
+            color: var(--nes-green);
+        }
+
+        .workflow-step.active::before {
+            content: "▶";
+            font-size: 12px;
+            animation: bounce 0.5s steps(2) infinite;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(5px); }
+        }
+
+        /* Loot acquired popup */
+        .loot-popup {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #000;
+            border: 4px solid var(--nes-gold);
+            padding: 20px;
+            z-index: 100;
+            display: none;
+            text-align: center;
+            animation: popup-bounce 0.4s steps(4);
+        }
+
+        @keyframes popup-bounce {
+            0% { transform: translate(-50%, -50%) scale(0.5); }
+            70% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Capsule Card Pages */
+        .capsule-page { display: none; }
+        .capsule-page.active { display: block; }
+
+        .price-tag {
+            background-color: var(--nes-red);
+            padding: 5px 10px;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .context-quote {
+            border-left: 4px solid var(--nes-blue);
+            padding-left: 10px;
+            margin-top: 10px;
+            color: var(--nes-grey);
+            font-style: italic;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        <!-- LEFT PANEL: FEED -->
+        <div class="left-panel">
+            <div class="feed-header">
+                <h1 class="pixel-font">DOUYIN FEED</h1>
+            </div>
+            <div class="feed-container" id="feed">
+                <!-- Standard Item 1 -->
+                <div class="card card-standard">
+                    <div class="card-title pixel-font">TRAVEL LOG</div>
+                    <div class="item-box">
+                        <div class="pixel-art-placeholder" style="background-color: #3e4a3d;">🏔️</div>
+                        <div class="card-content">
+                            <div class="ch-font">在大山深处寻找清凉...</div>
+                            <div class="pixel-font" style="font-size: 10px; color: #888; margin-top: 5px;">@MOGAN_TRAVELER</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Standard Item 2 -->
+                <div class="card card-standard">
+                    <div class="card-title pixel-font">DAILY OUTFIT</div>
+                    <div class="item-box">
+                        <div class="pixel-art-placeholder" style="background-color: #4a3e3e;">🎒</div>
+                        <div class="card-content">
+                            <div class="ch-font">今日份的复古工装风</div>
+                            <div class="pixel-font" style="font-size: 10px; color: #888; margin-top: 5px;">@OUTFIT_DIARY</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Capsule Card (The Wow Moment) -->
+                <div class="card card-capsule" id="capsule-card">
+                    <div class="page-indicator">
+                        <div class="dot active" data-page="1"></div>
+                        <div class="dot" data-page="2"></div>
+                        <div class="dot" data-page="3"></div>
+                    </div>
+                    <div class="card-title pixel-font" style="color: var(--nes-gold);">[ LOOT ACQUIRED! ]</div>
+                    
+                    <!-- Page 1: Summary -->
+                    <div class="capsule-page active" id="page-1">
+                        <div class="item-box">
+                            <div class="pixel-art-placeholder" style="border-color: var(--nes-gold);">👕</div>
+                            <div class="card-content">
+                                <div class="ch-font" style="color: var(--nes-gold);">蹲到了！你心仪的上衣</div>
+                                <div class="price-tag">¥199 (历史低价)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page 2: Context -->
+                    <div class="capsule-page" id="page-2">
+                        <div class="ch-font" style="font-size: 18px;">三週前你在『大山的穿搭日記』蹲过这件上衣</div>
+                        <div class="context-quote">"这件衣服真的很难抢..."</div>
+                        <div class="pixel-font" style="font-size: 10px; color: var(--nes-grey); margin-top: 10px;">PREDICTED FOR: WEEKEND TRIP</div>
+                    </div>
+
+                    <!-- Page 3: Action -->
+                    <div class="capsule-page" id="page-3">
+                        <div class="ch-font">立即入手，趁现在有货！</div>
+                        <div class="action-btns">
+                            <div class="btn-pixel btn-sm" style="background-color: var(--nes-red);">A: 立即下单</div>
+                            <div class="btn-pixel btn-sm">B: 再看看</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Standard Item 3 -->
+                <div class="card card-standard">
+                    <div class="card-title pixel-font">FOOD REVIEW</div>
+                    <div class="item-box">
+                        <div class="pixel-art-placeholder" style="background-color: #4a4a3e;">🍜</div>
+                        <div class="card-content">
+                            <div class="ch-font">这碗面我能吃一辈子</div>
+                            <div class="pixel-font" style="font-size: 10px; color: #888; margin-top: 5px;">@NOODLE_MASTER</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: AGENT CONSOLE -->
+        <div class="right-panel">
+            <div class="agent-header">
+                <div class="agent-portrait"></div>
+                <div class="agent-status">
+                    <div class="pixel-font" style="font-size: 10px;">AGENT: CONTEXT_BOT_V1</div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="status-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog-box">
+                <p class="dialog-text" id="dialog-text">等待指令... PRESS A TO START SCANNING.</p>
+                <div id="workflow-steps">
+                    <!-- Steps will appear here -->
+                </div>
+                <div class="dialog-cursor"></div>
+            </div>
+
+            <div class="presets">
+                <div class="btn-pixel active" data-type="outfit">穿搭/OUTFIT</div>
+                <div class="btn-pixel" data-type="tech">科技/TECH</div>
+                <div class="btn-pixel" data-type="game">游戏/GAME</div>
+                <div class="btn-pixel" data-type="travel">旅行/TRAVEL</div>
+            </div>
+
+            <div class="trigger-area">
+                <div class="btn-label">SCAN</div>
+                <div class="a-button" id="trigger-btn">A</div>
+                <div class="btn-label">START</div>
+            </div>
+        </div>
+
+        <!-- Loot Popup Overlay -->
+        <div class="loot-popup" id="loot-popup">
+            <h2 class="pixel-font" style="font-size: 24px; color: var(--nes-gold);">ITEM FOUND!</h2>
+            <div class="ch-font" style="margin: 15px 0;">蹲到了：『大山』同款上衣</div>
+            <div class="pixel-font" style="color: var(--nes-grey);">ADDED TO FEED</div>
+        </div>
+    </div>
+
+    <script>
+        const dialogText = document.getElementById('dialog-text');
+        const triggerBtn = document.getElementById('trigger-btn');
+        const statusFill = document.getElementById('status-fill');
+        const workflowContainer = document.getElementById('workflow-steps');
+        const capsuleCard = document.getElementById('capsule-card');
+        const lootPopup = document.getElementById('loot-popup');
+        const presetBtns = document.querySelectorAll('.btn-pixel');
+        
+        const steps = [
+            "正在扫描你的『关注』信息流...",
+            "检测到『大山的穿搭日記』中的心动信号...",
+            "正在比对全网库存与历史底价...",
+            "回溯 3 週前的记忆：你在蹲这件上衣...",
+            "生成『蹲到了』情境胶囊！LOOT ACQUIRED!"
+        ];
+
+        let isRunning = false;
+
+        async function typeWriter(text, element, speed = 30) {
+            element.innerHTML = "";
+            for (let i = 0; i < text.length; i++) {
+                element.innerHTML += text.charAt(i);
+                await new Promise(r => setTimeout(r, speed));
+            }
+        }
+
+        async function runWorkflow() {
+            if (isRunning) return;
+            isRunning = true;
+            
+            // Reset
+            capsuleCard.style.display = 'none';
+            workflowContainer.innerHTML = "";
+            statusFill.style.width = '0%';
+            
+            await typeWriter("正在启动情境预言扫描程序...", dialogText);
+            
+            for (let i = 0; i < steps.length; i++) {
+                await new Promise(r => setTimeout(r, 800));
+                
+                const stepEl = document.createElement('div');
+                stepEl.className = 'workflow-step active';
+                stepEl.innerText = steps[i];
+                workflowContainer.appendChild(stepEl);
+                
+                // Update progress bar
+                statusFill.style.width = `${((i + 1) / steps.length) * 100}%`;
+                
+                // Remove active from previous steps
+                if (workflowContainer.children.length > 1) {
+                    workflowContainer.children[i-1].classList.remove('active');
+                }
+
+                if (i === 4) {
+                    showLoot();
+                }
+            }
+            
+            isRunning = false;
+        }
+
+        function showLoot() {
+            // Play Sound effect (visual shake)
+            document.querySelector('.screen').style.animation = 'shake 0.2s steps(2) infinite';
+            setTimeout(() => document.querySelector('.screen').style.animation = '', 400);
+
+            lootPopup.style.display = 'block';
+            setTimeout(() => {
+                lootPopup.style.display = 'none';
+                capsuleCard.style.display = 'block';
+                capsuleCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 2000);
+        }
+
+        // Pagination for Capsule Card
+        const dots = document.querySelectorAll('.dot');
+        const pages = document.querySelectorAll('.capsule-page');
+
+        function showPage(index) {
+            pages.forEach(p => p.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            pages[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => showPage(i));
+        });
+
+        // Trigger Button
+        triggerBtn.addEventListener('click', runWorkflow);
+
+        // Preset buttons
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'a') {
+                runWorkflow();
+            }
+        });
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0% { transform: translate(2px, 2px); }
+                25% { transform: translate(-2px, -2px); }
+                50% { transform: translate(-2px, 2px); }
+                75% { transform: translate(2px, -2px); }
+                100% { transform: translate(0, 0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+    </script>
+</body>
+</html>

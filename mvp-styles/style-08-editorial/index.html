@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 | THE ECHOING MOMENT</title>
+    <!-- Google Fonts: Serif perfection -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #F7F7F2;
+            --black: #1A1A1A;
+            --accent: #C9302C; /* 燃烧朱 */
+            --rule: rgba(0, 0, 0, 0.15);
+            --font-display: 'Playfair Display', serif;
+            --font-serif: 'Libre Caslon Text', 'Noto Serif SC', serif;
+            --font-body: 'Cormorant Garamond', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--paper);
+            color: var(--black);
+            font-family: var(--font-serif);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- LAYOUT GRID --- */
+        .magazine-spread {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100vw;
+            height: 100vh;
+            border: 20px solid var(--paper); /* Outer margin */
+            position: relative;
+        }
+
+        /* Vertical Divider */
+        .magazine-spread::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            bottom: 5%;
+            width: 1px;
+            background: var(--rule);
+        }
+
+        /* --- LEFT PANEL: THE PRODUCT FEED --- */
+        .left-panel {
+            padding: 40px 60px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            border-right: 0.5px solid var(--rule);
+            display: flex;
+            flex-direction: column;
+            gap: 80px;
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 10px;
+        }
+
+        .issue-no {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 900;
+        }
+
+        .issue-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        /* Feed Items */
+        .feed-item {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 0.8;
+            transition: opacity 0.5s;
+        }
+
+        .feed-item img {
+            width: 100%;
+            aspect-ratio: 4/5;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(1.1);
+        }
+
+        .feed-item .caption {
+            font-family: var(--font-body);
+            font-size: 18px;
+            line-height: 1.4;
+            max-width: 80%;
+        }
+
+        /* THE "蹲到了" CARD */
+        #dundao-card {
+            background: #fff;
+            padding: 40px;
+            box-shadow: 20px 20px 0px var(--accent);
+            display: none; /* Initially Hidden */
+            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .context-line {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--accent);
+            line-height: 1.6;
+        }
+
+        .context-line span {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .card-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card-p1-hero {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-p1-hero::before {
+            content: 'PLAY';
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 12px;
+            border: 1px solid white;
+            padding: 4px 10px;
+            letter-spacing: 2px;
+        }
+
+        .card-p1-hero img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            filter: grayscale(0);
+        }
+
+        .card-footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-action {
+            background: var(--black);
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .btn-action:hover {
+            background: var(--accent);
+        }
+
+        .card-nav {
+            font-family: var(--font-display);
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        /* --- RIGHT PANEL: THE AGENT WORKSPACE --- */
+        .right-panel {
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .agent-title {
+            font-family: var(--font-display);
+            font-size: 120px;
+            line-height: 0.8;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .agent-title::after {
+            content: '01';
+            font-size: 24px;
+            position: absolute;
+            top: 0;
+            right: -40px;
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .agent-subtitle {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 60px;
+            color: rgba(0,0,0,0.5);
+        }
+
+        /* Input Area */
+        .input-box {
+            border-bottom: 3px solid var(--black);
+            padding: 20px 0;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .input-box input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-family: var(--font-serif);
+            font-size: 28px;
+            outline: none;
+            color: var(--black);
+        }
+
+        .input-box input::placeholder {
+            color: rgba(0,0,0,0.1);
+        }
+
+        /* Presets */
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 60px;
+        }
+
+        .preset-tag {
+            border: 1px solid var(--black);
+            padding: 8px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-body);
+            font-weight: 600;
+        }
+
+        .preset-tag:hover {
+            background: var(--black);
+            color: var(--paper);
+        }
+
+        /* Workflow Steps */
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border-left: 0.5px solid var(--rule);
+            margin-left: 10px;
+        }
+
+        .step {
+            padding: 20px 30px;
+            position: relative;
+            opacity: 0.2;
+            transition: all 0.5s;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: -5.5px;
+            top: 28px;
+            width: 10px;
+            height: 10px;
+            background: var(--paper);
+            border: 1px solid var(--black);
+            border-radius: 50%;
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateX(10px);
+        }
+
+        .step.active::before {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .step-num {
+            font-family: var(--font-display);
+            font-size: 14px;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .step-text {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Decorative Pull Quote */
+        .pull-quote {
+            margin-top: auto;
+            border-top: 1px solid var(--rule);
+            padding-top: 40px;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 24px;
+            line-height: 1.2;
+            color: rgba(0,0,0,0.6);
+        }
+
+        .pull-quote span {
+            color: var(--accent);
+            font-size: 48px;
+            display: block;
+            margin-bottom: -10px;
+        }
+
+        /* Multi-page Card Logic */
+        .page-p2, .page-p3 {
+            display: none;
+        }
+
+        /* Drop cap */
+        .drop-cap::first-letter {
+            float: left;
+            font-family: var(--font-display);
+            font-size: 75px;
+            line-height: 60px;
+            padding-top: 4px;
+            padding-right: 8px;
+            padding-left: 3px;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="magazine-spread">
+        
+        <!-- LEFT PANEL: PRODUCT (DOUYIN FEED SIMULATION) -->
+        <section class="left-panel" id="feed-container">
+            <header class="issue-header">
+                <div class="issue-no">NO. 01</div>
+                <div class="issue-title">The Echoing Moment / 蹲到了</div>
+            </header>
+
+            <div class="feed-item">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000" alt="Fashion">
+                <div class="caption">
+                    <p class="drop-cap">在快节奏的信息流中，我们总是不断地刷过。那些被标记为“稍后再看”的视频，那些在评论区留下的“蹲”，最终都沉没在了数据的海洋里。</p>
+                </div>
+            </div>
+
+            <!-- THE INTERACTIVE CARD -->
+            <div id="dundao-card">
+                <div id="card-p1" class="page-p1">
+                    <div class="context-line" id="card-context">
+                        <span>情感锚点 / THE CONTEXT</span>
+                        你 3 周前在「大山的穿搭日记」里蹲过这件上衣
+                    </div>
+                    <div class="card-content">
+                        <div class="card-p1-hero">
+                            <img id="card-image" src="https://images.unsplash.com/photo-1539109132314-3477524c8935?auto=format&fit=crop&q=80&w=1000" alt="Result">
+                        </div>
+                        <p style="font-family: var(--font-body); font-size: 16px; font-style: italic;">博主今天更新了穿搭系列，你当时问的那件上衣，终于有了链接。</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn-action">去看看</button>
+                        <div class="card-nav">P. 01 / 03</div>
+                    </div>
+                </div>
+                <!-- Simplified P2 for Demo -->
+                <div id="card-p2" class="page-p2">
+                    <div class="context-line">
+                        <span>AI 解释 / WHY I KNOW</span>
+                        AI 看到你 21 天前蹲过，现在博主发了后续
+                    </div>
+                    <div style="font-family: var(--font-body); font-size: 18px; line-height: 1.6;">
+                        <p>匹配信号：评论意图「蹲链接」</p>
+                        <p>置信度：98.4%</p>
+                        <p>这是一次履约。你曾经的念头，AI 帮你接回来了。</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn-action" onclick="showPage(1)">返回</button>
+                        <div class="card-nav">P. 02 / 03</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feed-item">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=1000" alt="Object">
+                <div class="caption">
+                    <p>“逆风如解意，容易莫摧残。” 那些念念不忘的瞬间，总会有回响。AI 不再只是冷冰冰的推荐，而是温情脉脉的守候。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: AGENT (AI BACKEND WORKSPACE) -->
+        <main class="right-panel">
+            <h1 class="agent-title">THE<br>AGENT</h1>
+            <p class="agent-subtitle">Fulfillment Engine / 履约引擎</p>
+
+            <div class="input-box">
+                <input type="text" id="agent-input" placeholder="输入一条曾经的评论..." readonly>
+            </div>
+
+            <div class="presets">
+                <div class="preset-tag" onclick="startWorkflow(0)">蹲链接姐妹们 上衣链接求！</div>
+                <div class="preset-tag" onclick="startWorkflow(1)">一个月前按稍后再看 忘了看</div>
+                <div class="preset-tag" onclick="startWorkflow(2)">蹲后续 爷爷真帅</div>
+                <div class="preset-tag" onclick="startWorkflow(3)">求教程求教程求教程</div>
+            </div>
+
+            <div class="workflow" id="workflow-steps">
+                <div class="step" id="step-1">
+                    <span class="step-num">STEP 01</span>
+                    <span class="step-text">评论意图识别 / Intent Recognition</span>
+                </div>
+                <div class="step" id="step-2">
+                    <span class="step-num">STEP 02</span>
+                    <span class="step-text">历史意图匹配 / History Matching</span>
+                </div>
+                <div class="step" id="step-3">
+                    <span class="step-num">STEP 03</span>
+                    <span class="step-text">监听博主动态 / Content Monitoring</span>
+                </div>
+                <div class="step" id="step-4">
+                    <span class="step-num">STEP 04</span>
+                    <span class="step-text">情景还原生成 / Contextual Revival</span>
+                </div>
+                <div class="step" id="step-5">
+                    <span class="step-num">STEP 05</span>
+                    <span class="step-text">触发履约卡片 / Card Triggered</span>
+                </div>
+            </div>
+
+            <div class="pull-quote">
+                <span>“</span>
+                把信息、情绪与选择<br>
+                都刚好准备好。
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        const scripts = [
+            {
+                text: "蹲链接姐妹们 上衣链接求！",
+                context: "你 3 周前在「大山的穿搭日记」里蹲过这件上衣",
+                img: "https://images.unsplash.com/photo-1539109132314-3477524c8935?auto=format&fit=crop&q=80&w=1000",
+                desc: "博主今天更新了穿搭系列，你当时问的那件上衣，终于有了链接。"
+            },
+            {
+                text: "一个月前按稍后再看 忘了看",
+                context: "你一个月前在「30 天变身 Day1」按了稍后再看",
+                img: "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?auto=format&fit=crop&q=80&w=1000",
+                desc: "她已经更新到 Day 28 了。AI 已经为你摘录了前情提要，现在续看吗？"
+            },
+            {
+                text: "蹲后续 爷爷真帅",
+                context: "你 2 周前在「爷爷的退伍档案」下评论了「蹲后续」",
+                img: "https://images.unsplash.com/photo-1471341971476-3ae1119aa9a2?auto=format&fit=crop&q=80&w=1000",
+                desc: "爷爷的老战友联系到他了！博主刚刚发了重逢的下集视频。"
+            },
+            {
+                text: "求教程求教程求教程",
+                context: "你 5 天前在「阿强手工课」求过那个木工教程",
+                img: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=1000",
+                desc: "阿强刚才私信回复了你：教程已上传，请查收。"
+            }
+        ];
+
+        let isRunning = false;
+
+        function startWorkflow(index) {
+            if (isRunning) return;
+            isRunning = true;
+
+            const script = scripts[index];
+            const input = document.getElementById('agent-input');
+            const card = document.getElementById('dundao-card');
+            const steps = document.querySelectorAll('.step');
+
+            // Reset
+            input.value = "";
+            card.style.display = 'none';
+            steps.forEach(s => s.classList.remove('active'));
+
+            // Typewriter effect (simplified)
+            input.value = script.text;
+
+            // Animate steps
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    steps[currentStep].classList.add('active');
+                    currentStep++;
+                } else {
+                    clearInterval(interval);
+                    showCard(script);
+                    isRunning = false;
+                }
+            }, 800);
+        }
+
+        function showCard(script) {
+            const card = document.getElementById('dundao-card');
+            const contextLine = document.getElementById('card-context');
+            const cardImage = document.getElementById('card-image');
+            const cardDesc = card.querySelector('.card-content p');
+
+            contextLine.innerHTML = `<span>情感锚点 / THE CONTEXT</span>${script.context}`;
+            cardImage.src = script.img;
+            cardDesc.innerText = script.desc;
+
+            card.style.display = 'block';
+            
+            // Scroll to card
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function showPage(num) {
+            document.getElementById('card-p1').style.display = num === 1 ? 'block' : 'none';
+            document.getElementById('card-p2').style.display = num === 2 ? 'block' : 'none';
+        }
+
+        // Add flip event to card
+        document.getElementById('dundao-card').onclick = () => {
+            const p1 = document.getElementById('card-p1');
+            if (p1.style.display !== 'none') {
+                showPage(2);
+            } else {
+                showPage(1);
+            }
+        };
+
+        // Initial state
+        showPage(1);
+    </script>
+</body>
+</html>

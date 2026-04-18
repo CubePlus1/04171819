@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 | CAUGHT:// SYSTEM-V3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-panel: #121222;
+            --magenta: #ff00e5;
+            --cyan: #00ffe5;
+            --glitch-red: #ff003c;
+            --accent-yellow: #fcee0c;
+            --border-glow: 0 0 10px rgba(0, 255, 229, 0.4);
+            --neon-shadow: 0 0 15px var(--cyan);
+            --font-mono: 'Share Tech Mono', 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--cyan);
+            font-family: var(--font-mono);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- CRT & GRID OVERLAY --- */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 1000;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 20%, var(--bg-dark) 90%);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .data-grid {
+            position: absolute;
+            width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 255, 229, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 255, 229, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- HEADER --- */
+        header {
+            height: 60px;
+            border-bottom: 2px solid var(--magenta);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            background: rgba(18, 16, 34, 0.8);
+            z-index: 1001;
+            box-shadow: 0 0 20px rgba(255, 0, 229, 0.3);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            text-shadow: 2px 2px var(--glitch-red);
+            letter-spacing: 2px;
+        }
+
+        .sys-status {
+            font-size: 12px;
+            color: var(--magenta);
+        }
+
+        /* --- MAIN LAYOUT --- */
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 2px;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        /* --- LEFT PANEL: PRODUCT FEED --- */
+        #feed-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 20px;
+            scrollbar-width: none;
+        }
+        #feed-panel::-webkit-scrollbar { display: none; }
+
+        .feed-item {
+            background: rgba(18, 16, 34, 0.6);
+            border-left: 4px solid var(--cyan);
+            padding: 20px;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        /* THE "蹲到了" SPECIAL CARD */
+        .caught-card {
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.9), rgba(40, 20, 60, 0.8));
+            border: 2px solid var(--accent-yellow);
+            box-shadow: 0 0 30px rgba(252, 238, 12, 0.2);
+            position: relative;
+            padding: 0;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .caught-card.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .caught-header {
+            background: var(--accent-yellow);
+            color: black;
+            padding: 5px 15px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .p-section {
+            padding: 15px 20px;
+            border-bottom: 1px dashed rgba(252, 238, 12, 0.3);
+        }
+
+        .p-label {
+            font-size: 10px;
+            color: var(--magenta);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .p-content {
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .p1-context {
+            color: var(--accent-yellow);
+            font-weight: bold;
+            border-left: 2px solid var(--accent-yellow);
+            padding-left: 10px;
+        }
+
+        .p3-product {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .product-img {
+            width: 80px; height: 80px;
+            background: #222;
+            border: 1px solid var(--cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .product-info h3 { color: var(--cyan); margin-bottom: 5px; }
+        .product-info .price { color: var(--magenta); font-size: 20px; font-weight: bold; }
+
+        /* --- RIGHT PANEL: AGENT CONSOLE --- */
+        #agent-panel {
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--cyan);
+            display: flex;
+            flex-direction: column;
+            clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 5% 100%, 0 95%);
+            box-shadow: var(--border-glow);
+        }
+
+        .console-header {
+            padding: 10px;
+            border-bottom: 1px solid var(--cyan);
+            font-size: 12px;
+            background: rgba(0, 255, 229, 0.1);
+        }
+
+        .console-body {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        textarea {
+            background: #000;
+            border: 1px solid var(--magenta);
+            color: var(--magenta);
+            padding: 10px;
+            font-family: var(--font-mono);
+            resize: none;
+            height: 80px;
+            outline: none;
+        }
+
+        .presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .preset-btn {
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 8px;
+            font-size: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .preset-btn:hover {
+            background: var(--cyan);
+            color: black;
+        }
+
+        .workflow {
+            flex: 1;
+            border: 1px solid rgba(0, 255, 229, 0.2);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .step {
+            opacity: 0.3;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step.active {
+            opacity: 1;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 5px var(--accent-yellow);
+        }
+        .step.done {
+            opacity: 0.8;
+            color: var(--cyan);
+        }
+        .step-icon {
+            width: 8px; height: 8px;
+            background: currentColor;
+            transform: rotate(45deg);
+        }
+
+        .trigger-btn {
+            background: var(--magenta);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+            font-family: var(--font-mono);
+            letter-spacing: 3px;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .trigger-btn:hover {
+            background: var(--glitch-red);
+            box-shadow: 0 0 20px var(--glitch-red);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes glitch {
+            0% { transform: translate(0); text-shadow: -2px 0 red, 2px 0 blue; }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .glitch-text:hover {
+            animation: glitch 0.3s infinite;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 2px;
+            background: var(--cyan);
+            position: absolute;
+            top: 0; left: 0;
+            transition: width 0.5s;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            main { grid-template-columns: 1fr; overflow-y: auto; }
+            #agent-panel { height: 500px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="data-grid"></div>
+
+    <header>
+        <div class="logo">蹲到了 // CAUGHT</div>
+        <div class="sys-status">
+            SECURE_LINK: ACTIVE | LATENCY: 12ms | SECTOR: 0BKHDD-3
+        </div>
+    </header>
+
+    <main>
+        <!-- LEFT PANEL: FEED -->
+        <div id="feed-panel">
+            <div class="feed-item">
+                <p style="font-size: 12px; color: #666; margin-bottom: 5px;">SPONSORED://ALGO_FEED</p>
+                <h4 style="color: var(--cyan)">[广告] 极客霓虹外设旗舰店</h4>
+                <p style="font-size: 14px; margin-top: 5px;">新款机械键盘限时 8 折，注入灵魂。>> 立即查看</p>
+            </div>
+
+            <!-- THE MAGIC CARD -->
+            <div id="magic-card" class="caught-card">
+                <div class="caught-header">
+                    <span>FULFILLMENT://SUCCESS</span>
+                    <span>TIMESTAMP: 2026.04.18</span>
+                </div>
+                
+                <div class="p-section">
+                    <span class="p-label">P1: PAST INTENT // 过去意图</span>
+                    <div class="p-content p1-context" id="p1-text">
+                        正在加载关联记忆...
+                    </div>
+                </div>
+
+                <div class="p-section">
+                    <span class="p-label">P2: PRESENT TRIGGER // 当下触发</span>
+                    <div class="p-content" id="p2-text">
+                        正在分析环境信号...
+                    </div>
+                </div>
+
+                <div class="p-section" style="border-bottom: none;">
+                    <span class="p-label">P3: PRODUCT // 命定之物</span>
+                    <div class="p3-product">
+                        <div class="product-img" id="p3-img">?</div>
+                        <div class="product-info">
+                            <h3 id="p3-title">检索中...</h3>
+                            <div class="price" id="p3-price">¥ --</div>
+                            <p style="font-size: 11px; color: #888; margin-top: 4px;">STOCK: LIMITED_EDITION</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 10px; background: rgba(0,0,0,0.3); font-size: 10px; text-align: center; color: var(--accent-yellow);">
+                    [ PRESS ENTER TO CLAIM REALITY ]
+                </div>
+            </div>
+
+            <div class="feed-item">
+                <h4 style="color: var(--cyan)">城市探索日报 #402</h4>
+                <p style="font-size: 14px; margin-top: 5px;">下北泽蓝染文化兴起，古着爱好者的天堂还是商业陷阱？</p>
+            </div>
+
+            <div class="feed-item">
+                <h4 style="color: var(--cyan)">系统通知</h4>
+                <p style="font-size: 14px; margin-top: 5px;">检测到高频同步信号，意图链路已锁定。</p>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: AGENT -->
+        <div id="agent-panel">
+            <div class="console-header">
+                > AGENT_ID: CYBER_HUNTER_V3 | STATUS: IDLE
+            </div>
+            
+            <div class="console-body">
+                <div class="input-group">
+                    <label style="font-size: 12px;">INPUT_DESIRE://</label>
+                    <textarea id="agent-input" placeholder="输入你一直想要但没找到的东西..."></textarea>
+                </div>
+
+                <div class="presets">
+                    <button class="preset-btn" onclick="runPreset('jacket')">> 3月前提到的蓝染古着</button>
+                    <button class="preset-btn" onclick="runPreset('glsl')">> 去年收藏的GLSL教程</button>
+                </div>
+
+                <div class="workflow" id="workflow">
+                    <div class="loading-bar" id="load-bar"></div>
+                    <div class="step" id="step-1">
+                        <div class="step-icon"></div>
+                        <span>扫描跨平台历史碎片 (Diary, Likes, Notes)</span>
+                    </div>
+                    <div class="step" id="step-2">
+                        <div class="step-icon"></div>
+                        <span>提取语义核心: "Indigo-Dyed", "Vintage", "Noragi"</span>
+                    </div>
+                    <div class="step" id="step-3">
+                        <div class="step-icon"></div>
+                        <span>监听环境触发器: GPS_LOWER_SHIMOKITA</span>
+                    </div>
+                    <div class="step" id="step-4">
+                        <div class="step-icon"></div>
+                        <span>匹配实时供应池 (Local Shops, Second-hand)</span>
+                    </div>
+                    <div class="step" id="step-5">
+                        <div class="step-icon"></div>
+                        <span>生成瞬间卡片 (CAUGHT:// GENERATED)</span>
+                    </div>
+                </div>
+
+                <button class="trigger-btn" onclick="executeWorkflow()">EXECUTE_HUNT</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const presets = {
+            jacket: {
+                input: "我想要一件手工蓝染的野良着，不要工业量产的那种。",
+                p1: "3个月前在你的‘赛博笔记’里提到：‘想在下北泽找一件40年代的蓝染古着，手工缝补感要强’。",
+                p2: "你刚才经过了 [Vintage Shop A] 的后门，GPS定位与视觉识别匹配到橱窗新品。",
+                p3: {
+                    title: "1940s 手工缝补蓝染野良着",
+                    price: "¥ 1,280",
+                    img: "👘"
+                }
+            },
+            glsl: {
+                input: "能不能推荐点深奥的Three.js/WebGL学习资料？",
+                p1: "去年11月你收藏了3篇关于‘Ray Marching’和‘SDF’的深度博文，但一直没时间细读。",
+                p2: "你正在阅读《WebGL数学》，且最近在搜索‘复杂着色器优化’。",
+                p3: {
+                    title: "《GLSL：从入门到精通》高级版",
+                    price: "¥ 49 (限时 5 折)",
+                    img: "💾"
+                }
+            }
+        };
+
+        let currentPreset = null;
+
+        function runPreset(type) {
+            currentPreset = presets[type];
+            document.getElementById('agent-input').value = currentPreset.input;
+            executeWorkflow();
+        }
+
+        async function executeWorkflow() {
+            if (!currentPreset) {
+                alert("PLEASE SELECT A PRESET OR INPUT DESIRE");
+                return;
+            }
+
+            const card = document.getElementById('magic-card');
+            card.classList.remove('active');
+            
+            // Reset steps
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(s => s.className = 'step');
+            document.getElementById('load-bar').style.width = '0%';
+
+            // Run animation
+            for (let i = 1; i <= 5; i++) {
+                const step = document.getElementById(`step-${i}`);
+                step.classList.add('active');
+                document.getElementById('load-bar').style.width = `${i * 20}%`;
+                
+                await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+                
+                step.classList.remove('active');
+                step.classList.add('done');
+            }
+
+            // Populate Card
+            document.getElementById('p1-text').innerText = currentPreset.p1;
+            document.getElementById('p2-text').innerText = currentPreset.p2;
+            document.getElementById('p3-title').innerText = currentPreset.p3.title;
+            document.getElementById('p3-price').innerText = currentPreset.p3.price;
+            document.getElementById('p3-img').innerText = currentPreset.p3.img;
+
+            // Reveal Card with Glitch
+            setTimeout(() => {
+                card.classList.add('active');
+                playGlitchEffect();
+            }, 300);
+        }
+
+        function playGlitchEffect() {
+            const body = document.body;
+            body.style.filter = 'invert(0.1) hue-rotate(90deg)';
+            setTimeout(() => {
+                body.style.filter = 'none';
+            }, 100);
+            setTimeout(() => {
+                body.style.filter = 'contrast(2) brightness(2)';
+            }, 150);
+            setTimeout(() => {
+                body.style.filter = 'none';
+            }, 250);
+        }
+
+        // Terminal text typing effect
+        function typeWriter(element, text, i = 0) {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                setTimeout(() => typeWriter(element, text, i + 1), 20);
+            }
+        }
+    </script>
+</body>
+</html>

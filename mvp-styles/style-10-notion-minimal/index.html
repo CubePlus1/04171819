@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 - Notion Minimal MVP</title>
+    <!-- Inter Font & Lucide Icons via CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        :root {
+            --notion-bg: #FFFFFF;
+            --notion-secondary: #F7F6F3;
+            --notion-text: #37352F;
+            --notion-muted: rgba(55, 53, 47, 0.65);
+            --notion-border: rgba(55, 53, 47, 0.09);
+            --notion-red: #E03E3E;
+            --notion-green: #0F7B0F;
+            --notion-blue: #0B6E99;
+            --notion-yellow-bg: #FBF3DB;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'PingFang SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--notion-bg);
+            color: var(--notion-text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Panels */
+        .panel {
+            flex: 1;
+            height: 100%;
+            overflow-y: auto;
+            padding: 40px 60px;
+            border-right: 1px solid var(--notion-border);
+        }
+
+        .panel:last-child {
+            border-right: none;
+            background-color: var(--notion-bg);
+        }
+
+        /* Notion Typography */
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--notion-muted);
+            margin-bottom: 32px;
+        }
+
+        .breadcrumb span:hover {
+            color: var(--notion-text);
+            cursor: pointer;
+        }
+
+        /* Notion Blocks */
+        .notion-block {
+            margin-bottom: 2px;
+            padding: 4px 0;
+            font-size: 16px;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--notion-border);
+            margin: 16px 0;
+        }
+
+        /* Callout */
+        .callout {
+            display: flex;
+            padding: 16px;
+            background-color: var(--notion-secondary);
+            border-radius: 4px;
+            gap: 12px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .callout-icon { font-size: 18px; }
+
+        /* Toggles */
+        .toggle-container {
+            margin: 8px 0;
+        }
+
+        .toggle-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .toggle-icon {
+            font-size: 12px;
+            transition: transform 0.1s;
+            width: 16px;
+            color: var(--notion-muted);
+        }
+
+        .toggle-content {
+            padding-left: 24px;
+            margin-top: 4px;
+            color: var(--notion-muted);
+            font-size: 14px;
+        }
+
+        /* Card Decoration */
+        .duns-card {
+            border: 1px solid var(--notion-border);
+            padding: 20px;
+            border-radius: 4px;
+            margin: 24px 0;
+            background: var(--notion-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Agent Panel Specifics */
+        .input-wrapper {
+            position: relative;
+            margin: 24px 0;
+        }
+
+        .notion-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--notion-border);
+            background: var(--notion-secondary);
+            border-radius: 4px;
+            font-size: 15px;
+            outline: none;
+            color: var(--notion-text);
+        }
+
+        .notion-input:focus {
+            box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2);
+        }
+
+        .pill-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .pill {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            background: #E8ECEE;
+            color: #444;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .pill:hover { background: #DDE1E3; }
+        .pill.active { background: var(--notion-blue); color: white; }
+
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease-out;
+        }
+
+        .workflow-step.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--notion-muted);
+            margin-top: 8px;
+        }
+
+        .trigger-btn {
+            background: var(--notion-text);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 24px;
+            font-size: 14px;
+        }
+
+        .trigger-btn:hover { opacity: 0.9; }
+
+        /* Utility */
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const Toggle = ({ title, children, defaultOpen = false }) => {
+            const [isOpen, setIsOpen] = useState(defaultOpen);
+            return (
+                <div className="toggle-container">
+                    <div className="toggle-header" onClick={() => setIsOpen(!isOpen)}>
+                        <span className="toggle-icon">{isOpen ? '▾' : '▸'}</span>
+                        <span>{title}</span>
+                    </div>
+                    {isOpen && <div className="toggle-content">{children}</div>}
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [activeWorkflow, setActiveWorkflow] = useState([]);
+            const [showResultCard, setShowResultCard] = useState(false);
+            const [isAnimating, setIsAnimating] = useState(false);
+
+            const workflowData = [
+                "🔍 监听意图数据流 (Intent Stream Filtering)",
+                "📂 检索历史行为映射 (Historical Mapping)",
+                "⚡ 匹配即时场景触点 (Trigger Context Match)",
+                "📊 聚合多维价值反馈 (Value Aggregation)",
+                "✨ 生成即时满足卡片 (Experience Card Ready)"
+            ];
+
+            const handleTrigger = () => {
+                if (isAnimating) return;
+                setIsAnimating(true);
+                setActiveWorkflow([]);
+                setShowResultCard(false);
+
+                let i = 0;
+                const interval = setInterval(() => {
+                    setActiveWorkflow(prev => [...prev, workflowData[i]]);
+                    i++;
+                    if (i === workflowData.length) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            setShowResultCard(true);
+                            setIsAnimating(false);
+                        }, 500);
+                    }
+                }, 600);
+            };
+
+            return (
+                <div className="app-container">
+                    {/* Left Panel: Product */}
+                    <div className="panel">
+                        <div className="breadcrumb">
+                            <span>我的空间</span> / <span>发现</span> / <span>🎯 蹲到了 Feed</span>
+                        </div>
+                        <h1>🎯 蹲到了</h1>
+                        
+                        <div className="notion-block">今天你“蹲”到什么了？基于你的长期意图，系统已为你捕捉以下动态：</div>
+                        <div className="divider"></div>
+
+                        {/* Existing Feed Items */}
+                        <div className="notion-block">📄 <span style={{fontWeight: 500}}>Vision Pro 2 代供应链传闻汇总</span></div>
+                        <div className="notion-block" style={{color: 'var(--notion-muted)', fontSize: '14px', marginLeft: '24px'}}>
+                            ▸ 来源于你 2 周前关注的“科技前沿”主题
+                        </div>
+
+                        <div className="notion-block" style={{marginTop: '16px'}}>📄 <span style={{fontWeight: 500}}>杭州 10-11 月最佳徒步路线指南</span></div>
+                        <div className="notion-block" style={{color: 'var(--notion-muted)', fontSize: '14px', marginLeft: '24px'}}>
+                            ▸ 来源于你收藏的“秋季出行计划”
+                        </div>
+
+                        <div className="notion-block" style={{marginTop: '16px'}}>📄 <span style={{fontWeight: 500}}>《黑神话：悟空》美术设定集预售提醒</span></div>
+                        <div className="divider"></div>
+
+                        {/* Result Card (Target) */}
+                        {showResultCard && (
+                            <div className="duns-card">
+                                <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
+                                    <span style={{fontSize: '18px', fontWeight: '600'}}>📌 这就是你想要的：黑椒和牛汉堡半价</span>
+                                    <span style={{background: '#E03E3E20', color: '#E03E3E', padding: '2px 8px', borderRadius: '4px', fontSize: '12px'}}>P0 - 即时满足</span>
+                                </div>
+                                
+                                <Toggle title="P1: 捕获瞬间 (Moment)" defaultOpen={true}>
+                                    系统在 14:02 识别到你进入了静安嘉里中心 B1 层，并关联到美罗城店的会员积分即将过期。
+                                </Toggle>
+                                <Toggle title="P2: 意图回溯 (Context)" defaultOpen={false}>
+                                    你 3 周前在“深夜食堂”清单中标记过该品牌，并备注“希望下次路过能吃上”。
+                                </Toggle>
+                                <Toggle title="P3: 行动建议 (Action)" defaultOpen={false}>
+                                    点击“立即下单”，凭此卡片可免排队核销。预计步行距离 120 米。
+                                </Toggle>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Panel: Agent */}
+                    <div className="panel">
+                        <div className="breadcrumb">
+                            <span>AI Agent</span> / <span>Intention Engine</span>
+                        </div>
+                        
+                        <div className="callout" style={{background: 'var(--notion-yellow-bg)'}}>
+                            <span className="callout-icon">💭</span>
+                            <div className="callout-text">
+                                <strong>Context Aware:</strong> 你 3 周前蹲过这个品牌的“黑椒和牛”，目前距离你 100m 内有匹配项。
+                            </div>
+                        </div>
+
+                        <div className="input-wrapper">
+                            <input 
+                                className="notion-input" 
+                                placeholder="输入指令，使用 / 查看命令..." 
+                                defaultValue="/match_intent local_food"
+                            />
+                        </div>
+
+                        <div className="pill-tags">
+                            <span className="pill active" onClick={handleTrigger}>📍 附近意图</span>
+                            <span className="pill">🛍️ 降价提醒</span>
+                            <span className="pill">📅 档期冲突</span>
+                            <span className="pill">💡 灵感捕捉</span>
+                        </div>
+
+                        <div style={{marginTop: '32px'}}>
+                            <h3 style={{fontSize: '14px', fontWeight: '600', color: 'var(--notion-muted)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.05em'}}>执行流 (Workflow)</h3>
+                            
+                            <div className="workflow-container">
+                                {workflowData.map((step, idx) => (
+                                    <div key={idx} className={`workflow-step ${activeWorkflow.includes(step) ? 'visible' : ''}`}>
+                                        <div className="step-dot" style={{background: activeWorkflow.includes(step) ? 'var(--notion-green)' : 'var(--notion-border)'}}></div>
+                                        <div style={{fontSize: '14px', color: activeWorkflow.includes(step) ? 'var(--notion-text)' : 'var(--notion-muted)'}}>
+                                            {step}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <button className="trigger-btn" onClick={handleTrigger} disabled={isAnimating}>
+                            {isAnimating ? '正在捕获...' : '触发意图匹配'}
+                        </button>
+
+                        <div className="divider"></div>
+                        <div style={{fontSize: '12px', color: 'var(--notion-muted)', fontStyle: 'italic'}}>
+                            Notion Minimal (S10) Engine v0.1.0-alpha
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 | 手账日志 MVP</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-cream: #FFF8E1;
+            --paper-light: #FFEDC2;
+            --tape-peach: #FFD6A5;
+            --tape-sky: #A5D6FF;
+            --tape-lavender: #D6A5FF;
+            --tape-mint: #B5FFD4;
+            --ink: #4A4A4A;
+            --accent: #FF6B6B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            background-image: url("https://www.transparenttextures.com/patterns/felt.png");
+            font-family: 'ZCOOL XiaoWei', serif;
+            color: var(--ink);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Paper Texture Filter */
+        .paper-texture {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.05;
+            z-index: 1000;
+        }
+
+        .main-container {
+            width: 95vw;
+            height: 90vh;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 40px;
+            padding: 20px;
+            max-width: 1400px;
+        }
+
+        /* LEFT PANEL: Feed */
+        .feed-panel {
+            position: relative;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .feed-panel::-webkit-scrollbar { display: none; }
+
+        .feed-item {
+            background: white;
+            padding: 15px;
+            box-shadow: 2px 5px 15px rgba(0,0,0,0.05);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        /* Polaroid Style */
+        .polaroid {
+            border-bottom: 40px solid white;
+            padding: 10px 10px 10px 10px;
+            transform: rotate(-1deg);
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            filter: sepia(0.2) contrast(0.9);
+        }
+
+        /* Washi Tape Decor */
+        .washi-tape {
+            position: absolute;
+            height: 30px;
+            width: 80px;
+            opacity: 0.8;
+            z-index: 2;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .tape-top { top: -15px; left: 50%; transform: translateX(-50%) rotate(2deg); background: var(--tape-sky); clip-path: polygon(0% 0%, 5% 100%, 95% 100%, 100% 0%); }
+        .tape-corner { top: -10px; right: -20px; transform: rotate(45deg); background: var(--tape-peach); width: 60px; clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%); }
+
+        /* THE "DUNDAO" CARD (P1/P2/P3) */
+        .dundao-card {
+            display: none; /* Initially hidden */
+            animation: revealCard 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            background: white;
+            padding: 20px;
+            border-radius: 2px;
+            transform: rotate(1deg);
+        }
+
+        @keyframes revealCard {
+            0% { opacity: 0; transform: translateY(50px) rotate(5deg) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) rotate(1deg) scale(1); }
+        }
+
+        .status-badge {
+            font-family: 'Zhi Mang Xing', cursive;
+            background: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            display: inline-block;
+            margin-bottom: 15px;
+            transform: skew(-10deg);
+        }
+
+        .card-p1 { font-size: 1.8rem; margin-bottom: 10px; border-bottom: 2px dashed #eee; padding-bottom: 5px; }
+        .card-p2 { font-size: 1rem; color: #666; font-style: italic; margin-bottom: 15px; line-height: 1.4; }
+        .card-p3 { font-family: 'Caveat', cursive; font-size: 1.5rem; color: var(--accent); }
+
+        /* RIGHT PANEL: Agent */
+        .agent-panel {
+            background: var(--paper-light);
+            clip-path: polygon(2% 1%, 98% 3%, 99% 97%, 1% 99%);
+            box-shadow: 5px 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-header {
+            font-family: 'Zhi Mang Xing', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .agent-header::after {
+            content: '✿';
+            position: absolute;
+            right: 0; bottom: 0;
+            color: var(--tape-peach);
+            font-size: 1.2rem;
+        }
+
+        .input-area {
+            background: rgba(255,255,255,0.6);
+            border: 2px solid rgba(0,0,0,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--ink);
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.2rem;
+            padding: 10px;
+            outline: none;
+        }
+
+        .presets {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .preset-btn {
+            background: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 1px 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            position: relative;
+        }
+        .preset-btn:hover { transform: translateY(-2px); background: var(--tape-mint); }
+        .preset-btn::before { content: '✎'; margin-right: 5px; opacity: 0.5; }
+
+        /* Workflow Steps */
+        .workflow {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-left: 30px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0.3;
+            transition: all 0.5s;
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateX(10px);
+        }
+
+        .step-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--tape-lavender);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Caveat', cursive;
+            font-weight: bold;
+        }
+
+        .step-text { font-size: 1.1rem; }
+
+        .doodle-arrow {
+            position: absolute;
+            left: 10px; top: 0;
+            height: 100%;
+            width: 2px;
+            background: repeating-linear-gradient(to bottom, #ccc, #ccc 5px, transparent 5px, transparent 10px);
+        }
+
+        /* Trigger Button */
+        .trigger-btn {
+            margin-top: 20px;
+            background: var(--ink);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Zhi Mang Xing', cursive;
+            transition: all 0.3s;
+            box-shadow: 3px 3px 0px var(--tape-peach);
+        }
+        .trigger-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px; }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            animation: sparkleAnim 1s infinite alternate;
+        }
+
+        @keyframes sparkleAnim {
+            from { opacity: 0.2; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; overflow-y: auto; }
+            .agent-panel { height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-texture"></div>
+
+    <div class="main-container">
+        <!-- LEFT: Feed -->
+        <div class="feed-panel" id="feed">
+            <div class="feed-item polaroid" style="transform: rotate(2deg)">
+                <div class="washi-tape tape-top"></div>
+                <img src="https://images.unsplash.com/photo-1501339819358-ee5969a2f238?q=80&w=800" alt="coffee">
+                <p style="margin-top: 10px; font-size: 0.9rem;">☕️ 午后三点的阳光与美式</p>
+            </div>
+
+            <div class="feed-item polaroid" style="transform: rotate(-3deg)">
+                <div class="washi-tape tape-corner" style="background: var(--tape-mint)"></div>
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800" alt="watch">
+                <p style="margin-top: 10px; font-size: 0.9rem;">🕰 慢下来的时光</p>
+            </div>
+
+            <!-- Dynamic Card Placeholder -->
+            <div id="dynamic-card-container"></div>
+
+            <div class="feed-item polaroid" style="transform: rotate(1deg)">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800" alt="mountain">
+                <p style="margin-top: 10px; font-size: 0.9rem;">🏔 想要去山野间呼吸</p>
+            </div>
+        </div>
+
+        <!-- RIGHT: Agent -->
+        <div class="agent-panel">
+            <h1 class="agent-header">蹲到了 · 守护中</h1>
+            
+            <div class="input-area">
+                <p style="font-size: 0.8rem; margin-bottom: 5px; opacity: 0.6;">你想蹲的是...</p>
+                <input type="text" id="target-input" placeholder="输入你的期待..." value="">
+                
+                <div class="presets" style="margin-top: 15px;">
+                    <button class="preset-btn" onclick="setTarget('上海-东京 ￥1200 机票')">特价机票</button>
+                    <button class="preset-btn" onclick="setTarget('周杰伦 演唱会 门票')">演唱会</button>
+                    <button class="preset-btn" onclick="setTarget('雨天专属的 治愈歌单')">雨天情绪</button>
+                    <button class="preset-btn" onclick="setTarget('绝版 樱桃小丸子 挂件')">绝版好物</button>
+                </div>
+            </div>
+
+            <div class="workflow">
+                <div class="doodle-arrow"></div>
+                <div class="step" id="step-1">
+                    <div class="step-num">1</div>
+                    <div class="step-text">需求捕捉：听懂你的弦外之音</div>
+                </div>
+                <div class="step" id="step-2">
+                    <div class="step-num">2</div>
+                    <div class="step-text">全网巡航：在千万信息中潜水</div>
+                </div>
+                <div class="step" id="step-3">
+                    <div class="step-num">3</div>
+                    <div class="step-text">价值过滤：剔除杂音，只留真意</div>
+                </div>
+                <div class="step" id="step-4">
+                    <div class="step-num">4</div>
+                    <div class="step-text">情感链接：匹配你当下的那一刻</div>
+                </div>
+                <div class="step" id="step-5">
+                    <div class="step-num">5</div>
+                    <div class="step-text">瞬间生成：让惊喜自然发生</div>
+                </div>
+            </div>
+
+            <button class="trigger-btn" id="trigger" onclick="startWorkflow()">
+                ✨ 开始守护我的期待
+            </button>
+
+            <!-- Doodle Decorations -->
+            <span class="sparkle" style="top: 20px; left: 30px; font-size: 20px;">⭐</span>
+            <span class="sparkle" style="bottom: 40px; right: 50px; font-size: 24px;">🎨</span>
+        </div>
+    </div>
+
+    <script>
+        function setTarget(val) {
+            document.getElementById('target-input').value = val;
+        }
+
+        async function startWorkflow() {
+            const target = document.getElementById('target-input').value;
+            if (!target) {
+                alert('请先输入你想“蹲”的内容哦~');
+                return;
+            }
+
+            const btn = document.getElementById('trigger');
+            btn.disabled = true;
+            btn.innerText = "正在为你 潜心寻找...";
+
+            // Animate Steps
+            for (let i = 1; i <= 5; i++) {
+                const step = document.getElementById(`step-${i}`);
+                step.classList.add('active');
+                await new Promise(r => setTimeout(r, 800));
+            }
+
+            // Reveal Card in Feed
+            revealDundao(target);
+
+            // Reset
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerText = "✨ 继续守护我的期待";
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`step-${i}`).classList.remove('active');
+                }
+            }, 3000);
+        }
+
+        function revealDundao(target) {
+            const container = document.getElementById('dynamic-card-container');
+            
+            // Logic for content based on target
+            let p1 = `终于蹲到了！${target}`;
+            let p2 = "全网巡航 12,402 条动态，在最适合的瞬间为你抓取。";
+            let p3 = "Just what you waited for.";
+            let img = "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=800";
+
+            if (target.includes('机票')) {
+                p2 = "发现低价波峰，仅持续 15 分钟。";
+                img = "https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?q=80&w=800";
+            } else if (target.includes('雨天')) {
+                p2 = "听，窗外雨声正美，此时最适合。";
+                img = "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=800";
+            }
+
+            const cardHtml = `
+                <div class="feed-item dundao-card">
+                    <div class="washi-tape tape-top" style="background: var(--tape-lavender)"></div>
+                    <div class="status-badge">DUNDAO! 蹲到了</div>
+                    <div class="card-p1">${p1}</div>
+                    <div class="card-p2">${p2}</div>
+                    <div class="polaroid" style="margin: 15px 0; border-bottom-width: 20px;">
+                        <img src="${img}" alt="result">
+                    </div>
+                    <div class="card-p3">-- ${p3}</div>
+                </div>
+            `;
+
+            container.innerHTML = cardHtml;
+            const card = container.querySelector('.dundao-card');
+            card.style.display = 'block';
+            
+            // Scroll feed to show the new card
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Add some random doodle movements
+        document.querySelectorAll('.sparkle').forEach(s => {
+            s.style.left = (Math.random() * 90) + '%';
+            s.style.top = (Math.random() * 90) + '%';
+            s.style.animationDelay = (Math.random() * 2) + 's';
+        });
+    </script>
+</body>
+</html>

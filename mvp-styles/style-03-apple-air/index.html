@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 | AI 体验信息流</title>
+    <!-- SF Pro & PingFang SC setup -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --apple-bg: #FFFFFF;
+            --apple-glass: rgba(255, 255, 255, 0.72);
+            --apple-border: rgba(0, 0, 0, 0.05);
+            --apple-text: #1D1D1F;
+            --apple-text-secondary: #86868B;
+            --apple-accent: #0071E3;
+            --apple-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--apple-bg);
+            color: var(--apple-text);
+            font-family: -apple-system, "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Container Layout */
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            background: linear-gradient(135deg, #F5F5F7 0%, #FFFFFF 100%);
+            padding: 24px;
+            gap: 24px;
+        }
+
+        /* Left Panel: Product/Feed */
+        .product-panel {
+            flex: 1.2;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-right: 12px;
+            scroll-behavior: smooth;
+        }
+
+        .product-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        .product-panel::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        /* Feed Items */
+        .feed-item {
+            background: var(--apple-glass);
+            backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 0.5px solid var(--apple-border);
+            padding: 24px;
+            min-height: 400px;
+            box-shadow: var(--apple-shadow);
+            opacity: 1;
+            transition: all 0.8s var(--ease-out);
+        }
+
+        .feed-item.placeholder {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .skeleton-line {
+            height: 12px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 6px;
+            width: 60%;
+        }
+
+        .skeleton-box {
+            height: 200px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 20px;
+            width: 100%;
+        }
+
+        /* "蹲到了" Special Card */
+        .dunedao-card {
+            position: relative;
+            overflow: hidden;
+            padding: 0; /* Full bleed swipe area */
+            background: #FFFFFF;
+            border: 0.5px solid var(--apple-border);
+            display: none; /* Initially hidden until triggered */
+        }
+
+        .swipe-container {
+            display: flex;
+            width: 300%;
+            height: 400px;
+            transition: transform 0.6s var(--ease-out);
+        }
+
+        .swipe-page {
+            width: 33.333%;
+            height: 100%;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* P1: Context */
+        .p1-context {
+            font-size: 14px;
+            color: var(--apple-accent);
+            font-weight: 500;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .p1-headline {
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        /* P2: Core Data */
+        .price-viz {
+            text-align: center;
+        }
+        .old-price {
+            text-decoration: line-through;
+            color: var(--apple-text-secondary);
+            font-size: 20px;
+        }
+        .new-price {
+            font-size: 64px;
+            font-weight: 700;
+            color: var(--apple-text);
+            margin: 8px 0;
+            display: block;
+        }
+
+        /* P3: Action */
+        .action-button {
+            background: var(--apple-text);
+            color: #FFF;
+            padding: 18px 32px;
+            border-radius: 40px;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .action-button:active {
+            transform: scale(0.96);
+        }
+
+        .swipe-dots {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .dot.active {
+            background: var(--apple-text);
+            width: 12px;
+            border-radius: 3px;
+        }
+
+        /* Right Panel: Agent/Workflow */
+        .agent-panel {
+            flex: 0.8;
+            background: var(--apple-glass);
+            backdrop-filter: blur(24px);
+            border-radius: 28px;
+            border: 0.5px solid var(--apple-border);
+            padding: 32px;
+            box-shadow: var(--apple-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .agent-header {
+            margin-bottom: 32px;
+        }
+        .agent-header h2 {
+            font-size: 24px;
+            margin: 0 0 8px 0;
+            font-weight: 600;
+        }
+        .agent-header p {
+            color: var(--apple-text-secondary);
+            font-size: 15px;
+            margin: 0;
+        }
+
+        /* Input Area */
+        .agent-input-box {
+            background: rgba(0,0,0,0.03);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .agent-input-box textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            outline: none;
+            height: 60px;
+            color: var(--apple-text);
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+        .preset-chip {
+            padding: 8px 16px;
+            background: #FFF;
+            border: 0.5px solid var(--apple-border);
+            border-radius: 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .preset-chip:hover {
+            border-color: var(--apple-accent);
+            color: var(--apple-accent);
+        }
+
+        /* Workflow Viz */
+        .workflow {
+            margin-top: auto;
+            border-top: 0.5px solid var(--apple-border);
+            padding-top: 32px;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+            transition: all 0.5s;
+        }
+        .step.active {
+            opacity: 1;
+        }
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .step.active .step-icon {
+            background: var(--apple-accent);
+            color: #FFF;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+        }
+        .step-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .trigger-btn {
+            width: 100%;
+            background: var(--apple-accent);
+            color: #FFF;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s;
+        }
+        .trigger-btn:disabled {
+            background: #E5E5E5;
+            cursor: not-allowed;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s var(--ease-out) forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Left: Product Feed -->
+        <div class="product-panel" id="productFeed">
+            <div class="feed-item placeholder">
+                <div class="skeleton-line" style="width: 30%"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line" style="width: 80%"></div>
+            </div>
+
+            <!-- The "蹲到了" Card (Injected here) -->
+            <div id="dunedaoCard" class="feed-item dunedao-card">
+                <div class="swipe-container" id="swipeContainer">
+                    <!-- Page 1 -->
+                    <div class="swipe-page">
+                        <div class="p1-context">基于你的监控列表</div>
+                        <h2 class="p1-headline">你蹲了 3 天的<br>Sony A7C2 降价了</h2>
+                        <div style="margin-top: 24px; color: var(--apple-text-secondary);">
+                            <i data-lucide="info" style="width: 14px; vertical-align: middle;"></i> 
+                            匹配你设定的「¥13,000」期望价位
+                        </div>
+                    </div>
+                    <!-- Page 2 -->
+                    <div class="swipe-page">
+                        <div class="price-viz">
+                            <span class="old-price">¥14,999</span>
+                            <span class="new-price">¥12,888</span>
+                            <div style="background: rgba(52, 199, 89, 0.1); color: #248A3D; padding: 8px 16px; border-radius: 20px; display: inline-block; font-weight: 600;">
+                                已省 ¥2,111
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Page 3 -->
+                    <div class="swipe-page">
+                        <div style="text-align: center;">
+                            <h3 style="font-size: 24px; margin-bottom: 24px;">即刻拔草</h3>
+                            <div class="action-button">去京东抢购</div>
+                            <div style="margin-top: 20px; color: var(--apple-text-secondary); font-size: 13px;">
+                                优惠仅剩 14 分钟
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swipe-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+
+            <div class="feed-item placeholder">
+                <div class="skeleton-line" style="width: 40%"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-line"></div>
+            </div>
+        </div>
+
+        <!-- Right: Agent Panel -->
+        <div class="agent-panel">
+            <div class="agent-header">
+                <h2>智能助手</h2>
+                <p>为您捕捉每一个“刚刚好”的瞬间</p>
+            </div>
+
+            <div class="agent-input-box">
+                <textarea id="agentInput" placeholder="告诉我想蹲什么..."></textarea>
+            </div>
+
+            <div class="presets">
+                <div class="preset-chip" onclick="handlePreset('监控 Sony A7C2 价格低于 1.3w')">监控 Sony A7C2 价格</div>
+                <div class="preset-chip" onclick="handlePreset('蹲一个去日本的特价机票')">蹲特价机票</div>
+                <div class="preset-chip" onclick="handlePreset('提醒我周杰伦演唱会放票')">蹲演唱会门票</div>
+            </div>
+
+            <div class="workflow" id="workflow">
+                <div class="step" data-step="1">
+                    <div class="step-icon"><i data-lucide="search"></i></div>
+                    <div class="step-label">分析情境</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-icon"><i data-lucide="eye"></i></div>
+                    <div class="step-label">实时监控</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-icon"><i data-lucide="zap"></i></div>
+                    <div class="step-label">契合瞬间</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-icon"><i data-lucide="layers"></i></div>
+                    <div class="step-label">生成策略</div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-icon"><i data-lucide="check"></i></div>
+                    <div class="step-label">部署卡片</div>
+                </div>
+            </div>
+
+            <button class="trigger-btn" id="triggerBtn" onclick="runWorkflow()">启动监控</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        let currentStep = 0;
+        let currentSwipe = 0;
+
+        function handlePreset(text) {
+            document.getElementById('agentInput').value = text;
+        }
+
+        async function runWorkflow() {
+            const btn = document.getElementById('triggerBtn');
+            const steps = document.querySelectorAll('.step');
+            
+            btn.disabled = true;
+            btn.innerText = "处理中...";
+
+            // Reset steps
+            steps.forEach(s => s.classList.remove('active'));
+
+            // Animate steps
+            for (let i = 0; i < steps.length; i++) {
+                await new Promise(r => setTimeout(r, 600));
+                steps[i].classList.add('active');
+            }
+
+            // Inject Card
+            setTimeout(() => {
+                const card = document.getElementById('dunedaoCard');
+                card.style.display = 'block';
+                card.classList.add('animate-fade-in');
+                
+                // Scroll to card
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                btn.disabled = false;
+                btn.innerText = "重新启动";
+                
+                // Start auto-swipe demo
+                startSwipeDemo();
+            }, 500);
+        }
+
+        function startSwipeDemo() {
+            const container = document.getElementById('swipeContainer');
+            const dots = document.querySelectorAll('.dot');
+            let index = 0;
+
+            const interval = setInterval(() => {
+                index = (index + 1) % 3;
+                container.style.transform = `translateX(-${index * 33.333}%)`;
+                
+                dots.forEach((d, i) => {
+                    d.classList.toggle('active', i === index);
+                });
+
+                if (index === 0) {
+                    // Stop after one full cycle if you want, or keep it going
+                    // clearInterval(interval);
+                }
+            }, 3000);
+
+            // Allow manual click on dots
+            dots.forEach((dot, i) => {
+                dot.onclick = () => {
+                    clearInterval(interval);
+                    index = i;
+                    container.style.transform = `translateX(-${index * 33.333}%)`;
+                    dots.forEach((d, j) => d.classList.toggle('active', i === j));
+                };
+            });
+        }
+
+        // Add some parallax/hover effect to panels
+        document.addEventListener('mousemove', (e) => {
+            const panels = document.querySelectorAll('.feed-item, .agent-panel');
+            const x = (window.innerWidth / 2 - e.pageX) / 50;
+            const y = (window.innerHeight / 2 - e.pageY) / 50;
+
+            panels.forEach(p => {
+                // Subtle lift
+                // p.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+            });
+        });
+
+    </script>
+</body>
+</html>

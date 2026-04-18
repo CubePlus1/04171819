@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 · Track 3 MVP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFFFFF;
+            --butter: #FFE4B5;
+            --sky: #B5D4FF;
+            --matcha: #D4FFB5;
+            --rose: #FFB5D4;
+            --lavender: #E0B5FF;
+            --text-dark: #1A1A1A;
+            --radius: 20px;
+            --gap: 20px;
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- Layout Structures --- */
+        .container {
+            display: grid;
+            grid-template-columns: 375px 1fr;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- Left Panel: Product (Douyin Feed) --- */
+        .product-panel {
+            background: #000;
+            border-right: 1px solid #333;
+            position: relative;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+        }
+
+        .feed-item {
+            height: 100%;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .feed-overlay {
+            position: absolute;
+            bottom: 120px;
+            left: 20px;
+            right: 80px;
+            z-index: 2;
+        }
+
+        .creator-tag { font-size: 18px; margin-bottom: 8px; }
+        .caption { font-size: 14px; opacity: 0.9; line-height: 1.4; }
+
+        .side-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2;
+        }
+        .action-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        /* --- Dundao Card (The MVP Star) --- */
+        .dundao-card-container {
+            height: 100%;
+            width: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #121212;
+            padding: 20px;
+            display: none; /* Initially Hidden */
+        }
+
+        .dundao-card {
+            background: white;
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: cardReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes cardReveal {
+            from { transform: translateY(100px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .card-header {
+            padding: 20px;
+            background: var(--butter);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .context-line {
+            font-size: 15px;
+            line-height: 1.4;
+            color: #5c4b2a;
+        }
+        .ai-tag-mini {
+            background: rgba(255,255,255,0.6);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .card-content {
+            flex: 1;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .card-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+        }
+        .card-page.active { display: flex; }
+
+        .p1-video-mock {
+            width: 100%;
+            height: 200px;
+            background: #eee;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+        }
+        .p1-title { font-size: 20px; margin-bottom: 8px; }
+        .p1-desc { font-size: 14px; color: #666; }
+
+        .p2-ai-trace {
+            background: #f8f8f8;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 10px;
+        }
+        .trace-item { font-size: 13px; margin-bottom: 8px; display: flex; gap: 8px; }
+        .trace-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sky); margin-top: 6px; }
+
+        .card-footer {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+        }
+        .btn-primary {
+            flex: 1;
+            background: #000;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            width: 54px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 16px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .card-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding-bottom: 10px;
+        }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
+        .dot.active { background: #000; width: 12px; border-radius: 3px; }
+
+        /* --- Right Panel: Agent (Bento Grid) --- */
+        .agent-panel {
+            padding: var(--gap);
+            background-color: var(--bg-color);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: var(--gap);
+            overflow-y: auto;
+        }
+
+        .bento-block {
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            animation: blockFadeIn 0.5s var(--transition) both;
+        }
+
+        @keyframes blockFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bento-icon { font-size: 32px; margin-bottom: 12px; }
+        .bento-title { font-size: 14px; opacity: 0.7; margin-bottom: 4px; }
+        .bento-value { font-size: 28px; font-weight: 700; }
+
+        /* Specific Block Assignments */
+        .block-input { grid-column: span 3; grid-row: span 1; background: #F5F5F7; }
+        .block-input input {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            font-family: inherit;
+            width: 100%;
+            margin-top: 8px;
+            outline: none;
+        }
+
+        .block-trigger { grid-column: span 1; grid-row: span 1; background: var(--text-dark); color: white; justify-content: center; align-items: center; cursor: pointer; }
+        .block-trigger:active { transform: scale(0.95); }
+
+        .block-presets { grid-column: span 2; grid-row: span 2; background: var(--sky); }
+        .preset-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .preset-btn {
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+        }
+        .preset-btn:hover { background: rgba(255,255,255,0.6); }
+
+        .block-workflow { grid-column: span 2; grid-row: span 3; background: var(--matcha); }
+        .workflow-steps { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.3;
+            transition: var(--transition);
+        }
+        .step.active { opacity: 1; transform: translateX(5px); }
+        .step.done { opacity: 1; color: #2d5a27; }
+        .step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+        }
+        .step.done .step-num { background: #2d5a27; color: white; }
+
+        .block-metrics { grid-column: span 2; grid-row: span 2; background: var(--butter); }
+        .block-vision { grid-column: span 2; grid-row: span 2; background: var(--rose); }
+        .block-status { grid-column: span 2; grid-row: span 1; background: var(--lavender); }
+
+        /* Animation Classes */
+        .cascade-1 { animation-delay: 0.05s; }
+        .cascade-2 { animation-delay: 0.1s; }
+        .cascade-3 { animation-delay: 0.15s; }
+        .cascade-4 { animation-delay: 0.2s; }
+        .cascade-5 { animation-delay: 0.25s; }
+        .cascade-6 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- LEFT PANEL: Product Feed -->
+    <div class="product-panel" id="productFeed">
+        <div class="feed-item" style="background-image: url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80')">
+            <div class="feed-overlay">
+                <div class="creator-tag">@时尚博主A</div>
+                <div class="caption">今年春天最火的穿搭方案，快来看看有没有你喜欢的！#穿搭 #春天</div>
+            </div>
+            <div class="side-actions">
+                <div class="action-icon">❤️</div>
+                <div class="action-icon">💬</div>
+                <div class="action-icon">⭐️</div>
+            </div>
+        </div>
+
+        <div class="feed-item" style="background-image: url('https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80')">
+            <div class="feed-overlay">
+                <div class="creator-tag">@科技小助手</div>
+                <div class="caption">AI工具大合集！提升效率必备的5个神器。#AI #生产力</div>
+            </div>
+            <div class="side-actions">
+                <div class="action-icon">❤️</div>
+                <div class="action-icon">💬</div>
+                <div class="action-icon">⭐️</div>
+            </div>
+        </div>
+
+        <!-- Hidden Dundao Card Slot -->
+        <div class="dundao-card-container" id="dundaoSlot">
+            <div class="dundao-card">
+                <div class="card-header" id="cardHeader">
+                    <span style="font-size: 24px;">🎯</span>
+                    <div class="context-line" id="contextLine">你 3 周前在「大山的穿搭日记」里蹲过这件上衣</div>
+                    <div class="ai-tag-mini">AI 为你记得</div>
+                </div>
+                
+                <div class="card-content">
+                    <!-- Page 1: Answer -->
+                    <div class="card-page active" id="page1">
+                        <div class="p1-video-mock" id="answerVisual">🧥</div>
+                        <div class="p1-title" id="answerTitle">博主终于上链接了！</div>
+                        <div class="p1-desc" id="answerDesc">你当时蹲的同款「复古工装上衣」现已开启预售，点击下方查看详情。</div>
+                    </div>
+
+                    <!-- Page 2: AI Trace -->
+                    <div class="card-page" id="page2">
+                        <div class="p1-title">为什么刷到这个？</div>
+                        <div class="p2-ai-trace">
+                            <div class="trace-item"><div class="trace-dot"></div>AI 识别到你在 21 天前的评论</div>
+                            <div class="trace-item"><div class="trace-dot"></div>检测到关键词：「蹲一个链接」</div>
+                            <div class="trace-item"><div class="trace-dot"></div>匹配到博主今日置顶了新商品</div>
+                            <div class="trace-item"><div class="trace-dot"></div>置信度 98%：这是你想要的闭环</div>
+                        </div>
+                    </div>
+
+                    <!-- Page 3: Footprint -->
+                    <div class="card-page" id="page3">
+                        <div class="p1-title">你的蹲坑足迹</div>
+                        <div class="p1-desc" style="margin-top: 10px;">过去 30 天，你为这个主题留下了 3 次念头。</div>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <div style="flex: 1; height: 80px; background: #f0f0f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <span style="font-size: 20px;">💬</span>
+                                <span style="font-size: 10px; color: #999;">发过评论</span>
+                            </div>
+                            <div style="flex: 1; height: 80px; background: #f0f0f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <span style="font-size: 20px;">⏱️</span>
+                                <span style="font-size: 10px; color: #999;">长停留</span>
+                            </div>
+                            <div style="flex: 1; height: 80px; background: #f0f0f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <span style="font-size: 20px;">🔖</span>
+                                <span style="font-size: 10px; color: #999;">收藏过</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-dots">
+                    <div class="dot active" data-page="0"></div>
+                    <div class="dot" data-page="1"></div>
+                    <div class="dot" data-page="2"></div>
+                </div>
+
+                <div class="card-footer">
+                    <button class="btn-primary" id="mainBtn">立即查看</button>
+                    <button class="btn-secondary">➕</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="feed-item" style="background-image: url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=400&q=80')">
+            <div class="feed-overlay">
+                <div class="creator-tag">@美食博主</div>
+                <div class="caption">这顿饭我能吃三碗！简单易学的家常菜教程。</div>
+            </div>
+            <div class="side-actions">
+                <div class="action-icon">❤️</div>
+                <div class="action-icon">💬</div>
+                <div class="action-icon">⭐️</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: Agent Console -->
+    <div class="agent-panel">
+        <div class="bento-block block-input cascade-1">
+            <div class="bento-title">模拟用户评论输入</div>
+            <input type="text" id="agentInput" placeholder="输入用户的念头...">
+        </div>
+
+        <div class="bento-block block-trigger cascade-2" onclick="runWorkflow()">
+            <div style="font-size: 24px;">🚀</div>
+            <div style="font-size: 12px; margin-top: 4px;">触发 AI</div>
+        </div>
+
+        <div class="bento-block block-presets cascade-3">
+            <div class="bento-icon">💡</div>
+            <div class="bento-title">预设剧本</div>
+            <div class="preset-list">
+                <button class="preset-btn" onclick="selectPreset('A')">A. 蹲链接 → 看介绍</button>
+                <button class="preset-btn" onclick="selectPreset('B')">B. 稍后再看 → 系列追更</button>
+                <button class="preset-btn" onclick="selectPreset('C')">C. 蹲后续 → 博主发了下集</button>
+            </div>
+        </div>
+
+        <div class="bento-block block-workflow cascade-4">
+            <div class="bento-icon">⚙️</div>
+            <div class="bento-title">Agent 工作流</div>
+            <div class="workflow-steps" id="workflow">
+                <div class="step" id="step1"><div class="step-num">1</div> 评论文本入栈</div>
+                <div class="step" id="step2"><div class="step-num">2</div> AI 意图识别</div>
+                <div class="step" id="step3"><div class="step-num">3</div> 匹配历史意图</div>
+                <div class="step" id="step4"><div class="step-num">4</div> 写入数据库</div>
+                <div class="step" id="step5"><div class="step-num">5</div> 触发卡片生成</div>
+            </div>
+        </div>
+
+        <div class="bento-block block-metrics cascade-5">
+            <div class="bento-icon">📊</div>
+            <div class="bento-title">匹配置信度</div>
+            <div class="bento-value" id="confidenceValue">--%</div>
+            <div style="margin-top: 10px; height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px;">
+                <div id="confidenceBar" style="width: 0%; height: 100%; background: #000; transition: width 1s;"></div>
+            </div>
+        </div>
+
+        <div class="bento-block block-vision cascade-6">
+            <div class="bento-icon">👁️</div>
+            <div class="bento-title">意图识别</div>
+            <div id="intentType" style="font-size: 18px; margin-top: 8px; font-weight: bold;">WAITING...</div>
+            <div id="intentDesc" style="font-size: 12px; opacity: 0.6; margin-top: 4px;">等待输入触发</div>
+        </div>
+
+        <div class="bento-block block-status cascade-5" style="grid-column: span 4;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="bento-title">系统状态</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 8px; height: 8px; background: #00ff00; border-radius: 50%;"></div>
+                    <span style="font-size: 12px;">READY</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const scripts = {
+        'A': {
+            input: '蹲链接姐妹们 上衣链接求！',
+            context: '你 3 周前在「大山的穿搭日记」里蹲过这件上衣',
+            intent: '链接型蹲 (LINK)',
+            visual: '🧥',
+            title: '博主终于上链接了！',
+            desc: '你当时蹲的同款「复古工装上衣」现已开启预售。',
+            btn: '去看看',
+            confidence: 98,
+            bg: '#FFE4B5'
+        },
+        'B': {
+            input: '一个月前按稍后再看 忘了看',
+            context: '你一个月前在「30 天变身 Day 1」按了稍后再看',
+            intent: '系列型蹲 (SERIES)',
+            visual: '📈',
+            title: '该系列已经更完了',
+            desc: '博主已经更新了全部 30 集，AI 帮你摘录了核心看点。',
+            btn: '续看全集',
+            confidence: 94,
+            bg: '#B5D4FF'
+        },
+        'C': {
+            input: '蹲后续 爷爷真帅',
+            context: '你 2 周前在「爷爷的退伍档案」下评论了「蹲后续爷爷真帅」',
+            intent: '剧情型蹲 (STORY)',
+            visual: '🎖️',
+            title: '爷爷的老战友联系到了！',
+            desc: '博主刚刚更新了下集：跨越 50 年的重逢。',
+            btn: '看下集',
+            confidence: 99,
+            bg: '#FFB5D4'
+        }
+    };
+
+    let currentScript = null;
+    let currentPage = 0;
+
+    function selectPreset(id) {
+        currentScript = scripts[id];
+        document.getElementById('agentInput').value = currentScript.input;
+        resetWorkflow();
+    }
+
+    function resetWorkflow() {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active', 'done'));
+        document.getElementById('confidenceValue').innerText = '--%';
+        document.getElementById('confidenceBar').style.width = '0%';
+        document.getElementById('intentType').innerText = 'WAITING...';
+        document.getElementById('intentDesc').innerText = '等待输入触发';
+    }
+
+    async function runWorkflow() {
+        if (!currentScript) {
+            alert('请先选择一个预设剧本');
+            return;
+        }
+
+        resetWorkflow();
+
+        // Step-by-step animation
+        for (let i = 1; i <= 5; i++) {
+            const step = document.getElementById('step' + i);
+            step.classList.add('active');
+            
+            if (i === 2) {
+                document.getElementById('intentType').innerText = currentScript.intent;
+                document.getElementById('intentDesc').innerText = 'LLM 意图解析完成';
+            }
+            if (i === 3) {
+                document.getElementById('confidenceValue').innerText = currentScript.confidence + '%';
+                document.getElementById('confidenceBar').style.width = currentScript.confidence + '%';
+            }
+
+            await new Promise(r => setTimeout(r, 600));
+            step.classList.remove('active');
+            step.classList.add('done');
+        }
+
+        // Trigger Left Panel Card
+        revealCard();
+    }
+
+    function revealCard() {
+        const slot = document.getElementById('dundaoSlot');
+        const feed = document.getElementById('productFeed');
+        
+        // Update Card Content
+        document.getElementById('contextLine').innerText = currentScript.context;
+        document.getElementById('cardHeader').style.background = currentScript.bg;
+        document.getElementById('answerVisual').innerText = currentScript.visual;
+        document.getElementById('answerTitle').innerText = currentScript.title;
+        document.getElementById('answerDesc').innerText = currentScript.desc;
+        document.getElementById('mainBtn').innerText = currentScript.btn;
+
+        // Reveal and Scroll
+        slot.style.display = 'flex';
+        slot.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Card Paging Logic
+    document.querySelector('.dundao-card').addEventListener('click', (e) => {
+        // Simple click to cycle pages for demo
+        currentPage = (currentPage + 1) % 3;
+        updatePages();
+    });
+
+    function updatePages() {
+        document.querySelectorAll('.card-page').forEach((p, i) => {
+            p.classList.toggle('active', i === currentPage);
+        });
+        document.querySelectorAll('.dot').forEach((d, i) => {
+            d.classList.toggle('active', i === currentPage);
+        });
+    }
+
+    // Initialize with a default state
+    window.onload = () => {
+        console.log("蹲到了 MVP Initialized");
+    };
+</script>
+
+</body>
+</html>

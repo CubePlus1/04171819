@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蹲到了 | 新中式灵感捕捉</title>
+    <!-- 引入思源宋体与马善政楷书 -->
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper-color: #F5F0E6;
+            --ink-black: #1F1F1F;
+            --ink-grey: #4A4A4A;
+            --vermillion: #AF2E2E;
+            --celadon: #6B8E7F;
+            --accent-gold: #C5A059;
+            --shadow-ink: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #EFE7D4;
+            color: var(--ink-black);
+            font-family: 'Noto Serif SC', serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 宣纸纹理背景 */
+        .paper-texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            display: flex;
+            width: 90vw;
+            height: 85vh;
+            max-width: 1200px;
+            background: var(--paper-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* 左侧：产品面板 (信息流) */
+        .left-panel {
+            flex: 1.2;
+            border-right: 1px solid rgba(31, 31, 31, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .panel-header {
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .logo-area h1 {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+
+        .logo-area p {
+            font-size: 0.8rem;
+            letter-spacing: 0.2rem;
+            margin-top: 0.5rem;
+            opacity: 0.6;
+            text-transform: uppercase;
+        }
+
+        .seal {
+            background: var(--vermillion);
+            color: white;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.8rem;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+            transform: rotate(-5deg);
+        }
+
+        .feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 2rem 2rem;
+            scrollbar-width: none;
+        }
+
+        .feed::-webkit-scrollbar { display: none; }
+
+        .feed-item {
+            margin-bottom: 2.5rem;
+            opacity: 0.8;
+            transition: all 0.4s ease;
+        }
+
+        .feed-item.active {
+            opacity: 1;
+        }
+
+        .feed-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            filter: sepia(0.2) contrast(0.9);
+            border: 4px solid white;
+            box-shadow: var(--shadow-ink);
+        }
+
+        .feed-item .caption {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-left: 2px solid var(--ink-grey);
+            padding-left: 1rem;
+        }
+
+        /* 核心卡片：蹲到了卡片 */
+        .dundao-card {
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+            margin-top: 2rem;
+            display: none; /* 初始隐藏 */
+            animation: inkSpread 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes inkSpread {
+            0% { transform: scale(0.95); opacity: 0; filter: blur(10px); }
+            100% { transform: scale(1); opacity: 1; filter: blur(0); }
+        }
+
+        .card-slider {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-page {
+            min-width: 100%;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+        }
+
+        .page-tag {
+            font-family: 'Ma Shan Zheng', cursive;
+            color: var(--vermillion);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .page-content p {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: var(--ink-grey);
+        }
+
+        .context-line {
+            display: inline-block;
+            background: rgba(107, 142, 127, 0.1);
+            color: var(--celadon);
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .card-nav {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+        }
+
+        .nav-dot.active {
+            background: var(--vermillion);
+            transform: scale(1.5);
+        }
+
+        /* 右侧：Agent面板 */
+        .right-panel {
+            flex: 0.8;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .agent-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .agent-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 24px;
+            background: var(--ink-black);
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--ink-black);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.1rem;
+            padding: 1rem 0;
+            resize: none;
+            outline: none;
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .preset-btn {
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--vermillion);
+            color: var(--vermillion);
+        }
+
+        /* 工作流展示 */
+        .workflow {
+            margin-top: 2rem;
+            flex: 1;
+            display: none; /* 初始隐藏 */
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        @keyframes stepIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--ink-black);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .step-text {
+            font-size: 0.95rem;
+            color: var(--ink-grey);
+        }
+
+        .trigger-btn {
+            background: var(--ink-black);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trigger-btn::after {
+            content: '落笔寻音';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: var(--vermillion);
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+
+        .trigger-btn:hover::after {
+            transform: translateY(0);
+        }
+
+        /* 动画元素 */
+        .ink-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ink-black), transparent);
+            margin: 2rem 0;
+            opacity: 0.2;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1024px) {
+            .container { flex-direction: column; height: 95vh; overflow-y: auto; }
+            .left-panel { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.1); flex: none; height: 600px; }
+            .right-panel { flex: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper-texture"></div>
+
+    <div class="container">
+        <!-- 左侧面板 -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <div class="logo-area">
+                    <h1>山海流</h1>
+                    <p>Momentum of Zen</p>
+                </div>
+                <div class="seal">蹲</div>
+            </div>
+
+            <div class="feed" id="feed">
+                <div class="feed-item active">
+                    <img src="https://images.unsplash.com/photo-1542152345-42774a3f8c0a?q=80&w=1000&auto=format&fit=crop" alt="Ink Painting">
+                    <div class="caption">
+                        “万物静观皆自得，四时佳兴与人同。” 
+                        <br><small style="opacity:0.5">— 壬寅年暮春</small>
+                    </div>
+                </div>
+
+                <!-- 动态插入的“蹲到了”卡片 -->
+                <div class="dundao-card" id="dundaoCard">
+                    <div class="card-slider" id="cardSlider">
+                        <!-- P1: 念念不忘 -->
+                        <div class="card-page">
+                            <div class="page-tag">壹 · 念念不忘</div>
+                            <div class="page-content">
+                                <span class="context-line" id="cardContext">等一场江南雨</span>
+                                <h2>如期而遇</h2>
+                                <p id="cardP1">你曾在书卷中寻找那抹湿润的黛色，如今云层已在姑苏城外堆叠。此刻，雨水正敲打在第一片芭蕉叶上。</p>
+                            </div>
+                        </div>
+                        <!-- P2: 必有回响 -->
+                        <div class="card-page">
+                            <div class="page-tag">贰 · 必有回响</div>
+                            <div class="page-content">
+                                <h2>灵感溯源</h2>
+                                <p id="cardP2">基于你的意向，系统捕捉到今日湿度达85%，正是远山如黛的绝佳观察点。AI为你滤去了喧嚣，只留下这场雨的呼吸声。</p>
+                            </div>
+                        </div>
+                        <!-- P3: 如约而至 -->
+                        <div class="card-page">
+                            <div class="page-tag">叁 · 如约而至</div>
+                            <div class="page-content">
+                                <h2>即刻启程</h2>
+                                <p id="cardP3">我们已为你锁定十里芳堤的静谧处，亦或是那一盏刚沸的碧螺春。点击此处，随墨色入画。</p>
+                                <div style="margin-top:2rem; border-top:1px dashed #ccc; padding-top:1rem;">
+                                    <span style="color:var(--vermillion); font-weight:bold;">→ 开启雅鉴体验</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-nav">
+                        <div class="nav-dot active" onclick="goToPage(0)"></div>
+                        <div class="nav-dot" onclick="goToPage(1)"></div>
+                        <div class="nav-dot" onclick="goToPage(2)"></div>
+                    </div>
+                </div>
+
+                <div class="feed-item">
+                    <div class="caption" style="border-left-color: var(--celadon);">
+                        “逆风如解意，容易莫摧残。”
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧面板 -->
+        <div class="right-panel">
+            <div class="agent-title">入墨 · 灵感助手</div>
+            
+            <div class="input-container">
+                <textarea id="userInput" placeholder="在此写下你的一念关注，余下的交给笔墨..."></textarea>
+                <div class="presets">
+                    <button class="preset-btn" onclick="setPreset('想看西湖的第一场雪')">西湖初雪</button>
+                    <button class="preset-btn" onclick="setPreset('等一泡老白茶煮开')">老茶沸腾</button>
+                    <button class="preset-btn" onclick="setPreset('寻一处安静的石径')">幽谧石径</button>
+                    <button class="preset-btn" onclick="setPreset('听雨落在芭蕉叶上')">芭蕉听雨</button>
+                </div>
+            </div>
+
+            <div class="workflow" id="workflowArea">
+                <div class="workflow-step" style="animation: stepIn 0.5s forwards 0.2s;">
+                    <div class="step-num">一</div>
+                    <div class="step-text">意图识读：解析文人意境</div>
+                </div>
+                <div class="workflow-step" style="animation: stepIn 0.5s forwards 0.4s;">
+                    <div class="step-num">二</div>
+                    <div class="step-text">灵感溯源：横跨山海检索</div>
+                </div>
+                <div class="workflow-step" style="animation: stepIn 0.5s forwards 0.6s;">
+                    <div class="step-num">三</div>
+                    <div class="step-text">墨色渲染：重构内容单元</div>
+                </div>
+                <div class="workflow-step" style="animation: stepIn 0.5s forwards 0.8s;">
+                    <div class="step-num">四</div>
+                    <div class="step-text">雅鉴生成：封装即时卡片</div>
+                </div>
+                <div class="workflow-step" style="animation: stepIn 0.5s forwards 1.0s;">
+                    <div class="step-num">五</div>
+                    <div class="step-text">念念回响：投递至您的视野</div>
+                </div>
+            </div>
+
+            <button class="trigger-btn" id="triggerBtn" onclick="startWorkflow()">落笔寻音</button>
+
+            <div class="ink-line"></div>
+            <p style="font-size: 0.8rem; text-align: center; opacity: 0.4;">念念不忘，必有回响</p>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 0;
+
+        function setPreset(val) {
+            document.getElementById('userInput').value = val;
+        }
+
+        function startWorkflow() {
+            const input = document.getElementById('userInput').value;
+            if(!input) return;
+
+            // 显示工作流
+            document.getElementById('workflowArea').style.display = 'block';
+            document.getElementById('triggerBtn').disabled = true;
+            document.getElementById('triggerBtn').innerText = '墨色渲染中...';
+
+            // 模拟数据生成
+            updateCardData(input);
+
+            // 延迟后展示卡片
+            setTimeout(() => {
+                const card = document.getElementById('dundaoCard');
+                card.style.display = 'block';
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // 重置按钮
+                document.getElementById('triggerBtn').disabled = false;
+                document.getElementById('triggerBtn').innerText = '落笔寻音';
+            }, 2500);
+        }
+
+        function updateCardData(prompt) {
+            const context = document.getElementById('cardContext');
+            const p1 = document.getElementById('cardP1');
+            const p2 = document.getElementById('cardP2');
+            
+            context.innerText = `「蹲到了」${prompt}`;
+            
+            if (prompt.includes('雨')) {
+                p1.innerText = "烟雨入江南，山色有无中。你等待的不仅是一场降水，更是那份润物无声的宁静。";
+                p2.innerText = "AI捕捉到云图正向东南偏移，吴中地区的空气湿度已达临界。这抹黛色，正是为你而生。";
+            } else if (prompt.includes('雪')) {
+                p1.innerText = "断桥残雪，不仅是景，更是千年的等待。当第一片羽毛落入湖心，世界便安静了。";
+                p2.innerText = "气象节点已触发。气温降至零下2度，风速微降。这是一场精确到分钟的初雪预报。";
+            } else if (prompt.includes('茶')) {
+                p1.innerText = "水滚茶香，时光慢煮。等待茶芽舒展的过程，本身就是一种修行。";
+                p2.innerText = "我们监测到最佳的泉水涌动频率。此刻，温度刚好停留在95度，是老白茶最温润的时刻。";
+            } else {
+                p1.innerText = `你所念想的“${prompt}”，正在这方寸之间悄然发芽。`;
+                p2.innerText = "通过全域内容重构，AI为你筛选了最具共鸣的瞬间。不早不晚，刚好在此刻。";
+            }
+        }
+
+        function goToPage(index) {
+            currentPage = index;
+            const slider = document.getElementById('cardSlider');
+            slider.style.transform = `translateX(-${index * 100}%)`;
+            
+            // 更新导航点
+            const dots = document.querySelectorAll('.nav-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        // 简单的自动切换演示
+        let autoPlay = setInterval(() => {
+            if (document.getElementById('dundaoCard').style.display === 'block') {
+                currentPage = (currentPage + 1) % 3;
+                goToPage(currentPage);
+                if (currentPage === 2) clearInterval(autoPlay);
+            }
+        }, 4000);
+    </script>
+</body>
+</html>
