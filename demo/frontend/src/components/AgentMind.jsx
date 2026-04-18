@@ -140,7 +140,7 @@ export default function AgentMind() {
 
         {/* 左右泾渭：signals / actions 分区说明文字 */}
         <text x={PAD_X} y={12} fill="var(--color-text-muted)" fontSize="9" letterSpacing="2">
-          她念念不忘的
+          她许过的愿
         </text>
         <text x={VIEW_W - PAD_X} y={12} fill="var(--color-text-muted)" fontSize="9" letterSpacing="2" textAnchor="end">
           博主这阵子的动作

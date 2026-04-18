@@ -206,7 +206,7 @@ function Header({ connected, user, onReset, themes, theme, onPickTheme }) {
             蹲到了 · DUNDAO
           </div>
           <div className="text-[11px] font-medium text-[var(--color-text-muted)]">
-            逆风如解意 · 把你念念不忘的，接回来
+            逆风如解意 · 替你守到兑现
           </div>
         </div>
       </div>

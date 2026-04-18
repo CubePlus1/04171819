@@ -49,7 +49,7 @@ export default function AmbientPulse({ running, autoOn, nextTickMs, onToggleAuto
             : running
               ? '正在把这一条接回来…'
               : autoOn
-                ? '后台一直在看着她念念不忘的'
+                ? '后台一直在替她守着她许过的愿'
                 : '后台待命 · 没开自动接'}
         </div>
         {autoOn && pending && !running && (

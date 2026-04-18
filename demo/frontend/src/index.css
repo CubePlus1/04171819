@@ -186,6 +186,56 @@ html[data-surface='light'] .lg-btn {
 }
 html[data-surface='light'] .lg-btn:hover  { background: rgba(255, 255, 255, 0.55); }
 
+/* 液态玻璃 · 拉丝银青版（参考 Figma 液态玻璃稿 · iOS 26 Liquid Glass）
+ * 垂直细密拉丝 + 银→青渐变 · 叠在 lg-card 上作为第二层玻璃肌理 */
+.lg-card-brushed {
+  position: relative;
+  isolation: isolate;
+}
+.lg-card-brushed::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.11) 0px,
+      rgba(255,255,255,0) 1.2px,
+      rgba(255,255,255,0.05) 2.4px,
+      rgba(255,255,255,0) 3.6px,
+      rgba(0,0,0,0.05) 4.8px,
+      rgba(255,255,255,0) 6px
+    ),
+    linear-gradient(
+      180deg,
+      rgba(228,230,233,0.55) 0%,
+      rgba(192,208,205,0.40) 45%,
+      rgba(140,185,175,0.55) 100%
+    );
+  mix-blend-mode: overlay;
+}
+
+/* 品牌巨字 · 蹲到了 */
+.brand-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.70);
+  font-weight: 500;
+}
+.brand-title {
+  font-size: clamp(40px, 11vw, 56px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.18);
+}
+html[data-surface='light'] .brand-eyebrow { color: rgba(15,17,21,0.60); }
+html[data-surface='light'] .brand-title   { color: #0f1115; text-shadow: none; }
+
 /* 抖音粉主按钮 · 保留颜色但加玻璃反光 */
 .lg-btn-pink {
   background: rgba(254, 44, 85, 0.90);

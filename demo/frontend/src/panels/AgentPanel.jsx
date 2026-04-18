@@ -67,7 +67,7 @@ export default function AgentPanel({ onToast }) {
   // 成功落卡 → 柔和 toast
   useEffect(() => {
     if (lastCompleted?.cardId) {
-      onToast?.('她念念不忘的，替她接回来了');
+      onToast?.('她许过的愿，替她守到兑现了');
     }
   }, [lastCompleted, onToast]);
 
