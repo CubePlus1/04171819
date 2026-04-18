@@ -2,7 +2,9 @@
 
 字节大学生 Hackathon · **赛道三｜AI 体验：刷到懂你的瞬间** 展台 Demo。
 
-> 把你念念不忘的，接回来。
+> **逆风如解意 —— 把你念念不忘的，接回来。**
+
+**展台进度真实档** → [`PROGRESS.md`](./PROGRESS.md) · 记录哪些是真代码、哪些是占位、还能抢什么
 
 一种新的**信息流内容单元**：
 - 不是发现新内容 · 是对你过去某个念头的履约
@@ -309,6 +311,11 @@ cd ../frontend && npm run build
 
 ## 一句话
 
-> **代码已经够了。剩下的是讲得清 · 演得稳 · 打得动。**
+> **逆风如解意 —— 把你念念不忘的，接回来。**
+>
+> 代码已经够了 · 剩下的是讲得清 · 演得稳 · 打得动。
 
-下一步 → 打开 [`studydocs/README.md`](./studydocs/README.md) 开始学习讲给别人听。
+下一步：
+- 看进度 → [`PROGRESS.md`](./PROGRESS.md)
+- 生成素材 → [`docs/10-media-prompts.md`](./docs/10-media-prompts.md)
+- 学讲稿 → [`studydocs/README.md`](./studydocs/README.md)
