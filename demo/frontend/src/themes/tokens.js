@@ -8,6 +8,33 @@
 
 export const THEMES = [
   {
+    id: 'douyin-light',
+    name: '抖音浅色',
+    tagline: '抖音原生 · 浅色版 · 胶囊履约',
+    surface: 'light',
+    tokens: {
+      '--color-stage': '#f6f6f8',          // 主页浅灰
+      '--color-panel': '#ffffff',          // 面板白
+      '--color-ink':   '#0f1115',          // 深墨主标题
+      '--color-text':  '#1a1d24',          // 主要文字
+      '--color-text-muted': '#5b606b',     // 次级文字（浅色下加深）
+      '--color-warmth': '#fe2c55',         // 抖音粉（主 CTA）
+      '--color-ember':  '#fe2c55',
+      '--color-kiss':   '#25f4ee',         // 抖音青（副 accent）
+      '--color-hintA':  '#fe2c55',
+      '--color-hintB':  '#25f4ee',
+      '--color-hintC':  '#ffd60a',
+      '--font-sans':    '"Noto Sans SC", "PingFang SC", "Source Han Sans SC", Inter, sans-serif',
+      '--radius-card':  '28px',
+      '--radius-pill':  '9999px',
+      '--shadow-card':  '0 18px 48px -18px rgba(254,44,85,0.18), 0 4px 14px -8px rgba(0,0,0,0.12)',
+      '--shadow-soft':  '0 6px 20px -8px rgba(0,0,0,0.08)',
+      '--card-border':  '1px solid rgba(15,17,21,0.08)',
+      '--surface-glow': 'radial-gradient(ellipse 900px 500px at 50% 110%, rgba(254,44,85,0.05), transparent 70%), #f6f6f8',
+    },
+    layout: { split_ratio: '7-5', card_aspect: 'portrait', type_scale: 'normal' }
+  },
+  {
     id: 'healing-warmth',
     name: '暖色治愈',
     tagline: '默认风格 · 温暖的余烬与呼吸感',
