@@ -78,7 +78,8 @@
           "shop": "好物分享旗舰店"
         },
         "summary": "你 7 天前蹲的那个收纳箱 —— 她今天翻到链接了",
-        "emotional_close": "那条求链接 · 我替自己接住了"
+        "emotional_close": "那条求链接 · 我替自己接住了",
+        "headline": "我 {time} 蹲的那个收纳箱 · 它来了"
       }
     },
     {
@@ -118,7 +119,8 @@
           }
         ],
         "summary": "你 5 天前蹲的那条后续 · 她把这 5 天都记下来了",
-        "emotional_close": "那条蹲后续 · 我替自己等到了"
+        "emotional_close": "那条蹲后续 · 我替自己等到了",
+        "headline": "我 {time} 蹲的那条后续 · 它来了"
       }
     },
     {
@@ -132,7 +134,8 @@
         "cover": "/scenes/thumb-c-editing.jpg",
         "preview_seconds": 10,
         "summary": "你 9 天前求的那份教学 · 他真的录了",
-        "emotional_close": "那句求教学 · 我替自己追到了"
+        "emotional_close": "那句求教学 · 我替自己追到了",
+        "headline": "我 {time} 求的那份转场教学 · 它来了"
       }
     }
   ],

@@ -123,11 +123,28 @@ export default function CardPageP1({ page, scriptId }) {
     : '我';
 
   return (
-    <div className="flex h-full flex-col justify-center px-5">
+    <div className="flex h-full flex-col justify-center gap-5 px-5">
+      {/* Figma 顶端大标题 · style_UKXK95 · 22px/500 */}
+      {page.headline && (
+        <motion.header
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="w-[342px] max-w-full self-center"
+        >
+          <div className="text-[12px] font-medium tracking-[0.28em] text-white/75">
+            蹲到了
+          </div>
+          <div className="mt-1 text-[22px] font-semibold leading-[1.35] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
+            {page.headline}
+          </div>
+        </motion.header>
+      )}
+
       <motion.article
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45 }}
+        transition={{ duration: 0.45, delay: 0.05 }}
         className="fig-card relative w-[342px] max-w-full self-center"
       >
         <AvatarRow label={myLabel} />
