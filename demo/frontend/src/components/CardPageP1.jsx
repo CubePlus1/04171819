@@ -85,23 +85,6 @@ function ProductPearl({ product }) {
   );
 }
 
-// B 剧本专属 · 系列小缩略条（代替 Figma 珍珠胶囊的位置）
-function SeriesStrip({ thumbnails }) {
-  if (!Array.isArray(thumbnails) || thumbnails.length === 0) return null;
-  return (
-    <div className="flex gap-2 overflow-x-auto scrollbar-none">
-      {thumbnails.map((t) => (
-        <div key={t.day} className="fig-thumb shrink-0" style={{ width: 56, height: 72 }}>
-          <img src={t.cover} alt={t.title} />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-1 py-1 text-[9px] leading-none text-white">
-            D{t.day}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 const OPEN_FEEDBACK = {
   A: '链接已为你打开 · 同款已备好',
   B: 'Day1-Day5 的后续已按顺序接上',
@@ -122,11 +105,10 @@ export default function CardPageP1({ page, scriptId, onAction }) {
     onAction?.(OPEN_FEEDBACK[scriptId] ?? '为你打开了');
   };
 
-  // 珍珠条/条目 显示规则
+  // A 剧本走商品珍珠胶囊；B/C 只保留一张主缩略（不再铺系列小缩略）
   const isA = scriptId === 'A';
   const isB = scriptId === 'B';
   const product = isA ? answer?.product : null;
-  const seriesThumbs = isB ? (answer?.thumbnails ?? []) : [];
   const thumbShape = isB ? 'landscape' : 'portrait';
 
   // 评论文本用原始 raw_text · 即 Figma 的 "我的评论"
@@ -170,7 +152,6 @@ export default function CardPageP1({ page, scriptId, onAction }) {
           </div>
         )}
         {isA && product && <ProductPearl product={product} />}
-        {isB && seriesThumbs.length > 0 && <SeriesStrip thumbnails={seriesThumbs} />}
         <AuthorRow display={creator?.display ?? ''} avatar={creator?.avatar} />
 
         {/* Figma 底部双按钮 · 不用了（退出功能）· 去看看（算法自信 · 直达） */}
