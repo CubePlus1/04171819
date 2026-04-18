@@ -131,6 +131,9 @@ export function buildCard({ match, intentResult, userId }) {
   const p1 = {
     id: 'P1',
     name: '情景 + 答案',
+    // Figma 轻卡：我原评论 + 相对时间 + 原视频行 + 作者标签
+    my_comment: signal.raw_text ?? '',
+    occurred_relative: RELATIVE_TIME_CN(signal.occurred_at),
     context_line: buildContextLine({ signal, creator }),
     emotional_close: action?.payload?.emotional_close ?? defaultClose,
     answer: buildAnswer({ scriptId, action }),

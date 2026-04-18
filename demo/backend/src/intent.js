@@ -15,7 +15,7 @@ const RULES = [
     ],
     priority: 100,
     rationale: '用户在评论里显式表达「想要博主没放出的购买入口」',
-    topic_hint: 'dashan-knit-top',
+    topic_hint: 'storage-haul',
   },
   {
     intent: 'sequel_request',
@@ -29,7 +29,7 @@ const RULES = [
     ],
     priority: 95,
     rationale: '用户在评论里显式表达「等这条视频的后续」',
-    topic_hint: 'grandpa-archive',
+    topic_hint: 'missing-bf',
   },
   {
     intent: 'series_catchup',
@@ -44,7 +44,7 @@ const RULES = [
     ],
     priority: 90,
     rationale: '用户一个月前按了「稍后再看」但从未消费',
-    topic_hint: '30days-series',
+    topic_hint: 'missing-bf',
   },
   {
     intent: 'tutorial_request',
@@ -58,7 +58,7 @@ const RULES = [
     ],
     priority: 70,
     rationale: '用户希望博主把操作步骤写出来',
-    topic_hint: null,
+    topic_hint: 'editing-transition',
   },
   {
     intent: 'plus_one',

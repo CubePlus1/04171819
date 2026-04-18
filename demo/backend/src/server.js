@@ -136,9 +136,9 @@ function createApp(broadcast, state) {
     // 「扫描片段」：不是评论输入，而是评委可以挑一类信号让 AI 后台先处理
     //   —— 语义对齐 principle.json 里的"被动刷到即成立"，而不是"让用户输入"
     const triggers = [
-      { id: 'trigger-A', label: '蹲链接 · 链接型',     script: 'A', topic: 'dashan-knit-top',  hint: '把她那条评论下蹲过的上衣接回来' },
-      { id: 'trigger-B', label: '稍后再看 · 系列型',   script: 'B', topic: '30days-series',     hint: '把她一个月前按稍后再看的系列接上' },
-      { id: 'trigger-C', label: '蹲后续 · 情感收尾',   script: 'C', topic: 'grandpa-archive',   hint: '把她蹲过的那集后续接过来' },
+      { id: 'trigger-A', label: '收纳好物 · 求链接',     script: 'A', topic: 'storage-haul',       hint: '把我 7 天前蹲的那个露营收纳箱链接接回来' },
+      { id: 'trigger-B', label: '男友失联 · 蹲后续',     script: 'B', topic: 'missing-bf',         hint: '把我 5 天前蹲的那条后续接回来' },
+      { id: 'trigger-C', label: '剪辑教程 · 求教学',     script: 'C', topic: 'editing-transition', hint: '把我 9 天前求的那份转场教学接回来' },
     ];
     const pending = hasPendingAmbient(DEMO_USER_ID, { loopMode: LOOP_MODE });
 

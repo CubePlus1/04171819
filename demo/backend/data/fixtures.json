@@ -8,550 +8,131 @@
   ],
   "creators": [
     {
-      "id": "creator-dashan",
-      "handle": "@大山的穿搭日记",
-      "display": "大山的穿搭日记",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=dashan",
-      "bio": "日常 OOTD · 平价好物收集器"
+      "id": "creator-storage",
+      "handle": "@好物分享",
+      "display": "好物分享",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=storage",
+      "bio": "租房党 · 小众收纳 · 按头安利"
     },
     {
-      "id": "creator-30days",
-      "handle": "@30天变身计划",
-      "display": "30天变身计划",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=thirtydays",
-      "bio": "一个月 · 一个新习惯 · Day by day"
+      "id": "creator-gay",
+      "handle": "@杠我的都是gay",
+      "display": "杠我的都是gay",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=gay",
+      "bio": "情感树洞 · 每条评论都蹲到底"
     },
     {
-      "id": "creator-grandpa",
-      "handle": "@爷爷的退伍档案",
-      "display": "爷爷的退伍档案",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=grandpa",
-      "bio": "记录爷爷的抗美援朝岁月"
-    },
-    {
-      "id": "creator-pang",
-      "handle": "@胖友的考研笔记",
-      "display": "胖友的考研笔记",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=pangyou",
-      "bio": "二战考研 · 笔记模板 · 真题分享"
-    },
-    {
-      "id": "creator-lulu",
-      "handle": "@露露的深夜厨房",
-      "display": "露露的深夜厨房",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=lulu",
-      "bio": "一人一锅 · 便当菜单整理"
-    },
-    {
-      "id": "creator-brick",
-      "handle": "@Brick翻唱铺",
-      "display": "Brick翻唱铺",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=brick",
-      "bio": "周五更 · 吉他 + 钢琴双版本"
-    },
-    {
-      "id": "creator-mio",
-      "handle": "@Mio一个人走走",
-      "display": "Mio一个人走走",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=mio",
-      "bio": "独行 vlog · 高原 / 边境 / 雪线"
-    },
-    {
-      "id": "creator-ken",
-      "handle": "@Ken的一小时训练",
-      "display": "Ken的一小时训练",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=ken",
-      "bio": "家庭健身 · 动作拆解 · 进阶系列"
-    },
-    {
-      "id": "creator-yuri",
-      "handle": "@Yuri画一点",
-      "display": "Yuri画一点",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=yuri",
-      "bio": "零基础水彩 · 五分钟一张猫"
-    },
-    {
-      "id": "creator-hazel",
-      "handle": "@榛榛的阳台",
-      "display": "榛榛的阳台",
-      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=hazel",
-      "bio": "十平米阳台的养活之路"
+      "id": "creator-editor",
+      "handle": "@剪辑王",
+      "display": "剪辑王",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=editor",
+      "bio": "全网最酷转场 · 零基础也学得会"
     }
   ],
   "intent_signals": [
     {
       "user_id": "demo-user",
-      "creator_id": "creator-dashan",
-      "video_id": "v-dashan-001",
-      "video_title": "这件磨毛圆领打底 从秋穿到初冬",
+      "creator_id": "creator-storage",
+      "video_id": "v-storage-haul",
+      "video_title": "小众收纳好物分享，真的太适合租房党了… 按头给大家安利",
       "signal_type": "comment_intent",
-      "raw_text": "蹲链接姐妹们",
-      "topic": "dashan-knit-top",
-      "days_ago": 21
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-30days",
-      "video_id": "v-30days-d1",
-      "video_title": "30天变身 Day1：我决定开始了",
-      "signal_type": "watch_later",
-      "raw_text": null,
-      "topic": "30days-series",
-      "days_ago": 31
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-grandpa",
-      "video_id": "v-grandpa-002",
-      "video_title": "爷爷在朝鲜冻伤的那只脚，70 年后还会疼",
-      "signal_type": "comment_intent",
-      "raw_text": "蹲后续 爷爷真帅",
-      "topic": "grandpa-archive",
-      "days_ago": 14
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-dashan",
-      "video_id": "v-dashan-002",
-      "video_title": "我的秋冬色盘 · 焦糖褐色专场",
-      "signal_type": "passive_interest",
-      "raw_text": null,
-      "topic": "dashan-knit-top",
-      "days_ago": 10
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-30days",
-      "video_id": "v-30days-search",
-      "video_title": "（搜索）30 天习惯养成",
-      "signal_type": "unsatisfied_search",
-      "raw_text": "30 天习惯养成怎么坚持",
-      "topic": "30days-series",
-      "days_ago": 18
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-pang",
-      "video_id": "v-pang-notes",
-      "video_title": "我二战 3 个月逆袭的笔记长啥样",
-      "signal_type": "comment_intent",
-      "raw_text": "蹲模板 求一份",
-      "topic": "pang-studyplan",
+      "raw_text": "求链接！这个尺寸也太适合出租屋了。终于不用到处找地方塞那些零碎的小东西了。",
+      "topic": "storage-haul",
       "days_ago": 7
     },
     {
       "user_id": "demo-user",
-      "creator_id": "creator-lulu",
-      "video_id": "v-lulu-menu",
-      "video_title": "一个人也值得的 7 天便当菜单",
-      "signal_type": "unfinished_save",
-      "raw_text": null,
-      "topic": "lulu-weekmenu",
-      "days_ago": 25
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-brick",
-      "video_id": "v-brick-cover-a",
-      "video_title": "《successor》吉他翻唱 上集",
+      "creator_id": "creator-gay",
+      "video_id": "v-gay-missing",
+      "video_title": "男朋友失联了该怎么办，昨天下午两点左右就没回过信息",
       "signal_type": "comment_intent",
-      "raw_text": "蹲下集 这版太戳了",
-      "topic": "brick-cover-successor",
+      "raw_text": "姐妹，我刚经历过，至于结果，懂得都懂\n但是还是蹲个后续",
+      "topic": "missing-bf",
       "days_ago": 5
     },
     {
       "user_id": "demo-user",
-      "creator_id": "creator-mio",
-      "video_id": "v-mio-tibet-a",
-      "video_title": "一个人进藏 Ep4 · 在措那湖边等日落",
+      "creator_id": "creator-editor",
+      "video_id": "v-editor-transition",
+      "video_title": "这将是你看过的全网\n最酷的转场视频",
       "signal_type": "comment_intent",
-      "raw_text": "蹲下集，你是走丙察察吗",
-      "topic": "mio-tibet",
-      "days_ago": 12
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-ken",
-      "video_id": "v-ken-split-d1",
-      "video_title": "30 天自重训练系列 Day1 · 俯卧撑从 0 到 10",
-      "signal_type": "watch_later",
-      "raw_text": null,
-      "topic": "ken-30days",
-      "days_ago": 28
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-yuri",
-      "video_id": "v-yuri-cat-teaser",
-      "video_title": "我的第一只猫 · 水彩小稿",
-      "signal_type": "comment_intent",
-      "raw_text": "蹲教程！想给我家主子画一张",
-      "topic": "yuri-cat-tutorial",
+      "raw_text": "这个我也想学，能出个教学吗？",
+      "topic": "editing-transition",
       "days_ago": 9
-    },
-    {
-      "user_id": "demo-user",
-      "creator_id": "creator-hazel",
-      "video_id": "v-hazel-tools",
-      "video_title": "阳台党的 5 件入门工具",
-      "signal_type": "comment_intent",
-      "raw_text": "蹲链接 新手想入",
-      "topic": "hazel-tools",
-      "days_ago": 4
     }
   ],
   "creator_actions": [
     {
-      "creator_id": "creator-dashan",
+      "creator_id": "creator-storage",
       "action_type": "post_link",
-      "topic": "dashan-knit-top",
-      "hours_ago": 3,
-      "payload": {
-        "video_id": "v-dashan-top-launch",
-        "title": "姐妹们链接来啦！这件上衣的平替我找到了",
-        "cover": "https://picsum.photos/seed/dashan-top/360/640",
-        "product": {
-          "name": "磨毛圆领针织衫",
-          "price": "¥128",
-          "original": "¥189",
-          "shop": "大山的好物柜"
-        },
-        "summary": "你 21 天前蹲的那件 —— 博主自己找到了平替链接",
-        "cta": {
-          "primary": [
-            {
-              "id": "view_link",
-              "label": "领链接"
-            },
-            {
-              "id": "view_outfit",
-              "label": "看搭配"
-            }
-          ]
-        },
-        "emotional_close": "当时蹲的那件 · 这次替你接住了"
-      }
-    },
-    {
-      "creator_id": "creator-30days",
-      "action_type": "series_completed",
-      "topic": "30days-series",
-      "hours_ago": 8,
-      "payload": {
-        "video_id": "v-30days-d30",
-        "title": "30天变身 Day30 · 我其实没变 但变得温柔了",
-        "cover": "https://picsum.photos/seed/30days-complete/360/640",
-        "series_thumbnails": [
-          {
-            "day": 1,
-            "cover": "https://picsum.photos/seed/30d1/200/300",
-            "title": "Day1 · 我决定开始"
-          },
-          {
-            "day": 7,
-            "cover": "https://picsum.photos/seed/30d7/200/300",
-            "title": "Day7 · 第一次想放弃"
-          },
-          {
-            "day": 14,
-            "cover": "https://picsum.photos/seed/30d14/200/300",
-            "title": "Day14 · 撑过了平台期"
-          },
-          {
-            "day": 21,
-            "cover": "https://picsum.photos/seed/30d21/200/300",
-            "title": "Day21 · 有人开始留言鼓励我"
-          },
-          {
-            "day": 30,
-            "cover": "https://picsum.photos/seed/30d30/200/300",
-            "title": "Day30 · 最后一天"
-          }
-        ],
-        "summary": "她真的更完了 · AI 帮你摘好了前情 · 从哪一天续看都行",
-        "cta": {
-          "primary": [
-            {
-              "id": "resume_d1",
-              "label": "从 Day1 续看"
-            },
-            {
-              "id": "recap",
-              "label": "看前情摘要"
-            }
-          ]
-        },
-        "emotional_close": "你没追完的 30 天 · 这次一次性接上"
-      }
-    },
-    {
-      "creator_id": "creator-grandpa",
-      "action_type": "post_sequel",
-      "topic": "grandpa-archive",
-      "hours_ago": 1,
-      "payload": {
-        "video_id": "v-grandpa-reunion",
-        "title": "爷爷的老战友联系到他了 · 下集",
-        "cover": "https://picsum.photos/seed/grandpa-reunion/360/640",
-        "preview_seconds": 10,
-        "summary": "14 天前你蹲的那集后续 · 爷爷老战友真的找来了",
-        "cta": {
-          "primary": [
-            {
-              "id": "play_sequel",
-              "label": "立即观看下集"
-            },
-            {
-              "id": "share_grandpa",
-              "label": "分享给爷爷"
-            }
-          ]
-        },
-        "emotional_close": "爷爷的老战友联系到他了"
-      }
-    },
-    {
-      "creator_id": "creator-pang",
-      "action_type": "post_link",
-      "topic": "pang-studyplan",
+      "topic": "storage-haul",
       "hours_ago": 2,
       "payload": {
-        "video_id": "v-pang-notion-template",
-        "title": "我把逆袭的笔记模板做成了可复用文件",
-        "cover": "https://picsum.photos/seed/pang-plan/360/640",
+        "video_id": "v-storage-launch",
+        "title": "姐妹们蹲到了！那个露营收纳箱的链接今天能放了",
+        "cover": "/scenes/thumb-a-storage.jpg",
         "product": {
-          "name": "考研 3 个月复盘笔记模板（Notion 可复制）",
-          "price": "¥0",
-          "original": "¥58",
-          "shop": "胖友的店"
+          "name": "露营收纳箱 40L · 家居通用款",
+          "price": "¥128",
+          "original": "¥189",
+          "shop": "好物分享旗舰店"
         },
-        "summary": "你 7 天前蹲的模板 · 她今天整理好了免费放出来",
-        "cta": {
-          "primary": [
-            {
-              "id": "claim_template",
-              "label": "领模板"
-            },
-            {
-              "id": "view_method",
-              "label": "看笔记方法"
-            }
-          ]
-        },
-        "emotional_close": "你蹲的那份笔记 · 她真的整理好了"
+        "summary": "你 7 天前蹲的那个收纳箱 —— 她今天翻到链接了",
+        "emotional_close": "那条求链接 · 我替自己接住了"
       }
     },
     {
-      "creator_id": "creator-lulu",
+      "creator_id": "creator-gay",
       "action_type": "series_completed",
-      "topic": "lulu-weekmenu",
-      "hours_ago": 5,
+      "topic": "missing-bf",
+      "hours_ago": 6,
       "payload": {
-        "video_id": "v-lulu-d7",
-        "title": "便当菜单 Day7 · 一周做完结 · 成本算给你看",
-        "cover": "https://picsum.photos/seed/lulu-menu7/360/640",
+        "video_id": "v-gay-d5",
+        "title": "Day5 更新 · 他终于回信息了 · 姐妹们先别急着冲",
+        "cover": "/scenes/thumb-b-missing.jpg",
         "series_thumbnails": [
           {
             "day": 1,
-            "cover": "https://picsum.photos/seed/lulu1/200/300",
-            "title": "Day1 · 青椒肉丝饭盒"
+            "cover": "/scenes/thumb-b-missing.jpg",
+            "title": "Day1 · 下午两点 · 没回"
           },
           {
             "day": 2,
-            "cover": "https://picsum.photos/seed/lulu2/200/300",
-            "title": "Day2 · 番茄蛋面"
+            "cover": "/scenes/bg-b-missing.jpg",
+            "title": "Day2 · 手机还在响 · 人没来"
           },
           {
             "day": 3,
-            "cover": "https://picsum.photos/seed/lulu3/200/300",
-            "title": "Day3 · 韩式拌饭"
+            "cover": "/scenes/bg-a-storage.jpg",
+            "title": "Day3 · 他妈妈回了电话"
+          },
+          {
+            "day": 4,
+            "cover": "/scenes/bg-c-editing.jpg",
+            "title": "Day4 · 我哭完了 · 该上班了"
           },
           {
             "day": 5,
-            "cover": "https://picsum.photos/seed/lulu5/200/300",
-            "title": "Day5 · 烤鸡饭"
-          },
-          {
-            "day": 7,
-            "cover": "https://picsum.photos/seed/lulu7/200/300",
-            "title": "Day7 · 一碗温柔的面"
+            "cover": "/scenes/thumb-b-missing.jpg",
+            "title": "Day5 · 他发了一条长消息"
           }
         ],
-        "summary": "25 天前你收藏的那套菜单 · 她真的一周做到了",
-        "cta": {
-          "primary": [
-            {
-              "id": "start_day1",
-              "label": "从 Day1 做起"
-            },
-            {
-              "id": "save_menu",
-              "label": "存菜单清单"
-            }
-          ]
-        },
-        "emotional_close": "你收藏的那套菜单 · 她一周做完给你看"
+        "summary": "你 5 天前蹲的那条后续 · 她把这 5 天都记下来了",
+        "emotional_close": "那条蹲后续 · 我替自己等到了"
       }
     },
     {
-      "creator_id": "creator-brick",
+      "creator_id": "creator-editor",
       "action_type": "post_sequel",
-      "topic": "brick-cover-successor",
-      "hours_ago": 4,
+      "topic": "editing-transition",
+      "hours_ago": 3,
       "payload": {
-        "video_id": "v-brick-cover-b",
-        "title": "《successor》下集 · 这次我加了一段钢琴",
-        "cover": "https://picsum.photos/seed/brick-cover/360/640",
+        "video_id": "v-editor-tutorial",
+        "title": "教程来了 · 这招电影感转场 · 只用剪映就行",
+        "cover": "/scenes/thumb-c-editing.jpg",
         "preview_seconds": 10,
-        "summary": "5 天前你蹲的这版 · 他真的做了钢琴版续篇",
-        "cta": {
-          "primary": [
-            {
-              "id": "play_music",
-              "label": "听这版"
-            },
-            {
-              "id": "share_friend",
-              "label": "转给一起追的人"
-            }
-          ]
-        },
-        "emotional_close": "你蹲的那版续篇 · 他真的弹了"
-      }
-    },
-    {
-      "creator_id": "creator-mio",
-      "action_type": "post_sequel",
-      "topic": "mio-tibet",
-      "hours_ago": 6,
-      "payload": {
-        "video_id": "v-mio-tibet-b",
-        "title": "一个人进藏 Ep5 · 丙察察真的走完了",
-        "cover": "https://picsum.photos/seed/mio-tibet/360/640",
-        "preview_seconds": 10,
-        "summary": "12 天前你蹲的下集 · Mio 真的走完了那条路",
-        "cta": {
-          "primary": [
-            {
-              "id": "play_travel",
-              "label": "看下集"
-            },
-            {
-              "id": "save_route",
-              "label": "收藏这条路线"
-            }
-          ]
-        },
-        "emotional_close": "你蹲的那条路 · 她替你走完了"
-      }
-    },
-    {
-      "creator_id": "creator-ken",
-      "action_type": "series_completed",
-      "topic": "ken-30days",
-      "hours_ago": 10,
-      "payload": {
-        "video_id": "v-ken-d30",
-        "title": "自重训练 Day30 · 俯卧撑从 0 到 30 的那个人",
-        "cover": "https://picsum.photos/seed/ken-finish/360/640",
-        "series_thumbnails": [
-          {
-            "day": 1,
-            "cover": "https://picsum.photos/seed/ken1/200/300",
-            "title": "Day1 · 俯卧撑 0 个"
-          },
-          {
-            "day": 10,
-            "cover": "https://picsum.photos/seed/ken10/200/300",
-            "title": "Day10 · 第一次到 5 个"
-          },
-          {
-            "day": 20,
-            "cover": "https://picsum.photos/seed/ken20/200/300",
-            "title": "Day20 · 第一次标准 10 个"
-          },
-          {
-            "day": 25,
-            "cover": "https://picsum.photos/seed/ken25/200/300",
-            "title": "Day25 · 20 个不喘气"
-          },
-          {
-            "day": 30,
-            "cover": "https://picsum.photos/seed/ken30/200/300",
-            "title": "Day30 · 30 个 + 举手告别"
-          }
-        ],
-        "summary": "28 天前你按了稍后再看的那套系列 · 他真的更完了",
-        "cta": {
-          "primary": [
-            {
-              "id": "start_training_d1",
-              "label": "跟练 Day1"
-            },
-            {
-              "id": "save_plan",
-              "label": "存训练表"
-            }
-          ]
-        },
-        "emotional_close": "你没追完的训练系列 · 他真的给你更完了"
-      }
-    },
-    {
-      "creator_id": "creator-yuri",
-      "action_type": "post_sequel",
-      "topic": "yuri-cat-tutorial",
-      "hours_ago": 2,
-      "payload": {
-        "video_id": "v-yuri-cat-tut",
-        "title": "来了来了 · 五分钟水彩猫 · 分步拆解",
-        "cover": "https://picsum.photos/seed/yuri-cat/360/640",
-        "preview_seconds": 10,
-        "summary": "9 天前你蹲的教程 · 她录成分步视频了",
-        "cta": {
-          "primary": [
-            {
-              "id": "follow_tutorial",
-              "label": "照着画一张"
-            },
-            {
-              "id": "save_tutorial",
-              "label": "收藏教程"
-            }
-          ]
-        },
-        "emotional_close": "你求的那个教程 · 她真的拍了"
-      }
-    },
-    {
-      "creator_id": "creator-hazel",
-      "action_type": "post_link",
-      "topic": "hazel-tools",
-      "hours_ago": 1,
-      "payload": {
-        "video_id": "v-hazel-kit",
-        "title": "五件入门工具 · 阳台党新手包上架了",
-        "cover": "https://picsum.photos/seed/hazel-kit/360/640",
-        "product": {
-          "name": "阳台党新手五件套（含浇水壶、喷雾、小铲）",
-          "price": "¥88",
-          "original": "¥128",
-          "shop": "榛榛的阳台"
-        },
-        "summary": "你 4 天前蹲的那份清单 · 她自己配好上架了",
-        "cta": {
-          "primary": [
-            {
-              "id": "claim_kit",
-              "label": "领新手包"
-            },
-            {
-              "id": "view_plants",
-              "label": "看种什么好"
-            }
-          ]
-        },
-        "emotional_close": "你蹲的那份清单 · 她替你配齐了"
+        "summary": "你 9 天前求的那份教学 · 他真的录了",
+        "emotional_close": "那句求教学 · 我替自己追到了"
       }
     }
   ],

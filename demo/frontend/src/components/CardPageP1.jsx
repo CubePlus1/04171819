@@ -1,233 +1,146 @@
 import { motion } from 'framer-motion';
 
-function AnswerProduct({ answer }) {
-  const { video, product, summary } = answer;
+function LinkIcon() {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative overflow-hidden rounded-2xl">
-        <img src={video.cover} alt={video.title} className="h-64 w-full object-cover" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-          <div className="text-[13px] font-medium text-white">{video.title}</div>
-        </div>
-        <span className="absolute left-3 top-3 pill bg-ember/20 text-kiss">静音自动播放</span>
-      </div>
+    <svg width="14" height="14" viewBox="0 0 14 10" fill="none" aria-hidden="true" className="shrink-0">
+      <path
+        d="M3.2 5h2.3M8.5 5h2.3M5.1 3.1h3.8M5.1 6.9h3.8"
+        stroke="rgba(255,255,255,0.4)"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <rect x="0.6" y="0.6" width="12.8" height="8.8" rx="2" stroke="rgba(255,255,255,0.4)" strokeWidth="1.2" />
+    </svg>
+  );
+}
 
-      {product && (
-        <div className="glass rounded-2xl p-3">
-          <div className="flex items-start gap-3">
-            <div className="h-14 w-14 shrink-0 rounded-lg bg-gradient-to-br from-kiss/70 to-warmth/70" />
-            <div className="flex-1">
-              <div className="text-[13px] text-stone-200">{product.name}</div>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-lg font-semibold text-ember">{product.price}</span>
-                {product.original && (
-                  <span className="text-[11px] text-stone-200 line-through">{product.original}</span>
-                )}
-              </div>
-              <div className="mt-1 text-[11px] text-stone-200">来自 {product.shop}</div>
-            </div>
+function AvatarRow({ avatar, label }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="fig-avatar">
+        {avatar ? <img src={avatar} alt="" /> : <span className="block h-full w-full bg-white/20" />}
+      </span>
+      <span className="text-[14px] font-medium leading-[1.43]">{label}</span>
+    </div>
+  );
+}
+
+function CommentBody({ text }) {
+  return (
+    <p className="whitespace-pre-line text-[14px] font-medium leading-[1.625] text-white">
+      {text}
+    </p>
+  );
+}
+
+function LinkedVideoRow({ title, cover, shape = 'landscape' }) {
+  // landscape = 144×89（Figma Card B · 主 thumbnail）
+  // portrait  = 77×103（Figma Card A/C）
+  const thumbStyle = shape === 'portrait'
+    ? { width: 77, height: 103 }
+    : { width: 144, height: 89 };
+  return (
+    <div className="flex items-start gap-4">
+      <LinkIcon />
+      <div className="flex-1 whitespace-pre-line text-[16px] font-medium leading-[1.625] text-white">
+        {title}
+      </div>
+      <div className="fig-thumb" style={thumbStyle}>
+        <img src={cover} alt={title} />
+      </div>
+    </div>
+  );
+}
+
+function AuthorRow({ display, avatar }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="fig-author-badge">
+        {avatar && <img src={avatar} alt="" />}
+      </span>
+      <span className="text-[14px] font-medium leading-[1.43] text-white/80">{display}</span>
+    </div>
+  );
+}
+
+// A 剧本专属 · 替换 Figma 珍珠胶囊里的抖音 URL 为商品条
+function ProductPearl({ product }) {
+  if (!product) return null;
+  return (
+    <div className="fig-pearl">
+      <div className="flex-1 truncate">
+        <div className="truncate text-[13px] font-semibold text-black">{product.name}</div>
+        <div className="mt-0.5 flex items-baseline gap-2">
+          <span className="text-[15px] font-extrabold text-[#fe2c55]">{product.price}</span>
+          {product.original && (
+            <span className="text-[11px] text-black/45 line-through">{product.original}</span>
+          )}
+          <span className="text-[11px] text-black/55">· {product.shop}</span>
+        </div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M6 4l4 4-4 4" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  );
+}
+
+// B 剧本专属 · 系列小缩略条（代替 Figma 珍珠胶囊的位置）
+function SeriesStrip({ thumbnails }) {
+  if (!Array.isArray(thumbnails) || thumbnails.length === 0) return null;
+  return (
+    <div className="flex gap-2 overflow-x-auto scrollbar-none">
+      {thumbnails.map((t) => (
+        <div key={t.day} className="fig-thumb shrink-0" style={{ width: 56, height: 72 }}>
+          <img src={t.cover} alt={t.title} />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-1 py-1 text-[9px] leading-none text-white">
+            D{t.day}
           </div>
         </div>
-      )}
-
-      {summary && (
-        <div className="text-[12px] leading-relaxed text-stone-100">
-          {summary}
-        </div>
-      )}
+      ))}
     </div>
   );
 }
 
-function AnswerSeries({ answer }) {
-  const { video, thumbnails, summary } = answer;
+export default function CardPageP1({ page, scriptId }) {
+  const { answer, creator } = page;
+  const videoTitle = answer?.video?.title ?? '';
+  const cover = answer?.video?.cover;
+
+  // 珍珠条/条目 显示规则
+  const isA = scriptId === 'A';
+  const isB = scriptId === 'B';
+  const product = isA ? answer?.product : null;
+  const seriesThumbs = isB ? (answer?.thumbnails ?? []) : [];
+  const thumbShape = isB ? 'landscape' : 'portrait';
+
+  // 评论文本用原始 raw_text · 即 Figma 的 "我的评论"
+  const myComment = page.my_comment ?? page.comment_text ?? '';
+
+  // 头像旁带 "我 · N 天前"
+  const myLabel = page.occurred_relative
+    ? `我 · ${page.occurred_relative}`
+    : '我';
+
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative overflow-hidden rounded-2xl">
-        <img src={video.cover} alt={video.title} className="h-40 w-full object-cover" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-          <div className="text-[13px] font-medium text-white">{video.title}</div>
-        </div>
-      </div>
-      <div className="grid grid-cols-5 gap-2">
-        {thumbnails.map((t) => (
-          <div key={t.day} className="relative overflow-hidden rounded-lg">
-            <img src={t.cover} alt={t.title} className="h-16 w-full object-cover" />
-            <span className="absolute left-1 top-1 rounded bg-black/60 px-1 py-0.5 text-[10px] text-white">
-              D{t.day}
-            </span>
-          </div>
-        ))}
-      </div>
-      {summary && <div className="text-[12px] leading-relaxed text-stone-100">{summary}</div>}
-    </div>
-  );
-}
-
-function AnswerInline({ answer }) {
-  const { video, summary } = answer;
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="relative overflow-hidden rounded-2xl">
-        <img src={video.cover} alt={video.title} className="h-72 w-full object-cover" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-          <div className="text-[13px] font-medium text-white">{video.title}</div>
-        </div>
-        <span className="absolute left-3 top-3 pill bg-ember/20 text-kiss">
-          含 {video.preview_seconds}s 前情提要
-        </span>
-      </div>
-      {summary && <div className="text-[12px] leading-relaxed text-stone-100">{summary}</div>}
-    </div>
-  );
-}
-
-function Answer({ answer }) {
-  if (answer.type === 'product_card') return <AnswerProduct answer={answer} />;
-  if (answer.type === 'series_grid') return <AnswerSeries answer={answer} />;
-  return <AnswerInline answer={answer} />;
-}
-
-/**
- * 主按钮组：
- * - 单按钮时全宽大块
- * - 两个按钮：第一个全宽抖音粉 · 第二个白底次级（保持情感主导 + 分流操作）
- */
-function PrimaryButtons({ actions, onAction }) {
-  if (actions.length === 0) return null;
-  // 液态玻璃卡里 · 主 CTA 抖音粉（带玻璃反光）· 次要 CTA 白玻璃
-  if (actions.length === 1) {
-    const a = actions[0];
-    return (
-      <button
-        onClick={(e) => { e.stopPropagation(); onAction(a.id, a.label); }}
-        className="focus-ring lg-btn lg-btn-pink w-full px-5 py-3.5 text-[15px] font-black"
-      >
-        {a.label}
-      </button>
-    );
-  }
-  // 两个主按钮 · 并排 · 左侧玻璃白（次级）· 右侧抖音粉（主级）
-  // 参考液态玻璃稿里底部"不用了 · 去看看"双列布局
-  const [first, second, ...more] = actions;
-  return (
-    <>
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          onClick={(e) => { e.stopPropagation(); onAction(first.id, first.label); }}
-          className="focus-ring lg-btn px-4 py-3.5 text-[14px] font-bold"
-        >
-          {first.label}
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onAction(second.id, second.label); }}
-          className="focus-ring lg-btn lg-btn-pink px-4 py-3.5 text-[14px] font-black"
-        >
-          {second.label}
-        </button>
-      </div>
-      {more.length > 0 && (
-        <div className="grid" style={{ gridTemplateColumns: `repeat(${more.length}, minmax(0, 1fr))`, gap: '0.5rem' }}>
-          {more.map((a) => (
-            <button
-              key={a.id}
-              onClick={(e) => { e.stopPropagation(); onAction(a.id, a.label); }}
-              className="focus-ring lg-btn px-3 py-3 text-[13px]"
-            >
-              {a.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </>
-  );
-}
-
-// 每个 action id 对应的回显文案 · 缺失则直接回显 label
-const ACTION_FEEDBACK = {
-  // 默认旧 id（保留兼容）
-  add_wish: '已加到「我蹲过的」· 不让它再错过',
-  view:     '先替你留在这儿，不让它再溜走',
-  resume:   '从 Day1 接着给你看',
-  recap:    '前情替你捋好了，她的心意也接上了',
-  play:     '放给你看',
-  save:     '收藏到「我蹲过的」· 等下次相遇',
-  save_later: '好，下次她再冒出来',
-  not_now:  '好，这次先放过它',
-  // 剧本特化 id
-  view_link:        '链接已为你打开 · 平替同款',
-  view_outfit:      '她的搭配灵感替你整理了',
-  resume_d1:        '从 Day1 开始 · 帮你接回来',
-  play_sequel:      '下集已备好 · 含 10 秒前情',
-  share_grandpa:    '这份惦记，替你带给爷爷了',
-  claim_template:   '模板已归入你的笔记 · 免费可复制',
-  view_method:      '笔记方法已展开',
-  start_day1:       '从第一天开始做起 · 清单在手',
-  save_menu:        '菜单存到「我蹲过的」',
-  play_music:       '这版已为你循环播放',
-  share_friend:     '已转给和你一起追的朋友',
-  play_travel:      '下集开播 · 替你补上前情',
-  save_route:       '这条路线存好了',
-  start_training_d1:'Day1 开始 · 训练计划已就位',
-  save_plan:        '训练表存到「我蹲过的」',
-  follow_tutorial:  '分步已展开 · 画一张吧',
-  save_tutorial:    '教程已收藏',
-  claim_kit:        '新手包链接已为你打开',
-  view_plants:      '种什么好 · 已整理给你',
-};
-
-export default function CardPageP1({ page, scriptId, onAction }) {
-  const handleAction = (id, label) => {
-    const feedback = ACTION_FEEDBACK[id] ?? label;
-    onAction?.(feedback);
-  };
-  return (
-    <div className="flex h-full flex-col gap-3 px-4 pt-14 pb-14">
-      {/* Hero 区 · 替你守候 + 蹲到了 + 本次上下文 · 主语是我们/AI 不是用户 */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
+    <div className="flex h-full flex-col justify-center px-5">
+      <motion.article
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col gap-1.5"
+        transition={{ duration: 0.45 }}
+        className="fig-card relative w-[342px] max-w-full self-center"
       >
-        <div className="brand-eyebrow">替你守候</div>
-        <div className="brand-title">蹲到了</div>
-        <div className="mt-1 text-[14px] font-medium leading-relaxed text-stone-50/95">
-          {page.context_line}
-        </div>
-        <div className="mt-1 flex items-center gap-1.5 opacity-80">
-          <span className="pill bg-warmth/15 text-warmth">AI 为你记得</span>
-          <span className="pill">剧本 {scriptId}</span>
-        </div>
-      </motion.div>
-
-      <Answer answer={page.answer} />
-
-      {/* 情感收束放到按钮组上方 · 液态玻璃卡的标志性节奏 */}
-      <div className="mt-auto text-center text-[12px] italic text-[color:var(--color-warmth)]/95 font-medium pt-2">
-        {page.emotional_close}
-      </div>
-
-      {/* CTA · 液态玻璃按钮组（参考液态玻璃设计稿底部双列）*/}
-      <div className="flex flex-col gap-2 pt-1">
-        <PrimaryButtons actions={page.actions?.primary ?? []} onAction={handleAction} />
-        {page.actions?.secondary?.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
-            {page.actions.secondary.map((a) => (
-              <button
-                key={a.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAction(a.id, a.label);
-                }}
-                className="focus-ring lg-btn px-3 py-3 text-[13px]"
-              >
-                {a.label}
-              </button>
-            ))}
+        <AvatarRow label={myLabel} />
+        {myComment && <CommentBody text={myComment} />}
+        {videoTitle && (
+          <div className="relative">
+            <LinkedVideoRow title={videoTitle} cover={cover} shape={thumbShape} />
           </div>
         )}
-      </div>
+        {isA && product && <ProductPearl product={product} />}
+        {isB && seriesThumbs.length > 0 && <SeriesStrip thumbnails={seriesThumbs} />}
+        <AuthorRow display={creator?.display ?? ''} avatar={creator?.avatar} />
+      </motion.article>
     </div>
   );
 }

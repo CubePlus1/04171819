@@ -78,7 +78,7 @@ async function main() {
   assert(boot.user?.id === 'demo-user', 'bootstrap 含 demo-user');
   assert(Array.isArray(boot.triggers) && boot.triggers.length === 3, 'bootstrap 含 3 个剧本触发器');
   assert(boot.pending === true, 'bootstrap.pending=true（还有未履约信号）');
-  assert(boot.history.length >= 5, 'bootstrap 含 >=5 历史信号');
+  assert(boot.history.length >= 3, 'bootstrap 含 >=3 历史信号');
   assert(boot.feed.length >= 6, 'bootstrap 含 >=6 填充信息流');
   assert(boot.cards.length === 0, 'bootstrap 初始卡片为空');
 
@@ -87,9 +87,9 @@ async function main() {
 
   // ========== Primary path · ambient tick 按 topic 精确触发 ==========
   const SCRIPTS = [
-    { topic: 'dashan-knit-top',  expectScript: 'A', expectPages: ['P1', 'P2'] },
-    { topic: '30days-series',    expectScript: 'B', expectPages: ['P1', 'P3'] },
-    { topic: 'grandpa-archive',  expectScript: 'C', expectPages: ['P1', 'P2', 'P3'] },
+    { topic: 'storage-haul',        expectScript: 'A', expectPages: ['P1', 'P2'] },
+    { topic: 'missing-bf',          expectScript: 'B', expectPages: ['P1', 'P3'] },
+    { topic: 'editing-transition',  expectScript: 'C', expectPages: ['P1', 'P2', 'P3'] },
   ];
 
   for (const tc of SCRIPTS) {
@@ -136,26 +136,16 @@ async function main() {
     assert(card.pages[0].context_line?.startsWith('你'), 'P1 情景锚点以 "你" 开头');
   }
 
-  // 三个指定剧本接完后，fixture 仍有其他 topic 未履约 · pending 应仍为 true
+  // Figma 三场景 · 三张卡接完后所有 topic 都履约 · pending 应为 false
   const afterThree = await (await fetch(`${BASE}/api/bootstrap`)).json();
-  assert(afterThree.pending === true, '指定 3 topic 接完后仍有其他 topic · pending=true');
+  assert(afterThree.pending === false, '3 topic 接完后 pending=false');
   assert(afterThree.cards.length === 3, '当前 bootstrap 返回 3 张卡片');
 
-  // ========== 把剩余所有 topic 跑干 · 直到 no-match ==========
-  let drained = 0;
-  for (let i = 0; i < 20; i += 1) {
-    const r = await ambientTick({});
-    if (!r.body.ok) {
-      assert(r.body.reason === 'no-match', `drain 终止 reason=no-match（实际 ${r.body.reason}）`);
-      break;
-    }
-    drained += 1;
-  }
-  assert(drained >= 1, `至少还有 1 个 topic 可以接（实际 drain ${drained}）`);
-
-  const afterAll = await (await fetch(`${BASE}/api/bootstrap`)).json();
-  assert(afterAll.pending === false, '所有 topic 接完后 pending=false');
-  assert(afterAll.cards.length >= 3 + drained, `bootstrap 返回 >=${3 + drained} 张卡片（实际 ${afterAll.cards.length}）`);
+  // ========== 再 tick 一次应 no-match（已全部履约）==========
+  const drainR = await ambientTick({});
+  assert(drainR.body.ok === false, 'drain 后再 ambient tick ok=false');
+  assert(drainR.body.reason === 'no-match',
+    `drain 后 reason=no-match（实际 ${drainR.body.reason}）`);
 
   // ========== 自动 ambient（无 topic）· reset 后应能挑到第一条 ==========
   await resetDemo();
@@ -166,8 +156,8 @@ async function main() {
   // ========== 并发去重 · 同 topic 两条并发应只落一张卡 ==========
   await resetDemo();
   const [concA, concB] = await Promise.all([
-    ambientTick({ topic: 'dashan-knit-top' }),
-    ambientTick({ topic: 'dashan-knit-top' }),
+    ambientTick({ topic: 'storage-haul' }),
+    ambientTick({ topic: 'storage-haul' }),
   ]);
   const okCount = [concA, concB].filter((r) => r.body.ok).length;
   const dupReasons = [concA, concB].filter((r) => !r.body.ok).map((r) => r.body.reason);
@@ -196,7 +186,7 @@ async function main() {
   const legacy = await fetch(`${BASE}/api/comment`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
-    body: JSON.stringify({ text: '蹲后续 爷爷真帅' }),
+    body: JSON.stringify({ text: '求链接姐妹们' }),
   });
   assert(legacy.ok, '/api/comment 遗留路径仍 200');
   const legacyBody = await legacy.json();
