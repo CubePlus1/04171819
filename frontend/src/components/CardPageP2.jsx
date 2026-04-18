@@ -2,50 +2,36 @@ import { motion } from 'framer-motion';
 
 function Row({ label, value }) {
   return (
-    <div className="flex flex-col gap-1 py-2">
-      <div className="text-[11px] uppercase tracking-[0.2em] text-stone-300">{label}</div>
-      <div className="text-[13px] leading-relaxed text-stone-100">{value}</div>
+    <div className="flex flex-col gap-1">
+      <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">{label}</div>
+      <div className="whitespace-pre-line text-[14px] font-medium leading-[1.625] text-white/90">{value}</div>
     </div>
   );
 }
 
 export default function CardPageP2({ page }) {
   return (
-    <div className="flex h-full flex-col gap-3 p-4">
-      <div className="flex items-center gap-2">
-        <span className="pill bg-hintB/15 text-hintB">它怎么记起你的</span>
-        <span className="pill">P2</span>
-      </div>
-
-      <div className="text-[14px] font-medium text-stone-100">{page.warm_summary}</div>
-
-      <motion.div
-        initial="hidden"
-        animate="show"
-        variants={{
-          hidden: {},
-          show: { transition: { staggerChildren: 0.08 } },
-        }}
-        className="glass divide-y divide-white/5 rounded-2xl px-4"
+    <div className="flex h-full flex-col justify-center px-5">
+      <motion.article
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        className="fig-card relative w-[342px] max-w-full self-center"
       >
-        {[
-          { label: '你当时留下的',   value: page.trigger_signal },
-          { label: 'AI 读懂的意思', value: page.ai_intent },
-          { label: '为什么这么判',   value: page.rationale },
-          { label: '这次的回音',     value: page.matched_basis },
-        ].map((row) => (
-          <motion.div
-            key={row.label}
-            variants={{ hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0 } }}
-          >
-            <Row {...row} />
-          </motion.div>
-        ))}
-      </motion.div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-semibold tracking-[0.15em] text-white">它怎么记起我的</span>
+          <span className="text-[10px] text-white/50">P2</span>
+        </div>
 
-      <div className="mt-auto text-center text-[11px] text-stone-200">
-        — 它为什么会在这一刻回来找你 —
-      </div>
+        <div className="text-[16px] font-medium leading-[1.5] text-white">{page.warm_summary}</div>
+
+        <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
+          <Row label="我当时留下的"  value={page.trigger_signal} />
+          <Row label="AI 读懂的意思" value={page.ai_intent} />
+          <Row label="为什么这么判"  value={page.rationale} />
+          <Row label="这次的回音"    value={page.matched_basis} />
+        </div>
+      </motion.article>
     </div>
   );
 }

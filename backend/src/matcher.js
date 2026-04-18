@@ -2,20 +2,21 @@
 import { getDb } from './db.js';
 import { SUPPORTED_INTENTS } from './intent.js';
 
+// 三场景对齐 Figma：A=收纳/post_link, B=男友失联/series_completed, C=剪辑教程/post_sequel
 const INTENT_TO_ACTION = {
   link_request:    ['post_link'],
-  sequel_request:  ['post_sequel'],
+  sequel_request:  ['series_completed', 'post_sequel'],
   series_catchup:  ['series_completed'],
-  tutorial_request:['reply_tutorial'],
+  tutorial_request:['post_sequel'],
   plus_one:        ['post_link', 'post_sequel', 'series_completed'],
   passive_interest:['post_link', 'post_sequel', 'series_completed'],
 };
 
 const INTENT_TO_SCRIPT = {
   link_request:     'A',
-  sequel_request:   'C',
+  sequel_request:   'B',
   series_catchup:   'B',
-  tutorial_request: 'A',
+  tutorial_request: 'C',
   plus_one:         'A',
   passive_interest: 'A',
 };

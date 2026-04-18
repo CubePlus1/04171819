@@ -6,6 +6,12 @@ import CardPageP3 from './CardPageP3.jsx';
 
 const PAGE_RENDERERS = { P1: CardPageP1, P2: CardPageP2, P3: CardPageP3 };
 
+const SCENE_BG = {
+  A: '/scenes/bg-a-storage.jpg',
+  B: '/scenes/bg-b-missing.jpg',
+  C: '/scenes/bg-c-editing.jpg',
+};
+
 function DouyinTab({ label, active, badge }) {
   return (
     <span className={`relative flex flex-col items-center gap-0.5 ${active ? 'text-white font-bold' : 'opacity-55'}`}>
@@ -24,6 +30,7 @@ export default function DunCard({ card, spotlight, onAction }) {
   const pages = card.pages ?? [];
   const active = pages[index] ?? pages[0];
   const Renderer = PAGE_RENDERERS[active?.id] ?? CardPageP1;
+  const bgImg = SCENE_BG[card.script_id] ?? SCENE_BG.A;
 
   const clamp = useCallback((n) => Math.max(0, Math.min(pages.length - 1, n)), [pages.length]);
   const goto = useCallback((n) => setIndex(clamp(n)), [clamp]);
@@ -56,31 +63,22 @@ export default function DunCard({ card, spotlight, onAction }) {
           : '0 18px 48px -16px rgba(255, 91, 95, 0.35)',
       }}
       transition={{ type: 'spring', stiffness: 180, damping: 22 }}
-      className="lg-card lg-card-brushed feed-snap focus-ring relative h-full w-full overflow-hidden"
+      className="feed-snap focus-ring relative h-full w-full overflow-hidden rounded-[26px] text-white"
+      style={{ isolation: 'isolate' }}
     >
-      {/* 顶部反光高光 · 玻璃厚度感 */}
+      {/* 场景沉浸式背景图 · 铺满 iPhone 框架 · 底部深色渐变（Figma Home page fill） */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 rounded-t-[26px] opacity-70"
-        style={{
-          background: 'linear-gradient(to bottom, rgba(255,255,255,0.35), transparent)',
-        }}
+        className="fig-scene-bg"
+        style={{ backgroundImage: `url(${bgImg})` }}
+        aria-hidden="true"
       />
 
-      {/* 顶部 tab 条深色底 · 让 P1/P2/P3 + 履约型内容 pill 不悬浮 */}
+      {/* 顶部 tab 条深色底 · 让抖音顶栏可读 */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-12 rounded-t-[26px]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-14"
         style={{
           background:
-            'linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.12) 60%, transparent 100%)',
-        }}
-      />
-
-      {/* 底部分页提示深色底 · 与顶部对称 · 不挡 CTA */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-[26px]"
-        style={{
-          background:
-            'linear-gradient(to top, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.10) 65%, transparent 100%)',
+            'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.12) 70%, transparent 100%)',
         }}
       />
 
