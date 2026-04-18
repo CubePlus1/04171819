@@ -25,6 +25,14 @@ const initialState = {
   cards: [],
   spotlightCardId: null,
 
+  // 单卡轮播视图状态
+  // - currentItem: 当前视口里展示的唯一一条（卡片或 filler 视频）
+  // - queue:       待展示的列队（新卡到会 enqueue，用户滑一下 / 按一下从 queue shift）
+  // - fillerCursor: filler 轮播指针，当 queue 空时拿 filler 填
+  currentItem: null,
+  queue: [],
+  fillerCursor: 0,
+
   // Workflow UI 只跟踪 App 层已判定为「本标签页发起」的事件
   running: false,
   activeRunId: null,
@@ -33,16 +41,27 @@ const initialState = {
   lastReason: null,
 };
 
+// 把 card / filler 包成统一的 item shape
+function cardItem(card) {
+  return { kind: 'card', id: card.id, data: card };
+}
+function fillerItem(filler, cursor) {
+  const loop = Math.floor(cursor / 1000);
+  return { kind: 'feed', id: `${filler.id}-turn-${cursor}-l${loop}`, data: filler };
+}
+
+// cards 数组语义：**从旧到新（ASC）**，最新的卡永远在末尾。
+// 这样 Feed 往下追加、视口自动滚到底 = 抖音"下一条"的方向感。
 function dedupeMergeCards(primary, existing) {
+  // primary = WS 先到的（可能乱序），existing = 已有的。
+  // 合并后按 card.id 去重，按原始顺序稳定（不再依赖 created_at）。
   const seen = new Set();
-  const out = [];
-  for (const c of primary) {
-    if (c?.id && !seen.has(c.id)) { seen.add(c.id); out.push(c); }
+  const ordered = [];
+  for (const c of [...existing, ...primary]) {
+    if (c?.id && !seen.has(c.id)) { seen.add(c.id); ordered.push(c); }
   }
-  for (const c of existing) {
-    if (c?.id && !seen.has(c.id)) { seen.add(c.id); out.push(c); }
-  }
-  return out.slice(0, MAX_CARDS_IN_UI);
+  // 只保留最后 N 张 · 刷过的自动滑出
+  return ordered.slice(-MAX_CARDS_IN_UI);
 }
 
 export const useDemoStore = create((set) => ({
@@ -58,18 +77,32 @@ export const useDemoStore = create((set) => ({
   hydrate: ({ server_epoch, user, feed, triggers, history, cards, pending }) =>
     set((state) => {
       const epochChanged = state.serverEpoch && server_epoch && state.serverEpoch !== server_epoch;
+      const incoming = [...(cards ?? [])].reverse();
       const nextCards = epochChanged
-        ? (cards ?? []).slice(0, MAX_CARDS_IN_UI)
-        : dedupeMergeCards(cards ?? [], state.cards);
+        ? incoming.slice(-MAX_CARDS_IN_UI)
+        : dedupeMergeCards(incoming, state.cards);
+
+      // 初次进站 · 视口先放第一条 filler 热场（没卡也能看）
+      const feedList = feed ?? state.feed;
+      let nextCurrent = state.currentItem;
+      let nextCursor = state.fillerCursor;
+      if (!nextCurrent && feedList.length > 0) {
+        nextCurrent = fillerItem(feedList[0], nextCursor);
+        nextCursor += 1;
+      }
+
       return {
         serverEpoch: server_epoch ?? state.serverEpoch,
         user,
-        feed: feed ?? state.feed,
+        feed: feedList,
         triggers: triggers ?? state.triggers,
         history: history ?? state.history,
         pending: typeof pending === 'boolean' ? pending : state.pending,
         cards: nextCards,
-        spotlightCardId: epochChanged ? null : (state.spotlightCardId ?? nextCards[0]?.id ?? null),
+        spotlightCardId: epochChanged ? null : (state.spotlightCardId ?? nextCards[nextCards.length - 1]?.id ?? null),
+        currentItem: nextCurrent,
+        fillerCursor: nextCursor,
+        queue: epochChanged ? [] : state.queue,
       };
     }),
 
@@ -122,15 +155,52 @@ export const useDemoStore = create((set) => ({
     }),
 
   /**
-   * @param {object} card
-   * @param {boolean} isLocal 由 App 层根据 client_id 判定
+   * 新卡到来 · 入队等展示 · 不抢当前视口。
+   * 视口空（还没播过任何一条）时立即占位 · 否则放进 queue 等用户"滑下一条"。
    */
   onCardGenerated: (card, isLocal) =>
     set((state) => {
-      const deduped = [card, ...state.cards.filter((c) => c.id !== card.id)].slice(0, MAX_CARDS_IN_UI);
+      const cardsBase = state.cards.filter((c) => c.id !== card.id);
+      const nextCards = [...cardsBase, card].slice(-MAX_CARDS_IN_UI);
+      const item = cardItem(card);
+      // 没 current → 直接展示（比如页面刚打开还没滑过任何一下）
+      if (!state.currentItem) {
+        return {
+          cards: nextCards,
+          spotlightCardId: card.id,
+          currentItem: item,
+        };
+      }
+      // 当前视口已有内容 · 排队（queue 去重防重入）
+      const queueFiltered = state.queue.filter((q) => q.kind !== 'card' || q.id !== card.id);
       return {
-        cards: deduped,
+        cards: nextCards,
         spotlightCardId: isLocal ? card.id : state.spotlightCardId,
+        queue: [...queueFiltered, item],
+      };
+    }),
+
+  /**
+   * 前进一条 · 用户手动触发（↑/↓/Space/点击）。
+   * - 优先从 queue 取下一条（通常是履约卡）
+   * - queue 空则从 feed filler 轮播取一条
+   */
+  advance: () =>
+    set((state) => {
+      if (state.queue.length > 0) {
+        const [next, ...rest] = state.queue;
+        return {
+          currentItem: next,
+          queue: rest,
+          spotlightCardId: next.kind === 'card' ? next.id : state.spotlightCardId,
+        };
+      }
+      if (state.feed.length === 0) return state;
+      const idx = state.fillerCursor % state.feed.length;
+      const filler = state.feed[idx];
+      return {
+        currentItem: fillerItem(filler, state.fillerCursor),
+        fillerCursor: state.fillerCursor + 1,
       };
     }),
 
