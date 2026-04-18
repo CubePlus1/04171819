@@ -15,6 +15,8 @@
 | **后端代码量** | 1,791 行 · **100% 真实逻辑**（SQL/WS/事务/并发/速率/审计） |
 | **前端代码量** | ~1,765 行 React · **100% 真实**（Zustand + 真 WS 事件驱动 MindCanvas） |
 | **数据库** | 真 SQLite 文件 + WAL · 3 张表 · 原子声明 + UNIQUE INDEX |
+| **Fixture 剧本数** | **10 个 topic × 10 个 creator**（对应 A/B/C 三种卡片） |
+| **循环模式** | `DEMO_LOOP=1` · **接完一轮自动软 reset · 前端永远看不到 pending=false** |
 | **测试** | 单测 5 用例 · Smoke 全链路 · Frontend build · 全绿 |
 | **AI 推理** | **规则引擎 · 非 LLM**（刻意设计，展台时延 0） |
 | **视频素材** | **全部 picsum 随机占位图**（`<img>`, 非 `<video>`） |
@@ -26,6 +28,8 @@
 
 **一句定位**：**骨架 100% 发布级 · 皮肤 100% 占位**。
 评委看的是故事 + 现场手感 + 管线透明度，这三样**都立住了**。但"皮肤"一露出就是减分项——骨架越硬，皮肤越该换。
+
+**展台循环**：`npm run dev` 已默认带 `DEMO_LOOP=1` · 10 个剧本轮流演 · 接完一轮后端软 reset（清 cards + 重置 fulfilled）· 前端的 `MAX_CARDS_IN_UI=40` 自然淘汰旧卡 · **观众从来看不到"信息流空了"的状态 · 卡片持续浮入 · 重复剧本视觉上是"下一波履约"**。
 
 ---
 
@@ -72,7 +76,7 @@
 
 - ✅ `schema.sql` · 真表结构：`users` / `creators` / `intent_signals` / `creator_actions` / `cards` · 含 UNIQUE INDEX `(user_id, topic)` 保护并发
 - ✅ `dundao.db` · 真 SQLite 文件 · 跑起来就是真读写
-- 🟡 `fixtures.json` · **硬编码演示数据**：1 用户 / 3 博主 / 5 信号 / 3 动作 · 这是 seed，不是 bug，但演示边界只有 3 个剧本
+- 🟢 `fixtures.json` · **10 个 topic × 10 个 creator**（dashan/30days/grandpa + pang/lulu/brick/mio/ken/yuri/hazel）· 单轮完整播放 ~90 秒 · 配合 LOOP_MODE 循环无限续杯
 
 ### 3.2 前端 · `demo/frontend/src/` (~1,765 行 · 全真代码 / 部分占位素材)
 
@@ -121,6 +125,7 @@
 - [x] 安全层 · CORS allowlist · Origin 校验 · rate limit · reset 本机限制
 - [x] 服务 epoch · 重启时前端清理幽灵卡片
 - [x] 多 tab clientId · 单机多开互不污染
+- [x] **DEMO_LOOP=1 循环模式** · 10 topic fixture + 软 reset + hasPendingAmbient 适配 + smoke 更新
 
 ### 体验
 - [x] 去掉输入框 · 纯被动履约（principle fit）

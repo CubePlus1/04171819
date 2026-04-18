@@ -27,6 +27,55 @@
       "display": "爷爷的退伍档案",
       "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=grandpa",
       "bio": "记录爷爷的抗美援朝岁月"
+    },
+    {
+      "id": "creator-pang",
+      "handle": "@胖友的考研笔记",
+      "display": "胖友的考研笔记",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=pangyou",
+      "bio": "二战考研 · 笔记模板 · 真题分享"
+    },
+    {
+      "id": "creator-lulu",
+      "handle": "@露露的深夜厨房",
+      "display": "露露的深夜厨房",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=lulu",
+      "bio": "一人一锅 · 便当菜单整理"
+    },
+    {
+      "id": "creator-brick",
+      "handle": "@Brick翻唱铺",
+      "display": "Brick翻唱铺",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=brick",
+      "bio": "周五更 · 吉他 + 钢琴双版本"
+    },
+    {
+      "id": "creator-mio",
+      "handle": "@Mio一个人走走",
+      "display": "Mio一个人走走",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=mio",
+      "bio": "独行 vlog · 高原 / 边境 / 雪线"
+    },
+    {
+      "id": "creator-ken",
+      "handle": "@Ken的一小时训练",
+      "display": "Ken的一小时训练",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=ken",
+      "bio": "家庭健身 · 动作拆解 · 进阶系列"
+    },
+    {
+      "id": "creator-yuri",
+      "handle": "@Yuri画一点",
+      "display": "Yuri画一点",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=yuri",
+      "bio": "零基础水彩 · 五分钟一张猫"
+    },
+    {
+      "id": "creator-hazel",
+      "handle": "@榛榛的阳台",
+      "display": "榛榛的阳台",
+      "avatar": "https://api.dicebear.com/9.x/bottts/svg?seed=hazel",
+      "bio": "十平米阳台的养活之路"
     }
   ],
   "intent_signals": [
@@ -79,6 +128,76 @@
       "raw_text": "30 天习惯养成怎么坚持",
       "topic": "30days-series",
       "days_ago": 18
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-pang",
+      "video_id": "v-pang-notes",
+      "video_title": "我二战 3 个月逆袭的笔记长啥样",
+      "signal_type": "comment_intent",
+      "raw_text": "蹲模板 求一份",
+      "topic": "pang-studyplan",
+      "days_ago": 7
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-lulu",
+      "video_id": "v-lulu-menu",
+      "video_title": "一个人也值得的 7 天便当菜单",
+      "signal_type": "unfinished_save",
+      "raw_text": null,
+      "topic": "lulu-weekmenu",
+      "days_ago": 25
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-brick",
+      "video_id": "v-brick-cover-a",
+      "video_title": "《successor》吉他翻唱 上集",
+      "signal_type": "comment_intent",
+      "raw_text": "蹲下集 这版太戳了",
+      "topic": "brick-cover-successor",
+      "days_ago": 5
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-mio",
+      "video_id": "v-mio-tibet-a",
+      "video_title": "一个人进藏 Ep4 · 在措那湖边等日落",
+      "signal_type": "comment_intent",
+      "raw_text": "蹲下集，你是走丙察察吗",
+      "topic": "mio-tibet",
+      "days_ago": 12
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-ken",
+      "video_id": "v-ken-split-d1",
+      "video_title": "30 天自重训练系列 Day1 · 俯卧撑从 0 到 10",
+      "signal_type": "watch_later",
+      "raw_text": null,
+      "topic": "ken-30days",
+      "days_ago": 28
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-yuri",
+      "video_id": "v-yuri-cat-teaser",
+      "video_title": "我的第一只猫 · 水彩小稿",
+      "signal_type": "comment_intent",
+      "raw_text": "蹲教程！想给我家主子画一张",
+      "topic": "yuri-cat-tutorial",
+      "days_ago": 9
+    },
+    {
+      "user_id": "demo-user",
+      "creator_id": "creator-hazel",
+      "video_id": "v-hazel-tools",
+      "video_title": "阳台党的 5 件入门工具",
+      "signal_type": "comment_intent",
+      "raw_text": "蹲链接 新手想入",
+      "topic": "hazel-tools",
+      "days_ago": 4
     }
   ],
   "creator_actions": [
@@ -97,7 +216,7 @@
           "original": "¥189",
           "shop": "大山的好物柜"
         },
-        "summary": "30 天前她在评论区蹲的那件 —— 博主自己找到了平替链接"
+        "summary": "你 21 天前蹲的那件 —— 博主自己找到了平替链接"
       }
     },
     {
@@ -130,6 +249,119 @@
         "cover": "https://picsum.photos/seed/grandpa-reunion/360/640",
         "preview_seconds": 10,
         "summary": "14 天前你蹲的那集后续 · 爷爷老战友真的找来了"
+      }
+    },
+    {
+      "creator_id": "creator-pang",
+      "action_type": "post_link",
+      "topic": "pang-studyplan",
+      "hours_ago": 2,
+      "payload": {
+        "video_id": "v-pang-notion-template",
+        "title": "我把逆袭的笔记模板做成了可复用文件",
+        "cover": "https://picsum.photos/seed/pang-plan/360/640",
+        "product": {
+          "name": "考研 3 个月复盘笔记模板（Notion 可复制）",
+          "price": "¥0",
+          "original": "¥58",
+          "shop": "胖友的店"
+        },
+        "summary": "你 7 天前蹲的模板 · 她今天整理好了免费放出来"
+      }
+    },
+    {
+      "creator_id": "creator-lulu",
+      "action_type": "series_completed",
+      "topic": "lulu-weekmenu",
+      "hours_ago": 5,
+      "payload": {
+        "video_id": "v-lulu-d7",
+        "title": "便当菜单 Day7 · 一周做完结 · 成本算给你看",
+        "cover": "https://picsum.photos/seed/lulu-menu7/360/640",
+        "series_thumbnails": [
+          { "day": 1, "cover": "https://picsum.photos/seed/lulu1/200/300", "title": "Day1 · 青椒肉丝饭盒" },
+          { "day": 2, "cover": "https://picsum.photos/seed/lulu2/200/300", "title": "Day2 · 番茄蛋面" },
+          { "day": 3, "cover": "https://picsum.photos/seed/lulu3/200/300", "title": "Day3 · 韩式拌饭" },
+          { "day": 5, "cover": "https://picsum.photos/seed/lulu5/200/300", "title": "Day5 · 烤鸡饭" },
+          { "day": 7, "cover": "https://picsum.photos/seed/lulu7/200/300", "title": "Day7 · 一碗温柔的面" }
+        ],
+        "summary": "25 天前你收藏的那套菜单 · 她真的一周做到了"
+      }
+    },
+    {
+      "creator_id": "creator-brick",
+      "action_type": "post_sequel",
+      "topic": "brick-cover-successor",
+      "hours_ago": 4,
+      "payload": {
+        "video_id": "v-brick-cover-b",
+        "title": "《successor》下集 · 这次我加了一段钢琴",
+        "cover": "https://picsum.photos/seed/brick-cover/360/640",
+        "preview_seconds": 10,
+        "summary": "5 天前你蹲的这版 · 他真的做了钢琴版续篇"
+      }
+    },
+    {
+      "creator_id": "creator-mio",
+      "action_type": "post_sequel",
+      "topic": "mio-tibet",
+      "hours_ago": 6,
+      "payload": {
+        "video_id": "v-mio-tibet-b",
+        "title": "一个人进藏 Ep5 · 丙察察真的走完了",
+        "cover": "https://picsum.photos/seed/mio-tibet/360/640",
+        "preview_seconds": 10,
+        "summary": "12 天前你蹲的下集 · Mio 真的走完了那条路"
+      }
+    },
+    {
+      "creator_id": "creator-ken",
+      "action_type": "series_completed",
+      "topic": "ken-30days",
+      "hours_ago": 10,
+      "payload": {
+        "video_id": "v-ken-d30",
+        "title": "自重训练 Day30 · 俯卧撑从 0 到 30 的那个人",
+        "cover": "https://picsum.photos/seed/ken-finish/360/640",
+        "series_thumbnails": [
+          { "day": 1,  "cover": "https://picsum.photos/seed/ken1/200/300",  "title": "Day1 · 俯卧撑 0 个" },
+          { "day": 10, "cover": "https://picsum.photos/seed/ken10/200/300", "title": "Day10 · 第一次到 5 个" },
+          { "day": 20, "cover": "https://picsum.photos/seed/ken20/200/300", "title": "Day20 · 第一次标准 10 个" },
+          { "day": 25, "cover": "https://picsum.photos/seed/ken25/200/300", "title": "Day25 · 20 个不喘气" },
+          { "day": 30, "cover": "https://picsum.photos/seed/ken30/200/300", "title": "Day30 · 30 个 + 举手告别" }
+        ],
+        "summary": "28 天前你按了稍后再看的那套系列 · 他真的更完了"
+      }
+    },
+    {
+      "creator_id": "creator-yuri",
+      "action_type": "post_sequel",
+      "topic": "yuri-cat-tutorial",
+      "hours_ago": 2,
+      "payload": {
+        "video_id": "v-yuri-cat-tut",
+        "title": "来了来了 · 五分钟水彩猫 · 分步拆解",
+        "cover": "https://picsum.photos/seed/yuri-cat/360/640",
+        "preview_seconds": 10,
+        "summary": "9 天前你蹲的教程 · 她录成分步视频了"
+      }
+    },
+    {
+      "creator_id": "creator-hazel",
+      "action_type": "post_link",
+      "topic": "hazel-tools",
+      "hours_ago": 1,
+      "payload": {
+        "video_id": "v-hazel-kit",
+        "title": "五件入门工具 · 阳台党新手包上架了",
+        "cover": "https://picsum.photos/seed/hazel-kit/360/640",
+        "product": {
+          "name": "阳台党新手五件套（含浇水壶、喷雾、小铲）",
+          "price": "¥88",
+          "original": "¥128",
+          "shop": "榛榛的阳台"
+        },
+        "summary": "你 4 天前蹲的那份清单 · 她自己配好上架了"
       }
     }
   ],
