@@ -69,7 +69,7 @@ runCase('剧本 B · P1 + P3 · 系列网格 · 情感收束「AI 帮你摘了�
   assert.ok(card.pages[0].actions.primary.some((a) => a.label === '续看'));
 });
 
-runCase('剧本 C · P1 + P2 + P3 · 内嵌视频 · 情感收束「爷爷的老战友联系到他了」', () => {
+runCase('剧本 C · P1 + P2 + P3 · 内嵌视频 · 默认情感收束不再写死爷爷', () => {
   const card = buildCard({
     match: mkMatch({
       scriptId: 'C', signal_type: 'comment_intent', raw_text: '蹲后续 爷爷真帅',
@@ -81,9 +81,36 @@ runCase('剧本 C · P1 + P2 + P3 · 内嵌视频 · 情感收束「爷爷的老
   assert.deepEqual(card.pages.map((p) => p.id), ['P1', 'P2', 'P3']);
   assert.equal(card.pages[0].answer.type, 'inline_video');
   assert.equal(card.pages[0].answer.video.preview_seconds, 10);
-  assert.equal(card.pages[0].emotional_close, '爷爷的老战友联系到他了');
+  // 不再硬编码"爷爷" · 默认走通用的"你蹲过的那条 · 她替你接回来了"
+  assert.equal(card.pages[0].emotional_close, '你蹲过的那条 · 她替你接回来了');
+  assert.ok(!card.pages[0].actions.primary.some((a) => /分享给爷爷/.test(a.label)),
+    '非爷爷剧本的默认 CTA 不应含"分享给爷爷"');
   assert.match(card.pages[1].warm_summary, /这件事|回音|惦记/);
   assert.ok(card.pages[2].items.length > 0, 'P3 行为足迹列表非空');
+});
+
+runCase('剧本 payload.cta / emotional_close 优先于默认', () => {
+  const match = mkMatch({
+    scriptId: 'C', signal_type: 'comment_intent', raw_text: '蹲后续 爷爷真帅',
+    daysAgo: 14, action_type: 'post_sequel',
+  });
+  match.action.payload.cta = {
+    primary: [
+      { id: 'play_sequel',   label: '立即观看下集' },
+      { id: 'share_grandpa', label: '分享给爷爷' },
+    ],
+  };
+  match.action.payload.emotional_close = '爷爷的老战友联系到他了';
+  const card = buildCard({
+    match,
+    intentResult: { intent: 'sequel_request', label: '蹲后续', confidence: 0.9, rationale: 'r' },
+    userId: 'demo-user',
+  });
+  assert.equal(card.pages[0].emotional_close, '爷爷的老战友联系到他了');
+  assert.deepEqual(
+    card.pages[0].actions.primary.map((a) => a.label),
+    ['立即观看下集', '分享给爷爷'],
+  );
 });
 
 runCase('P1 情景锚点使用相对时间而非绝对日期', () => {

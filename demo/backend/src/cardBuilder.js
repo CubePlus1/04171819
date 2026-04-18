@@ -53,16 +53,21 @@ function buildAnswer({ scriptId, action }) {
   };
 }
 
-function buildActionsStrip(scriptId) {
-  const shared = {
-    secondary: [
-      { id: 'save',       label: '收藏到「我蹲过的」' },
-      { id: 'not_now',    label: '不感兴趣' },
-    ],
-  };
-  if (scriptId === 'A') return { ...shared, primary: [{ id: 'add_wish', label: '加到清单' }, { id: 'view', label: '看' }] };
-  if (scriptId === 'B') return { ...shared, primary: [{ id: 'resume',   label: '续看' }, { id: 'recap', label: '看前情摘要' }] };
-  return { ...shared, primary: [{ id: 'play', label: '看' }, { id: 'share', label: '分享给爷爷' }] };
+// 按情景给按钮：优先用 action.payload.cta.primary（每条剧本自己写的）
+// 没有时回退到通用的 A/B/C 默认。"分享给爷爷"这种只属于特定剧本 · 不再共享。
+function buildActionsStrip(scriptId, action) {
+  const secondary = [
+    { id: 'save',    label: '收藏到「我蹲过的」' },
+    { id: 'not_now', label: '不感兴趣' },
+  ];
+  const customPrimary = action?.payload?.cta?.primary;
+  if (Array.isArray(customPrimary) && customPrimary.length > 0) {
+    return { primary: customPrimary, secondary };
+  }
+  if (scriptId === 'A') return { primary: [{ id: 'add_wish', label: '加到清单' }, { id: 'view', label: '看' }], secondary };
+  if (scriptId === 'B') return { primary: [{ id: 'resume',   label: '续看' },     { id: 'recap', label: '看前情摘要' }], secondary };
+  // 默认 C：仅看 · 不带"分享给爷爷"
+  return { primary: [{ id: 'play', label: '立即观看' }, { id: 'save_later', label: '下次再看' }], secondary };
 }
 
 function buildP2({ intentResult, signal, creator, action }) {
@@ -115,17 +120,21 @@ export function buildCard({ match, intentResult, userId }) {
   const { signal, action, creator, footprints, scriptId } = match;
   const pagesOrder = SCRIPT_TO_PAGES[scriptId] ?? ['P1'];
 
+  // 情感收束：优先 action.payload.emotional_close · 否则按 scriptId 走通用
+  // （原来 C = "爷爷的老战友联系到他了" 被跨剧本污染 · 现在必须按剧本贴情景）
+  const defaultClose = {
+    A: '当时蹲的，这次替你接住了',
+    B: '你没来得及追完的，这次替你接上了',
+    C: '你蹲过的那条 · 她替你接回来了',
+  }[scriptId] ?? '你念念不忘的 · 接回来了';
+
   const p1 = {
     id: 'P1',
     name: '情景 + 答案',
     context_line: buildContextLine({ signal, creator }),
-    emotional_close: {
-      A: '当时蹲的，这次替你接住了',
-      B: '你没来得及追完的，这次替你接上了',
-      C: '爷爷的老战友联系到他了',
-    }[scriptId] ?? '你念念不忘的，接回来',
+    emotional_close: action?.payload?.emotional_close ?? defaultClose,
     answer: buildAnswer({ scriptId, action }),
-    actions: buildActionsStrip(scriptId),
+    actions: buildActionsStrip(scriptId, action),
     creator,
   };
 
