@@ -26,11 +26,14 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
+// Mobile（<md）下单列展示 · 右侧 AgentPanel 驱动 pipeline 所以不能 unmount
+// 用 hidden md:block 让它继续跑 · 视口里看不到
+// 完整枚举每个 variant · Tailwind JIT 只扫源代码里字面量出现过的 class
 const SPLIT_TO_GRID = {
-  '7-5': { left: 'col-span-7',  right: 'col-span-5'  },
-  '6-6': { left: 'col-span-6',  right: 'col-span-6'  },
-  '8-4': { left: 'col-span-8',  right: 'col-span-4'  },
-  '5-7': { left: 'col-span-5',  right: 'col-span-7'  },
+  '7-5': { left: 'col-span-12 md:col-span-7', right: 'hidden md:block md:col-span-5' },
+  '6-6': { left: 'col-span-12 md:col-span-6', right: 'hidden md:block md:col-span-6' },
+  '8-4': { left: 'col-span-12 md:col-span-8', right: 'hidden md:block md:col-span-4' },
+  '5-7': { left: 'col-span-12 md:col-span-5', right: 'hidden md:block md:col-span-7' },
 };
 
 export default function App() {
@@ -168,7 +171,7 @@ export default function App() {
           <ErrorBanner message={bootState.error} onRetry={handleRetryBoot} />
         )}
 
-        <main className="relative grid flex-1 min-h-0 grid-cols-12 gap-4 px-5 pb-5">
+        <main className="relative grid flex-1 min-h-0 grid-cols-12 gap-4 px-3 pb-3 md:px-5 md:pb-5">
           <motion.section
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -196,7 +199,7 @@ export default function App() {
 
 function Header({ connected, user, onReset, themes, theme, onPickTheme }) {
   return (
-    <header className="relative flex items-center justify-between px-6 pt-5 pb-3 no-select bg-[color:var(--color-stage)]/90 backdrop-blur-md">
+    <header className="relative flex items-center justify-between px-4 pt-4 pb-3 md:px-6 md:pt-5 no-select bg-[color:var(--color-stage)]/90 backdrop-blur-md">
       <div className="flex items-center gap-3">
         <div className="relative h-7 w-7 rounded-full bg-gradient-to-br from-ember to-kiss shadow-card">
           <span className="absolute inset-0 rounded-full bg-ember/20 blur-md" />
@@ -211,7 +214,8 @@ function Header({ connected, user, onReset, themes, theme, onPickTheme }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      {/* 展台控件组 · 手机扫码只为 "看 demo" · md 以下整组隐藏 */}
+      <div className="hidden items-center gap-3 md:flex">
         {user && (
           <span className="pill">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-warmth" aria-hidden="true" />

@@ -38,34 +38,37 @@ export default function ProductPanel({ bootStatus, onAction }) {
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 shrink-0">
+        {/* 展台标签组 · 向评委说明这里是什么 · 手机扫码不需要 */}
+        <div className="hidden items-center gap-2 shrink-0 md:flex">
           <span className="pill bg-kiss/15 text-kiss">产品面板</span>
           <span className="text-[12px] text-stone-200">
             用户视角 · 抖音信息流模拟
           </span>
         </div>
 
-        {/* 进度条 + 统计 · 从视频上挪到这里 · 不再遮挡主内容 */}
+        {/* 进度条 + 统计 · md 以下只保留 "队列+N · 已蹲 N · 新卡片浮现中" */}
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 text-[11px] text-stone-200">
-          <ProgressDots advanced={advanceCount} />
-          <span className="whitespace-nowrap font-medium text-[color:var(--color-text)]">
+          <div className="hidden md:block">
+            <ProgressDots advanced={advanceCount} />
+          </div>
+          <span className="hidden whitespace-nowrap font-medium text-[color:var(--color-text)] md:inline">
             刷 {advanceCount}
           </span>
-          <span className="opacity-40">·</span>
-          <span className="whitespace-nowrap text-[color:var(--color-text-muted)]">
+          <span className="hidden opacity-40 md:inline">·</span>
+          <span className="hidden whitespace-nowrap text-[color:var(--color-text-muted)] md:inline">
             互动 {interactionCount}
           </span>
           {queueLen > 0 && (
             <>
-              <span className="opacity-40">·</span>
+              <span className="hidden opacity-40 md:inline">·</span>
               <span className="whitespace-nowrap font-bold text-[color:var(--color-warmth)]">
                 队列+{queueLen}
               </span>
             </>
           )}
-          <span>已蹲 {cards.length}</span>
+          <span className="whitespace-nowrap">已蹲 {cards.length}</span>
           {spotlightCardId && (
-            <span className="pill bg-ember/15 text-kiss animate-pulse-soft">新卡片浮现中</span>
+            <span className="pill whitespace-nowrap bg-ember/15 text-kiss animate-pulse-soft">新卡片浮现中</span>
           )}
         </div>
       </div>
