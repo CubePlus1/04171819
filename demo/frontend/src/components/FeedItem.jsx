@@ -1,9 +1,11 @@
+import { asset } from '../utils/asset.js';
+
 // Douyin 风格视频卡：全屏封面 + 左下博主信息 + 右侧竖排互动栏 + 底部装饰 tab bar
 export default function FeedItem({ item }) {
   return (
     <div className="feed-snap relative h-full w-full overflow-hidden rounded-2xl bg-black">
       <img
-        src={item.cover}
+        src={asset(item.cover)}
         alt={item.title}
         className="h-full w-full object-cover"
         loading="lazy"

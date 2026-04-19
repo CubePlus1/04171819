@@ -41,6 +41,9 @@ jobs:
         env:
           VITE_MOCK: '1'
           VITE_BASE: /04171819/
+          # 线上走 jsdelivr CDN 图床 · 锁 commit SHA 保证 immutable + 避开 GH Pages 偶发抽风
+          # 本地 dev 不设这个 env · asset() 回退到 vite public/
+          VITE_ASSET_CDN: https://cdn.jsdelivr.net/gh/CubePlus1/04171819@${{ github.sha }}/demo/frontend/public
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v3

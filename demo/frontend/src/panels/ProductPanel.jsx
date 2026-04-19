@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Feed from '../components/Feed.jsx';
 import { useDemoStore } from '../store/useDemoStore.js';
+import { asset } from '../utils/asset.js';
 
 // 从当前 item 里挑一张 cover 做模糊背景层 · 液态玻璃的色彩源泉
 function pickCoverUrl(item) {
@@ -21,7 +22,7 @@ export default function ProductPanel({ bootStatus, onAction }) {
   const interactionCount = useDemoStore((s) => s.interactionCount);
   const queueLen = useDemoStore((s) => s.queue.length);
   const currentItem = useDemoStore((s) => s.currentItem);
-  const coverUrl = pickCoverUrl(currentItem);
+  const coverUrl = asset(pickCoverUrl(currentItem));
 
   const [liveMsg, setLiveMsg] = useState('');
   const lastSpotlightRef = useRef(null);

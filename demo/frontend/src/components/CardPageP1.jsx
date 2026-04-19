@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { asset } from '../utils/asset.js';
 
 function LinkIcon() {
   return (
@@ -46,7 +47,7 @@ function LinkedVideoRow({ title, cover, shape = 'landscape' }) {
         {title}
       </div>
       <div className="fig-thumb" style={thumbStyle}>
-        <img src={cover} alt={title} />
+        <img src={asset(cover)} alt={title} />
       </div>
     </div>
   );

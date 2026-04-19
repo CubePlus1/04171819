@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import CardPageP1 from './CardPageP1.jsx';
 import CardPageP2 from './CardPageP2.jsx';
 import CardPageP3 from './CardPageP3.jsx';
+import { asset } from '../utils/asset.js';
 
 const PAGE_RENDERERS = { P1: CardPageP1, P2: CardPageP2, P3: CardPageP3 };
 
@@ -30,7 +31,7 @@ export default function DunCard({ card, spotlight, onAction }) {
   const pages = card.pages ?? [];
   const active = pages[index] ?? pages[0];
   const Renderer = PAGE_RENDERERS[active?.id] ?? CardPageP1;
-  const bgImg = SCENE_BG[card.script_id] ?? SCENE_BG.A;
+  const bgImg = asset(SCENE_BG[card.script_id] ?? SCENE_BG.A);
 
   const clamp = useCallback((n) => Math.max(0, Math.min(pages.length - 1, n)), [pages.length]);
   const goto = useCallback((n) => setIndex(clamp(n)), [clamp]);
