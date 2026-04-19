@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid meet">
+  <title>蹲到了 · PPT 08 · 收束</title>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FAFAF6"/>
+      <stop offset="1" stop-color="#F1EDE0"/>
+    </linearGradient>
+    <radialGradient id="ambient" cx="0.5" cy="0.55" r="0.6">
+      <stop offset="0" stop-color="#FE2C55" stop-opacity="0.12"/>
+      <stop offset="0.5" stop-color="#FE2C55" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#FE2C55" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="seal" cx="0.35" cy="0.3" r="0.82">
+      <stop offset="0" stop-color="#FF8FA8"/>
+      <stop offset="0.5" stop-color="#FE2C55"/>
+      <stop offset="1" stop-color="#9E0E2E"/>
+    </radialGradient>
+    <filter id="sealGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feFlood flood-color="#FE2C55" flood-opacity="0.55"/>
+      <feComposite in2="SourceAlpha" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#paper)"/>
+  <rect width="1920" height="1080" fill="url(#ambient)"/>
+  <rect width="1920" height="1080" fill="#FFFFFF" opacity="0.02" filter="url(#grain)"/>
+
+  <!-- 顶部：极小的页码 -->
+  <text x="120" y="110" font-size="20" fill="#A6B5A0" opacity="0.7"
+        font-family="'Noto Sans SC',sans-serif" font-weight="600" letter-spacing="6">END · 08</text>
+
+  <!-- 中央：大尺寸粉蜡印 -->
+  <g transform="translate(960, 440)" filter="url(#sealGlow)">
+    <circle r="140" fill="url(#seal)"/>
+    <text y="48" text-anchor="middle" font-size="140" font-weight="900" fill="#FFFFFF"
+          font-family="'Noto Sans SC','PingFang SC',sans-serif" opacity="0.95">蹲</text>
+  </g>
+
+  <!-- 主标 · 极简 -->
+  <text x="960" y="700" text-anchor="middle" font-size="96" fill="#0F1115"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="12">蹲 到 了</text>
+
+  <!-- 核心句 -->
+  <text x="960" y="790" text-anchor="middle" font-size="36" fill="#2A2A2A"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="500" letter-spacing="8">你许过的愿 · 我替你守到兑现</text>
+
+  <!-- 细分割线 -->
+  <line x1="860" y1="830" x2="1060" y2="830" stroke="#FE2C55" stroke-width="1" stroke-opacity="0.5"/>
+
+  <!-- 品牌副标 -->
+  <text x="960" y="880" text-anchor="middle" font-size="18" fill="#78736A"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="400" letter-spacing="8">逆风如解意 · 让每一个「蹲」都有回音</text>
+
+  <!-- 底部页脚 · 极淡 -->
+  <text x="960" y="1020" text-anchor="end" font-size="14" fill="#A6B5A0" opacity="0.55"
+        font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="4">字节 Hackathon · 赛道 3 · 蹲到了</text>
+  <text x="1800" y="1020" text-anchor="end" font-size="14" fill="#A6B5A0"
+        font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="3">08 / 08</text>
+</svg>
