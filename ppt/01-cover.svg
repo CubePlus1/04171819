@@ -3,18 +3,22 @@
   <title>蹲到了 · PPT 01 · 封面</title>
   <defs>
     <linearGradient id="videoBg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1A1410"/>
-      <stop offset="0.5" stop-color="#2D1F18"/>
-      <stop offset="1" stop-color="#0F0A08"/>
+      <stop offset="0" stop-color="#1F1710"/>
+      <stop offset="0.5" stop-color="#2D2218"/>
+      <stop offset="1" stop-color="#100B07"/>
     </linearGradient>
-    <radialGradient id="videoGlow" cx="0.6" cy="0.4" r="0.55">
-      <stop offset="0" stop-color="#FE2C55" stop-opacity="0.28"/>
-      <stop offset="0.5" stop-color="#FE2C55" stop-opacity="0.08"/>
+    <radialGradient id="videoGlow" cx="0.65" cy="0.35" r="0.6">
+      <stop offset="0" stop-color="#FE2C55" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#FE2C55" stop-opacity="0.06"/>
       <stop offset="1" stop-color="#FE2C55" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="videoGlowCool" cx="0.2" cy="0.75" r="0.55">
+      <stop offset="0" stop-color="#C9C2B1" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#C9C2B1" stop-opacity="0"/>
+    </radialGradient>
     <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FAFAF6" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#F1EDE0" stop-opacity="0.9"/>
+      <stop offset="0" stop-color="#FAFAF6" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#F1EDE0" stop-opacity="0.92"/>
     </linearGradient>
     <radialGradient id="seal" cx="0.35" cy="0.3" r="0.8">
       <stop offset="0" stop-color="#FF8FA8"/>
@@ -28,9 +32,9 @@
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="22"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="24"/>
       <feOffset dx="0" dy="14"/>
-      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.38 0"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.4 0"/>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="bubbleBlur">
@@ -43,69 +47,88 @@
     </filter>
   </defs>
 
-  <!-- 深色视频背景 -->
   <rect width="1920" height="1080" fill="url(#videoBg)"/>
   <rect width="1920" height="1080" fill="url(#videoGlow)"/>
+  <rect width="1920" height="1080" fill="url(#videoGlowCool)"/>
   <rect width="1920" height="1080" fill="#FFFFFF" opacity="0.02" filter="url(#grain)"/>
 
-  <!-- 浮动评论气泡（装饰 · 模糊） -->
-  <g opacity="0.35" filter="url(#bubbleBlur)">
+  <!-- 背景评论气泡 · 模糊 -->
+  <g opacity="0.3" filter="url(#bubbleBlur)">
     <g transform="translate(180, 280)">
-      <rect x="0" y="0" width="180" height="56" rx="28" fill="#FE2C55"/>
+      <rect width="180" height="56" rx="28" fill="#FE2C55"/>
       <text x="90" y="37" text-anchor="middle" font-size="22" fill="#FFFFFF"
             font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="600">蹲链接</text>
     </g>
-    <g transform="translate(1560, 230)">
-      <rect x="0" y="0" width="200" height="56" rx="28" fill="#FE2C55"/>
+    <g transform="translate(1560, 250)">
+      <rect width="200" height="56" rx="28" fill="#FE2C55"/>
       <text x="100" y="37" text-anchor="middle" font-size="22" fill="#FFFFFF"
             font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="600">等下集</text>
     </g>
     <g transform="translate(220, 820)">
-      <rect x="0" y="0" width="200" height="56" rx="28" fill="#FE2C55"/>
+      <rect width="200" height="56" rx="28" fill="#FE2C55"/>
       <text x="100" y="37" text-anchor="middle" font-size="22" fill="#FFFFFF"
             font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="600">求教程</text>
     </g>
-    <g transform="translate(1540, 820)">
-      <rect x="0" y="0" width="180" height="56" rx="28" fill="#FE2C55"/>
+    <g transform="translate(1540, 810)">
+      <rect width="180" height="56" rx="28" fill="#FE2C55"/>
       <text x="90" y="37" text-anchor="middle" font-size="22" fill="#FFFFFF"
             font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="600">求链接</text>
     </g>
   </g>
 
-  <!-- 中央玻璃卡片 -->
+  <!-- 前台评论气泡（一个锐利的 · 作为情景锚点） -->
+  <g transform="translate(220, 180)">
+    <rect width="200" height="58" rx="29" fill="#FE2C55"/>
+    <polygon points="40,58 48,75 58,58" fill="#FE2C55"/>
+    <text x="100" y="38" text-anchor="middle" font-size="24" fill="#FFFFFF"
+          font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700">蹲链接</text>
+  </g>
+  <text x="320" y="275" font-size="14" fill="#FAFAF6" opacity="0.45"
+        font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="2">她 · 3 周前</text>
+
+  <!-- 玻璃卡片 -->
   <g filter="url(#cardShadow)">
-    <rect x="460" y="260" width="1000" height="560" rx="28" fill="url(#glass)" stroke="#D9CDB9" stroke-width="1"/>
+    <rect x="440" y="280" width="1040" height="560" rx="28" fill="url(#glass)" stroke="#D9CDB9" stroke-width="1"/>
 
     <!-- 顶部徽章 -->
-    <g transform="translate(820, 320)">
-      <rect x="0" y="0" width="280" height="38" rx="19" fill="#FE2C55" fill-opacity="0.1"/>
-      <text x="140" y="26" text-anchor="middle" font-size="16" fill="#FE2C55"
+    <g transform="translate(800, 326)">
+      <rect width="320" height="36" rx="18" fill="#FE2C55" fill-opacity="0.1"/>
+      <text x="160" y="25" text-anchor="middle" font-size="15" fill="#FE2C55"
             font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="4">履 约 型 内 容 · P1</text>
     </g>
 
     <!-- 主标 -->
-    <text x="960" y="550" text-anchor="middle" font-size="200" fill="#0F1115"
+    <text x="960" y="530" text-anchor="middle" font-size="200" fill="#2A2420"
           font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="10">蹲到了</text>
 
-    <!-- 核心句 -->
-    <text x="960" y="650" text-anchor="middle" font-size="52" fill="#2A2A2A"
-          font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="500" letter-spacing="8">刷 到 即 成 立</text>
+    <!-- 核心句（替换） -->
+    <text x="960" y="635" text-anchor="middle" font-size="40" fill="#2A2420"
+          font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="4">不是猜你想要什么 · 是<tspan fill="#FE2C55">兑现你说过的话</tspan></text>
+
+    <!-- 三锚词 -->
+    <g transform="translate(960, 720)" text-anchor="middle">
+      <text x="0" y="0" font-size="18" fill="#78736A"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="500" letter-spacing="8">履约型内容 · 刷到即成立 · 一人一张</text>
+    </g>
+
+    <!-- 分割线 -->
+    <line x1="890" y1="760" x2="1030" y2="760" stroke="#D9CDB9" stroke-width="1"/>
 
     <!-- 副标 -->
-    <text x="960" y="735" text-anchor="middle" font-size="24" fill="#78736A"
-          font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="400" letter-spacing="6">不是猜你喜欢 · 是兑现你说过的话</text>
+    <text x="960" y="800" text-anchor="middle" font-size="16" fill="#A6B5A0"
+          font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="4">DELIVERY CONTENT · 履约型内容</text>
   </g>
 
-  <!-- 粉蜡印 · 挂在卡片右下 -->
-  <g transform="translate(1400, 790)" filter="url(#sealGlow)">
-    <circle r="60" fill="url(#seal)"/>
-    <text y="22" text-anchor="middle" font-size="60" font-weight="900" fill="#FFFFFF"
+  <!-- 粉蜡印 -->
+  <g transform="translate(1400, 810)" filter="url(#sealGlow)">
+    <circle r="56" fill="url(#seal)"/>
+    <text y="20" text-anchor="middle" font-size="56" font-weight="900" fill="#FFFFFF"
           font-family="'Noto Sans SC','PingFang SC',sans-serif" opacity="0.95">蹲</text>
   </g>
 
-  <!-- 底部页脚 -->
-  <text x="120" y="1020" font-size="18" fill="#FFFFFF" opacity="0.4"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="400" letter-spacing="4">字节 Hackathon · 赛道 3 · 蹲到了</text>
-  <text x="1800" y="1020" text-anchor="end" font-size="18" fill="#FFFFFF" opacity="0.45"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="400" letter-spacing="3">01 / 08</text>
+  <!-- 底部 -->
+  <text x="120" y="1020" font-size="16" fill="#FAFAF6" opacity="0.42"
+        font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="4">字节 Hackathon · 赛道 3 · 蹲到了</text>
+  <text x="1800" y="1020" text-anchor="end" font-size="16" fill="#FAFAF6" opacity="0.45"
+        font-family="'Inter',sans-serif" font-weight="500" letter-spacing="3">01 / 08</text>
 </svg>

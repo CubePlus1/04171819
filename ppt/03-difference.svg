@@ -1,38 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid meet">
-  <title>蹲到了 · PPT 03 · 定义</title>
+  <title>蹲到了 · PPT 03 · 差异 · 这不是推荐 是履约</title>
   <defs>
     <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FAFAF6"/>
       <stop offset="1" stop-color="#F1EDE0"/>
     </linearGradient>
-    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="cardLight" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FFFFFF"/>
       <stop offset="1" stop-color="#FAFAF6"/>
     </linearGradient>
-    <linearGradient id="thumb" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2A2420"/>
-      <stop offset="1" stop-color="#1A1410"/>
+    <linearGradient id="cardHero" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FFEEF3"/>
     </linearGradient>
-    <radialGradient id="thumbGlow" cx="0.3" cy="0.3" r="0.7">
-      <stop offset="0" stop-color="#FE2C55" stop-opacity="0.25"/>
-      <stop offset="1" stop-color="#FE2C55" stop-opacity="0"/>
-    </radialGradient>
     <radialGradient id="seal" cx="0.35" cy="0.3" r="0.8">
       <stop offset="0" stop-color="#FF8FA8"/>
       <stop offset="0.5" stop-color="#FE2C55"/>
       <stop offset="1" stop-color="#9E0E2E"/>
     </radialGradient>
     <filter id="sealGlow" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
       <feFlood flood-color="#FE2C55" flood-opacity="0.5"/>
       <feComposite in2="SourceAlpha" operator="in"/>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="16"/>
-      <feOffset dx="0" dy="10"/>
-      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.22 0"/>
+    <filter id="cardShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+      <feOffset dx="0" dy="6"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"/>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="grain">
@@ -45,107 +41,119 @@
   <rect width="1920" height="1080" fill="url(#paper)"/>
   <rect width="1920" height="1080" fill="#FFFFFF" opacity="0.02" filter="url(#grain)"/>
 
-  <!-- 页码 / 标题 -->
-  <text x="120" y="110" font-size="20" fill="#A6B5A0"
-        font-family="'Noto Sans SC',sans-serif" font-weight="600" letter-spacing="6">CONCEPT · 03</text>
-  <text x="120" y="180" font-size="42" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="2">我们提出一种新内容</text>
+  <!-- 顶部 -->
+  <text x="120" y="110" font-size="18" fill="#A6B5A0"
+        font-family="'Inter',sans-serif" font-weight="700" letter-spacing="6">DIFFERENCE · 03</text>
+  <text x="120" y="180" font-size="42" fill="#2A2420"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="2">这不是推荐 · 是履约</text>
 
-  <!-- 左侧：核心定义 -->
-  <text x="120" y="420" font-size="140" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="6">履约型</text>
-  <text x="120" y="560" font-size="140" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="6">内容</text>
-  <text x="120" y="620" font-size="24" fill="#A6B5A0"
-        font-family="'Inter','Noto Sans SC',sans-serif" font-weight="500" letter-spacing="8">DELIVERY CONTENT</text>
+  <!-- 核心句 -->
+  <text x="960" y="340" text-anchor="middle" font-size="96" fill="#2A2420"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="8">推荐猜你喜欢 · 履约<tspan fill="#FE2C55">兑现你说过</tspan></text>
 
-  <!-- 分割线 -->
-  <line x1="120" y1="680" x2="340" y2="680" stroke="#FE2C55" stroke-width="4" stroke-linecap="round"/>
+  <!-- 四格对照 -->
+  <g transform="translate(120, 470)">
+    <!-- 推荐 -->
+    <g filter="url(#cardShadow)">
+      <rect width="400" height="440" rx="22" fill="url(#cardLight)" stroke="#D9CDB9" stroke-width="1"/>
+      <!-- 图标 · 数据节点 -->
+      <g transform="translate(44, 60)" opacity="0.6">
+        <circle cx="10" cy="10" r="4" fill="#A6B5A0"/>
+        <circle cx="40" cy="28" r="6" fill="#A6B5A0"/>
+        <circle cx="76" cy="10" r="5" fill="#A6B5A0"/>
+        <circle cx="110" cy="32" r="4" fill="#A6B5A0"/>
+        <line x1="10" y1="10" x2="40" y2="28" stroke="#A6B5A0" stroke-width="1"/>
+        <line x1="40" y1="28" x2="76" y2="10" stroke="#A6B5A0" stroke-width="1"/>
+        <line x1="76" y1="10" x2="110" y2="32" stroke="#A6B5A0" stroke-width="1"/>
+      </g>
+      <text x="44" y="170" font-size="20" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="4">RECOMMEND</text>
+      <text x="44" y="225" font-size="72" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900">推荐</text>
+      <line x1="44" y1="260" x2="100" y2="260" stroke="#D9CDB9" stroke-width="2"/>
+      <text x="44" y="315" font-size="24" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="500">= 可能喜欢</text>
+      <text x="44" y="360" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">基于群体画像 · 概率预测</text>
+      <text x="44" y="395" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">由系统发起 · 不需你说</text>
+    </g>
 
-  <!-- 三条辅助说明 -->
-  <g transform="translate(120, 730)">
-    <text x="0" y="0" font-size="24" fill="#44403B"
-          font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="2">不是 <tspan fill="#A6B5A0">推荐</tspan> — 猜你喜欢</text>
-    <text x="0" y="50" font-size="24" fill="#44403B"
-          font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="2">不是 <tspan fill="#A6B5A0">提醒</tspan> — 博主更新了</text>
-    <text x="0" y="100" font-size="26" fill="#0F1115"
-          font-family="'Noto Sans SC',sans-serif" font-weight="700" letter-spacing="2">是 <tspan fill="#FE2C55">你说过想要的 · 我替你接回来了</tspan></text>
+    <!-- 收藏 -->
+    <g transform="translate(427, 0)" filter="url(#cardShadow)">
+      <rect width="400" height="440" rx="22" fill="url(#cardLight)" stroke="#D9CDB9" stroke-width="1"/>
+      <!-- 图标 · 书签 -->
+      <g transform="translate(44, 60)" opacity="0.6">
+        <path d="M 0,0 L 0,48 L 18,36 L 36,48 L 36,0 Z" fill="#A6B5A0"/>
+      </g>
+      <text x="44" y="170" font-size="20" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="4">BOOKMARK</text>
+      <text x="44" y="225" font-size="72" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900">收藏</text>
+      <line x1="44" y1="260" x2="100" y2="260" stroke="#D9CDB9" stroke-width="2"/>
+      <text x="44" y="315" font-size="24" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="500">= 自己回找</text>
+      <text x="44" y="360" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">需要主动操作 · pull 型</text>
+      <text x="44" y="395" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">忘了也不会被送回来</text>
+    </g>
+
+    <!-- 提醒 -->
+    <g transform="translate(854, 0)" filter="url(#cardShadow)">
+      <rect width="400" height="440" rx="22" fill="url(#cardLight)" stroke="#D9CDB9" stroke-width="1"/>
+      <!-- 图标 · 铃铛 -->
+      <g transform="translate(44, 60)" opacity="0.6">
+        <path d="M 24,0 C 14,0 8,8 8,18 L 8,30 C 8,36 4,40 0,44 L 48,44 C 44,40 40,36 40,30 L 40,18 C 40,8 34,0 24,0 Z" fill="none" stroke="#A6B5A0" stroke-width="2"/>
+        <circle cx="24" cy="50" r="4" fill="#A6B5A0"/>
+      </g>
+      <text x="44" y="170" font-size="20" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="4">NOTIFY</text>
+      <text x="44" y="225" font-size="72" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900">提醒</text>
+      <line x1="44" y1="260" x2="100" y2="260" stroke="#D9CDB9" stroke-width="2"/>
+      <text x="44" y="315" font-size="24" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="500">= 主动订阅</text>
+      <text x="44" y="360" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">要你先设 · 工具型</text>
+      <text x="44" y="395" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">没订阅就不会通知</text>
+    </g>
+
+    <!-- 蹲到了（主角卡） -->
+    <g transform="translate(1281, 0)" filter="url(#cardShadow)">
+      <rect width="400" height="440" rx="22" fill="url(#cardHero)" stroke="#FE2C55" stroke-width="1.5" stroke-opacity="0.5"/>
+      <!-- 图标 · 信封 + 蜡印 -->
+      <g transform="translate(44, 50)">
+        <rect y="8" width="76" height="52" rx="4" fill="none" stroke="#FE2C55" stroke-width="2"/>
+        <polygon points="0,8 38,40 76,8" fill="none" stroke="#FE2C55" stroke-width="2"/>
+        <g transform="translate(56, 42)" filter="url(#sealGlow)">
+          <circle r="16" fill="url(#seal)"/>
+          <text y="5" text-anchor="middle" font-size="14" font-weight="900" fill="#FFFFFF"
+                font-family="'Noto Sans SC',sans-serif">蹲</text>
+        </g>
+      </g>
+      <text x="44" y="170" font-size="20" fill="#FE2C55"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="4">DELIVERY</text>
+      <text x="44" y="225" font-size="72" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900">蹲到了</text>
+      <line x1="44" y1="260" x2="100" y2="260" stroke="#FE2C55" stroke-width="2.5"/>
+      <text x="44" y="315" font-size="24" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="700">= 忘了也会回来</text>
+      <text x="44" y="360" font-size="15" fill="#44403B"
+            font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="1">基于你说过的话 · push 型</text>
+      <text x="44" y="395" font-size="15" fill="#44403B"
+            font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="1">不需任何操作 · 刷到即成立</text>
+    </g>
   </g>
 
-  <!-- 右侧：信息流卡片 mockup -->
-  <g transform="translate(1120, 200)" filter="url(#cardShadow)">
-    <!-- 卡片主体 -->
-    <rect x="0" y="0" width="620" height="720" rx="28" fill="url(#card)" stroke="#D9CDB9" stroke-width="1.5"/>
+  <!-- 底部一句话收束 · 再切一刀 -->
+  <text x="960" y="990" text-anchor="middle" font-size="18" fill="#A6B5A0"
+        font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="6">前三者 · 在回答"你可能要什么" · 蹲到了 · 在回答"你已经说过想要的那个"</text>
 
-    <!-- 卡片顶部徽章 -->
-    <g transform="translate(30, 30)">
-      <rect x="0" y="0" width="160" height="32" rx="16" fill="#FE2C55" fill-opacity="0.1"/>
-      <circle cx="18" cy="16" r="4" fill="#FE2C55"/>
-      <text x="30" y="22" font-size="14" fill="#FE2C55"
-            font-family="'Noto Sans SC',sans-serif" font-weight="700" letter-spacing="2">履约 · 蹲到了</text>
-    </g>
-    <text x="590" y="52" text-anchor="end" font-size="13" fill="#A6B5A0"
-          font-family="'Noto Sans SC',sans-serif" font-weight="400">刚刚</text>
-
-    <!-- 视频缩略图位 -->
-    <g transform="translate(30, 90)">
-      <rect x="0" y="0" width="560" height="330" rx="18" fill="url(#thumb)"/>
-      <rect x="0" y="0" width="560" height="330" rx="18" fill="url(#thumbGlow)"/>
-      <!-- 播放按钮 -->
-      <circle cx="280" cy="165" r="42" fill="#FFFFFF" fill-opacity="0.15" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.5"/>
-      <polygon points="268,145 268,185 302,165" fill="#FFFFFF" opacity="0.9"/>
-      <!-- 视频角标 -->
-      <rect x="20" y="280" width="70" height="28" rx="14" fill="#000000" fill-opacity="0.45"/>
-      <text x="55" y="299" text-anchor="middle" font-size="13" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="500">0:28</text>
-    </g>
-
-    <!-- 文案 -->
-    <g transform="translate(30, 460)">
-      <text x="0" y="0" font-size="26" fill="#0F1115"
-            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="0.5">你 3 周前蹲的那件红豆毛衣</text>
-      <text x="0" y="40" font-size="26" fill="#0F1115"
-            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="0.5">她今天补了链接</text>
-      <!-- 原评论引用 -->
-      <g transform="translate(0, 70)">
-        <rect x="0" y="0" width="560" height="56" rx="12" fill="#F1EDE0"/>
-        <text x="20" y="26" font-size="14" fill="#78736A"
-              font-family="'Noto Sans SC',sans-serif" font-weight="400">你 3 周前说 ·</text>
-        <text x="20" y="46" font-size="16" fill="#0F1115"
-              font-family="'Noto Sans SC',sans-serif" font-weight="600">"好看 蹲一个"</text>
-      </g>
-
-      <!-- 底部统计 -->
-      <g transform="translate(0, 160)">
-        <text x="0" y="0" font-size="13" fill="#A6B5A0"
-              font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">@红豆心意 · 127 人与你一起蹲到</text>
-      </g>
-
-      <!-- CTA -->
-      <g transform="translate(0, 190)">
-        <rect x="0" y="0" width="250" height="44" rx="22" fill="#FE2C55"/>
-        <text x="125" y="28" text-anchor="middle" font-size="16" fill="#FFFFFF"
-              font-family="'Noto Sans SC',sans-serif" font-weight="700" letter-spacing="2">看一下 →</text>
-      </g>
-    </g>
-
-    <!-- 粉蜡印 · 卡片右下 -->
-    <g transform="translate(540, 650)" filter="url(#sealGlow)">
-      <circle r="36" fill="url(#seal)"/>
-      <text y="13" text-anchor="middle" font-size="34" font-weight="900" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" opacity="0.95">蹲</text>
-    </g>
-  </g>
-
-  <!-- 右上角悬浮标签 · "无输入 · 一人一张 · 基于过去" -->
-  <g transform="translate(1120, 960)" opacity="0.9">
-    <text x="0" y="0" font-size="16" fill="#78736A"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="4">无输入 · 一人一张 · 基于过去</text>
-  </g>
-
-  <!-- 底部页脚 -->
-  <text x="120" y="1020" font-size="16" fill="#A6B5A0"
+  <!-- 页脚 -->
+  <text x="120" y="1050" font-size="14" fill="#A6B5A0"
         font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="4">蹲到了 · 履约型内容</text>
-  <text x="1800" y="1020" text-anchor="end" font-size="16" fill="#A6B5A0"
-        font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="3">03 / 08</text>
+  <text x="1800" y="1050" text-anchor="end" font-size="14" fill="#A6B5A0"
+        font-family="'Inter',sans-serif" font-weight="500" letter-spacing="3">03 / 08</text>
 </svg>

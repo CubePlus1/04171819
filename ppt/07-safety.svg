@@ -1,40 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid meet">
-  <title>蹲到了 · PPT 07 · 可行性 · Demo 已在跑</title>
+  <title>蹲到了 · PPT 07 · 风控 · 记住你 但不打扰你</title>
   <defs>
     <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FAFAF6"/>
       <stop offset="1" stop-color="#F1EDE0"/>
     </linearGradient>
-    <linearGradient id="phoneBg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FAFAF6"/>
-      <stop offset="1" stop-color="#EEECE2"/>
-    </linearGradient>
-    <linearGradient id="cardInner" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="chip" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FFFFFF"/>
       <stop offset="1" stop-color="#FAFAF6"/>
     </linearGradient>
-    <radialGradient id="seal" cx="0.35" cy="0.3" r="0.8">
-      <stop offset="0" stop-color="#FF8FA8"/>
-      <stop offset="0.5" stop-color="#FE2C55"/>
-      <stop offset="1" stop-color="#9E0E2E"/>
-    </radialGradient>
-    <filter id="sealGlow" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
-      <feFlood flood-color="#FE2C55" flood-opacity="0.5"/>
-      <feComposite in2="SourceAlpha" operator="in"/>
-      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="phoneShadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="24"/>
-      <feOffset dx="0" dy="12"/>
-      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.25 0"/>
-      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="chipShadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
-      <feOffset dx="0" dy="4"/>
-      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0"/>
+    <filter id="cardShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+      <feOffset dx="0" dy="5"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.1 0"/>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="grain">
@@ -48,166 +27,86 @@
   <rect width="1920" height="1080" fill="#FFFFFF" opacity="0.02" filter="url(#grain)"/>
 
   <!-- 顶部 -->
-  <text x="120" y="110" font-size="20" fill="#A6B5A0"
-        font-family="'Noto Sans SC',sans-serif" font-weight="600" letter-spacing="6">FEASIBILITY · 07</text>
-  <text x="120" y="180" font-size="44" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="2">Demo 已在跑 · 现在就能上线</text>
+  <text x="120" y="110" font-size="18" fill="#A6B5A0"
+        font-family="'Inter',sans-serif" font-weight="700" letter-spacing="6">RESPECT · 07</text>
+  <text x="120" y="180" font-size="42" fill="#2A2420"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="2">记住你 · 但不打扰你</text>
 
-  <!-- 左侧：核心句 -->
-  <text x="120" y="360" font-size="120" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="6">技术</text>
-  <text x="120" y="490" font-size="120" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="6">不是愿景</text>
-  <text x="120" y="620" font-size="120" fill="#FE2C55"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="6">是现在</text>
+  <!-- 核心句 -->
+  <text x="960" y="340" text-anchor="middle" font-size="120" fill="#2A2420"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="8">每一次履约 · <tspan fill="#FE2C55">都可以被拒绝</tspan></text>
 
-  <!-- 实时运行指示 -->
-  <g transform="translate(120, 680)">
-    <circle cx="10" cy="10" r="6" fill="#22C55E"/>
-    <circle cx="10" cy="10" r="12" fill="#22C55E" fill-opacity="0.25"/>
-    <text x="30" y="15" font-size="18" fill="#22C55E"
-          font-family="'Inter',sans-serif" font-weight="700" letter-spacing="4">LIVE · REAL-TIME DEMO</text>
-  </g>
-
-  <!-- 左侧三个能力标签 -->
-  <g transform="translate(120, 760)">
-    <g filter="url(#chipShadow)">
-      <rect x="0" y="0" width="200" height="52" rx="26" fill="#FFFFFF" stroke="#D9CDB9" stroke-width="1"/>
-      <circle cx="24" cy="26" r="8" fill="#22C55E"/>
-      <path d="M 20,26 L 23,29 L 28,23" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="44" y="32" font-size="16" fill="#0F1115"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">语义识别层</text>
-    </g>
-    <g transform="translate(220, 0)" filter="url(#chipShadow)">
-      <rect x="0" y="0" width="200" height="52" rx="26" fill="#FFFFFF" stroke="#D9CDB9" stroke-width="1"/>
-      <circle cx="24" cy="26" r="8" fill="#22C55E"/>
-      <path d="M 20,26 L 23,29 L 28,23" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="44" y="32" font-size="16" fill="#0F1115"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">意图 × 动作匹配</text>
-    </g>
-    <g transform="translate(440, 0)" filter="url(#chipShadow)">
-      <rect x="0" y="0" width="200" height="52" rx="26" fill="#FFFFFF" stroke="#D9CDB9" stroke-width="1"/>
-      <circle cx="24" cy="26" r="8" fill="#22C55E"/>
-      <path d="M 20,26 L 23,29 L 28,23" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="44" y="32" font-size="16" fill="#0F1115"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">信息流插卡</text>
-    </g>
-  </g>
-
-  <!-- 底部隐形回答：语义识别的细节（Q3：伪 AI） -->
-  <g transform="translate(120, 860)">
-    <text x="0" y="0" font-size="14" fill="#A6B5A0"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="2">能区分 ·</text>
-    <text x="65" y="0" font-size="14" fill="#0F1115"
-          font-family="'Noto Sans SC',sans-serif" font-weight="700">"蹲下集"</text>
-    <text x="130" y="0" font-size="14" fill="#A6B5A0"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500">(内容期待)</text>
-    <text x="222" y="0" font-size="14" fill="#A6B5A0"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500">≠</text>
-    <text x="245" y="0" font-size="14" fill="#0F1115"
-          font-family="'Noto Sans SC',sans-serif" font-weight="700">"蹲一下"</text>
-    <text x="310" y="0" font-size="14" fill="#A6B5A0"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500">(口头禅)</text>
-  </g>
-
-  <!-- 右侧：手机真实 Demo -->
-  <g transform="translate(1120, 140)" filter="url(#phoneShadow)">
-    <!-- 手机边框 -->
-    <rect x="0" y="0" width="420" height="820" rx="50" fill="#1A1410"/>
-    <!-- 屏幕 -->
-    <rect x="14" y="14" width="392" height="792" rx="40" fill="url(#phoneBg)"/>
-    <!-- 刘海 -->
-    <rect x="160" y="26" width="100" height="24" rx="12" fill="#000000"/>
-
-    <!-- 顶部状态 -->
-    <text x="40" y="80" font-size="13" fill="#0F1115"
-          font-family="'Inter',sans-serif" font-weight="700">9:41</text>
-
-    <!-- 顶部 tab -->
-    <g transform="translate(40, 110)">
-      <text x="0" y="0" font-size="14" fill="#0F1115" opacity="0.55"
-            font-family="'Noto Sans SC',sans-serif" font-weight="500">关注</text>
-      <text x="80" y="0" font-size="14" fill="#FE2C55"
-            font-family="'Noto Sans SC',sans-serif" font-weight="700">推荐</text>
-      <line x1="78" y1="10" x2="112" y2="10" stroke="#FE2C55" stroke-width="2" stroke-linecap="round"/>
-    </g>
-
-    <!-- 卡片主体 · 履约卡 -->
-    <g transform="translate(40, 160)">
-      <rect x="0" y="0" width="340" height="500" rx="20" fill="url(#cardInner)" stroke="#D9CDB9" stroke-width="1"/>
-      <!-- 徽章 -->
-      <rect x="16" y="16" width="130" height="28" rx="14" fill="#FE2C55" fill-opacity="0.1"/>
-      <circle cx="30" cy="30" r="3.5" fill="#FE2C55"/>
-      <text x="40" y="36" font-size="12" fill="#FE2C55"
-            font-family="'Noto Sans SC',sans-serif" font-weight="700" letter-spacing="1.5">履约 · 蹲到了</text>
-      <text x="326" y="36" text-anchor="end" font-size="11" fill="#A6B5A0"
-            font-family="'Noto Sans SC',sans-serif">刚刚</text>
-
-      <!-- 视频缩略 -->
-      <rect x="16" y="58" width="308" height="210" rx="12" fill="#1A1410"/>
-      <rect x="16" y="58" width="308" height="210" rx="12" fill="url(#seal)" fill-opacity="0.08"/>
-      <circle cx="170" cy="163" r="26" fill="#FFFFFF" fill-opacity="0.15"/>
-      <polygon points="163,150 163,176 186,163" fill="#FFFFFF" opacity="0.9"/>
-      <!-- 时长 -->
-      <rect x="30" y="240" width="50" height="20" rx="10" fill="#000000" fill-opacity="0.45"/>
-      <text x="55" y="253" text-anchor="middle" font-size="11" fill="#FFFFFF"
-            font-family="'Inter',sans-serif" font-weight="500">0:28</text>
-
-      <!-- 标题 -->
-      <text x="16" y="298" font-size="17" fill="#0F1115"
-            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700">你 3 周前蹲的那件毛衣</text>
-      <text x="16" y="322" font-size="17" fill="#0F1115"
-            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700">她今天补了链接</text>
-
-      <!-- 原评论 -->
-      <rect x="16" y="340" width="308" height="48" rx="10" fill="#F1EDE0"/>
-      <text x="30" y="360" font-size="11" fill="#78736A"
-            font-family="'Noto Sans SC',sans-serif">你 3 周前 ·</text>
-      <text x="30" y="378" font-size="13" fill="#0F1115"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">"好看 蹲一个"</text>
-
-      <!-- CTA -->
-      <rect x="16" y="408" width="140" height="36" rx="18" fill="#FE2C55"/>
-      <text x="86" y="430" text-anchor="middle" font-size="13" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="700" letter-spacing="1">看一下 →</text>
-      <rect x="170" y="408" width="90" height="36" rx="18" fill="none" stroke="#D9CDB9" stroke-width="1.2"/>
-      <text x="215" y="430" text-anchor="middle" font-size="12" fill="#78736A"
-            font-family="'Noto Sans SC',sans-serif" font-weight="500">不感兴趣</text>
-
-      <!-- 蜡印 -->
-      <g transform="translate(294, 450)" filter="url(#sealGlow)">
-        <circle r="28" fill="url(#seal)"/>
-        <text y="10" text-anchor="middle" font-size="26" font-weight="900" fill="#FFFFFF"
-              font-family="'Noto Sans SC',sans-serif" opacity="0.95">蹲</text>
+  <!-- 四个控制签 · 2x2 -->
+  <g transform="translate(260, 470)">
+    <!-- 控制 1 · 只对明示意图触发 -->
+    <g filter="url(#cardShadow)">
+      <rect width="680" height="180" rx="22" fill="url(#chip)" stroke="#D9CDB9" stroke-width="1"/>
+      <!-- 开关 -->
+      <g transform="translate(40, 70)">
+        <rect width="64" height="36" rx="18" fill="#FE2C55"/>
+        <circle cx="46" cy="18" r="14" fill="#FFFFFF"/>
       </g>
+      <text x="130" y="76" font-size="13" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">CONTROL 01</text>
+      <text x="130" y="114" font-size="26" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700">只对明示意图触发</text>
+      <text x="130" y="148" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400">"蹲 / 求 / 等" 才算 · 沉默观众不进入池</text>
     </g>
 
-    <!-- 底部导航 -->
-    <g transform="translate(40, 720)">
-      <text x="0" y="0" font-size="11" fill="#0F1115"
-            font-family="'Noto Sans SC',sans-serif" font-weight="700">首页</text>
-      <text x="70" y="0" font-size="11" fill="#0F1115" opacity="0.55"
-            font-family="'Noto Sans SC',sans-serif" font-weight="500">朋友</text>
-      <rect x="148" y="-18" width="44" height="26" rx="13" fill="#FE2C55"/>
-      <text x="170" y="0" text-anchor="middle" font-size="16" fill="#FFFFFF" font-weight="700">+</text>
-      <text x="220" y="0" font-size="11" fill="#0F1115" opacity="0.55"
-            font-family="'Noto Sans SC',sans-serif" font-weight="500">消息</text>
-      <text x="290" y="0" font-size="11" fill="#0F1115" opacity="0.55"
-            font-family="'Noto Sans SC',sans-serif" font-weight="500">我</text>
+    <!-- 控制 2 · 同一主题只出现一次 -->
+    <g transform="translate(720, 0)" filter="url(#cardShadow)">
+      <rect width="680" height="180" rx="22" fill="url(#chip)" stroke="#D9CDB9" stroke-width="1"/>
+      <g transform="translate(40, 70)">
+        <rect width="64" height="36" rx="18" fill="#FE2C55"/>
+        <circle cx="46" cy="18" r="14" fill="#FFFFFF"/>
+      </g>
+      <text x="130" y="76" font-size="13" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">CONTROL 02</text>
+      <text x="130" y="114" font-size="26" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700">同一主题只出现一次</text>
+      <text x="130" y="148" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400">去重 · 频次上限 · 不会反复轰炸</text>
+    </g>
+
+    <!-- 控制 3 · 有时间新鲜度窗口 -->
+    <g transform="translate(0, 200)" filter="url(#cardShadow)">
+      <rect width="680" height="180" rx="22" fill="url(#chip)" stroke="#D9CDB9" stroke-width="1"/>
+      <g transform="translate(40, 70)">
+        <rect width="64" height="36" rx="18" fill="#FE2C55"/>
+        <circle cx="46" cy="18" r="14" fill="#FFFFFF"/>
+      </g>
+      <text x="130" y="76" font-size="13" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">CONTROL 03</text>
+      <text x="130" y="114" font-size="26" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700">时间新鲜度窗口</text>
+      <text x="130" y="148" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400">太久的 · 不再回接 · 不打扰过期愿望</text>
+    </g>
+
+    <!-- 控制 4 · 一键不感兴趣 -->
+    <g transform="translate(720, 200)" filter="url(#cardShadow)">
+      <rect width="680" height="180" rx="22" fill="url(#chip)" stroke="#D9CDB9" stroke-width="1"/>
+      <g transform="translate(40, 70)">
+        <rect width="64" height="36" rx="18" fill="#FE2C55"/>
+        <circle cx="46" cy="18" r="14" fill="#FFFFFF"/>
+      </g>
+      <text x="130" y="76" font-size="13" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">CONTROL 04</text>
+      <text x="130" y="114" font-size="26" fill="#2A2420"
+            font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700">一键「不感兴趣」</text>
+      <text x="130" y="148" font-size="15" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400">她说不要 · 主题就降权 · 当作改了心意</text>
     </g>
   </g>
 
-  <!-- 右侧浮动标签：实时连接 -->
-  <g transform="translate(1640, 220)" opacity="0.85">
-    <rect x="0" y="0" width="200" height="40" rx="20" fill="#0F1115"/>
-    <circle cx="22" cy="20" r="5" fill="#22C55E"/>
-    <text x="40" y="25" font-size="13" fill="#FFFFFF"
-          font-family="'Inter',sans-serif" font-weight="600" letter-spacing="2">WS · CONNECTED</text>
-  </g>
+  <!-- 底部隐形回答 Q2 + Q4 + Q5 -->
+  <text x="960" y="980" text-anchor="middle" font-size="18" fill="#A6B5A0"
+        font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="6">不是召回 · 不是推送 · 不是监视 · 是一封可以被撤回的信</text>
 
   <!-- 页脚 -->
-  <text x="120" y="1020" font-size="16" fill="#A6B5A0"
+  <text x="120" y="1040" font-size="14" fill="#A6B5A0"
         font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="4">蹲到了 · 履约型内容</text>
-  <text x="1800" y="1020" text-anchor="end" font-size="16" fill="#A6B5A0"
-        font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="3">07 / 08</text>
+  <text x="1800" y="1040" text-anchor="end" font-size="14" fill="#A6B5A0"
+        font-family="'Inter',sans-serif" font-weight="500" letter-spacing="3">07 / 08</text>
 </svg>
