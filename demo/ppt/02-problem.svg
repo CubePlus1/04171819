@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid meet">
-  <title>蹲到了 · PPT 02 · 痛点</title>
+  <title>蹲到了 · PPT 02 · 问题</title>
   <defs>
     <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FAFAF6"/>
       <stop offset="1" stop-color="#F1EDE0"/>
     </linearGradient>
-    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#FE2C55" stop-opacity="0.9"/>
-      <stop offset="0.5" stop-color="#FE2C55" stop-opacity="0.4"/>
-      <stop offset="1" stop-color="#A6B5A0" stop-opacity="0.15"/>
+    <linearGradient id="frameFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#D9CDB9" stop-opacity="0.3"/>
+      <stop offset="0.5" stop-color="#A6B5A0" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#FE2C55" stop-opacity="0.18"/>
     </linearGradient>
     <filter id="grain">
       <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/>
@@ -17,107 +17,122 @@
       <feComposite in2="SourceGraphic" operator="in"/>
     </filter>
     <filter id="softShadow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
-      <feOffset dx="0" dy="3"/>
-      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.12 0"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="4"/>
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.14 0"/>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+    <marker id="tinyArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,2 L10,6 L0,10" fill="none" stroke="#A6B5A0" stroke-width="1.5"/>
+    </marker>
   </defs>
 
-  <!-- 背景 -->
   <rect width="1920" height="1080" fill="url(#paper)"/>
+  <rect width="1920" height="1080" fill="url(#frameFade)"/>
   <rect width="1920" height="1080" fill="#FFFFFF" opacity="0.02" filter="url(#grain)"/>
 
-  <!-- 顶部页码 · 标题 -->
-  <text x="120" y="110" font-size="20" fill="#A6B5A0"
-        font-family="'Noto Sans SC',sans-serif" font-weight="600" letter-spacing="6">PROBLEM · 02</text>
-  <text x="120" y="180" font-size="48" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="2">评论区的承诺 · 90% 消失在信息流</text>
+  <!-- 顶部 -->
+  <text x="120" y="110" font-size="18" fill="#A6B5A0"
+        font-family="'Inter',sans-serif" font-weight="700" letter-spacing="6">PROBLEM · 02</text>
+  <text x="120" y="180" font-size="42" fill="#2A2420"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="700" letter-spacing="2">你留过一句话 · 平台通常接不住</text>
 
   <!-- 核心句 -->
-  <text x="120" y="320" font-size="150" fill="#0F1115"
-        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="6">你蹲过 · 但你忘了</text>
+  <text x="120" y="360" font-size="160" fill="#2A2420"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="8">当时想要</text>
+  <text x="120" y="520" font-size="160" fill="#2A2420"
+        font-family="'Noto Sans SC','PingFang SC',sans-serif" font-weight="900" letter-spacing="8">后来<tspan fill="#A69C8A">忘了</tspan></text>
 
-  <!-- 左侧：评论气泡墙（集中） -->
-  <g transform="translate(120, 450)" filter="url(#softShadow)">
-    <g transform="translate(0, 0)">
-      <rect width="170" height="50" rx="25" fill="#FE2C55"/>
-      <text x="85" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">蹲链接</text>
+  <!-- 四格时间线 -->
+  <g transform="translate(120, 680)">
+    <!-- 步骤 1 · 留言蹲链接 -->
+    <g filter="url(#softShadow)">
+      <rect width="380" height="220" rx="18" fill="#FFFFFF" stroke="#D9CDB9" stroke-width="1"/>
+      <text x="24" y="40" font-size="12" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">DAY 0</text>
+      <text x="24" y="70" font-size="18" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="600">她留言</text>
+      <!-- 评论气泡 -->
+      <g transform="translate(24, 100)">
+        <rect width="170" height="44" rx="22" fill="#FE2C55"/>
+        <polygon points="28,44 34,58 42,44" fill="#FE2C55"/>
+        <text x="85" y="29" text-anchor="middle" font-size="18" fill="#FFFFFF"
+              font-family="'Noto Sans SC',sans-serif" font-weight="700">蹲链接</text>
+      </g>
+      <text x="24" y="190" font-size="14" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">一支穿搭视频下的明示意图</text>
     </g>
-    <g transform="translate(190, 20)">
-      <rect width="190" height="50" rx="25" fill="#FE2C55" fill-opacity="0.92"/>
-      <text x="95" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">求教程</text>
+
+    <!-- 箭头 1 -->
+    <line x1="395" y1="790" x2="440" y2="790" stroke="#A6B5A0" stroke-width="1.5" marker-end="url(#tinyArrow)"/>
+
+    <!-- 步骤 2 · 博主没即时回 -->
+    <g transform="translate(440, 0)" filter="url(#softShadow)">
+      <rect width="380" height="220" rx="18" fill="#FFFFFF" stroke="#D9CDB9" stroke-width="1"/>
+      <text x="24" y="40" font-size="12" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">DAY 0 → 7</text>
+      <text x="24" y="70" font-size="18" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="600">博主 · 没即时回</text>
+      <!-- 占位灰块 -->
+      <g transform="translate(24, 92)" opacity="0.6">
+        <rect width="170" height="14" rx="7" fill="#E4DCC8"/>
+        <rect y="22" width="130" height="14" rx="7" fill="#E4DCC8"/>
+        <rect y="44" width="180" height="14" rx="7" fill="#E4DCC8"/>
+        <rect y="66" width="100" height="14" rx="7" fill="#E4DCC8"/>
+      </g>
+      <text x="24" y="190" font-size="14" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">可能还没上架 · 试品 · 未定</text>
     </g>
-    <g transform="translate(400, 0)">
-      <rect width="170" height="50" rx="25" fill="#FE2C55" fill-opacity="0.88"/>
-      <text x="85" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">蹲下集</text>
+
+    <!-- 箭头 2 -->
+    <line x1="835" y1="790" x2="880" y2="790" stroke="#A6B5A0" stroke-width="1.5" marker-end="url(#tinyArrow)"/>
+
+    <!-- 步骤 3 · 信息流冲走 -->
+    <g transform="translate(880, 0)" filter="url(#softShadow)">
+      <rect width="380" height="220" rx="18" fill="#FFFFFF" stroke="#D9CDB9" stroke-width="1"/>
+      <text x="24" y="40" font-size="12" fill="#A6B5A0"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">DAY 7 → 21</text>
+      <text x="24" y="70" font-size="18" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="600">信息流 · 向下</text>
+      <!-- 瀑布叠加 -->
+      <g transform="translate(24, 92)" opacity="0.85">
+        <rect width="332" height="22" rx="6" fill="#D9CDB9" fill-opacity="0.75"/>
+        <rect y="28" width="332" height="22" rx="6" fill="#D9CDB9" fill-opacity="0.55"/>
+        <rect y="56" width="332" height="22" rx="6" fill="#D9CDB9" fill-opacity="0.4"/>
+        <rect y="84" width="332" height="22" rx="6" fill="#D9CDB9" fill-opacity="0.25"/>
+      </g>
+      <text x="24" y="190" font-size="14" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">下一条 · 下一条 · 下一条</text>
     </g>
-    <g transform="translate(20, 90)">
-      <rect width="200" height="50" rx="25" fill="#FE2C55" fill-opacity="0.85"/>
-      <text x="100" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">求同款</text>
+
+    <!-- 箭头 3 -->
+    <line x1="1275" y1="790" x2="1320" y2="790" stroke="#A6B5A0" stroke-width="1.5" marker-end="url(#tinyArrow)"/>
+
+    <!-- 步骤 4 · 今天博主补了链接 -->
+    <g transform="translate(1320, 0)" filter="url(#softShadow)">
+      <rect width="380" height="220" rx="18" fill="#FFFFFF" stroke="#FE2C55" stroke-width="1.5" stroke-opacity="0.5"/>
+      <text x="24" y="40" font-size="12" fill="#FE2C55"
+            font-family="'Inter',sans-serif" font-weight="700" letter-spacing="3">DAY 21 · 今天</text>
+      <text x="24" y="70" font-size="18" fill="#2A2420"
+            font-family="'Noto Sans SC',sans-serif" font-weight="600">博主 · 补了链接</text>
+      <!-- 视频缩略 -->
+      <g transform="translate(24, 90)">
+        <rect width="332" height="94" rx="10" fill="#2A2018"/>
+        <circle cx="40" cy="47" r="16" fill="#FFFFFF" fill-opacity="0.2"/>
+        <polygon points="35,40 35,54 47,47" fill="#FFFFFF" opacity="0.85"/>
+        <text x="68" y="42" font-size="13" fill="#FFFFFF" opacity="0.85"
+              font-family="'Noto Sans SC',sans-serif" font-weight="600">@红豆心意</text>
+        <text x="68" y="62" font-size="12" fill="#FFFFFF" opacity="0.55"
+              font-family="'Noto Sans SC',sans-serif" font-weight="400">同款预售已上 · 点这里</text>
+      </g>
+      <text x="24" y="200" font-size="14" fill="#78736A"
+            font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="1">但她早已 · 刷到别处</text>
     </g>
-    <g transform="translate(240, 100)">
-      <rect width="180" height="50" rx="25" fill="#FE2C55" fill-opacity="0.82"/>
-      <text x="90" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">坐等更新</text>
-    </g>
-    <g transform="translate(440, 95)">
-      <rect width="160" height="50" rx="25" fill="#FE2C55" fill-opacity="0.78"/>
-      <text x="80" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">求食谱</text>
-    </g>
-    <g transform="translate(0, 180)">
-      <rect width="220" height="50" rx="25" fill="#FE2C55" fill-opacity="0.72"/>
-      <text x="110" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">蹲一个价格</text>
-    </g>
-    <g transform="translate(240, 180)">
-      <rect width="180" height="50" rx="25" fill="#FE2C55" fill-opacity="0.65"/>
-      <text x="90" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">等完整版</text>
-    </g>
-    <g transform="translate(430, 185)">
-      <rect width="160" height="50" rx="25" fill="#FE2C55" fill-opacity="0.55"/>
-      <text x="80" y="33" text-anchor="middle" font-size="20" fill="#FFFFFF"
-            font-family="'Noto Sans SC',sans-serif" font-weight="600">蹲购物车</text>
-    </g>
-    <!-- 副标：总量 -->
-    <text x="0" y="295" font-size="20" fill="#44403B"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="2">每天数以亿计的"蹲 / 求 / 等"</text>
-    <text x="0" y="325" font-size="20" fill="#44403B"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="2">在下一次滑动里消失</text>
   </g>
 
-  <!-- 中间：一条粉色线，从气泡墙指向右侧灰色手机 -->
-  <line x1="780" y1="600" x2="1180" y2="600" stroke="url(#fade)" stroke-width="4" stroke-linecap="round"/>
-  <text x="980" y="580" text-anchor="middle" font-size="18" fill="#A6B5A0"
-        font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="4">21 天后</text>
-
-  <!-- 右侧：灰色手机剪影 + "??" -->
-  <g transform="translate(1250, 380)" opacity="0.88">
-    <!-- 手机边框 -->
-    <rect x="0" y="0" width="380" height="680" rx="45" fill="#E8E2D4" stroke="#C9C2B1" stroke-width="2"/>
-    <!-- 屏幕 -->
-    <rect x="20" y="20" width="340" height="640" rx="28" fill="#D4CDBB"/>
-    <!-- 摄像头 -->
-    <circle cx="190" cy="50" r="6" fill="#A6B5A0"/>
-    <!-- 问号 -->
-    <text x="190" y="400" text-anchor="middle" font-size="220" fill="#78736A"
-          font-family="'Noto Sans SC',sans-serif" font-weight="900" opacity="0.6">？</text>
-    <!-- 底部 -->
-    <text x="190" y="500" text-anchor="middle" font-size="18" fill="#78736A"
-          font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="3">她早已刷到别处</text>
-    <text x="190" y="535" text-anchor="middle" font-size="16" fill="#A6B5A0"
-          font-family="'Noto Sans SC',sans-serif" font-weight="400" letter-spacing="2">那条蹲 从没被看见</text>
-  </g>
-
-  <!-- 底部页脚 -->
+  <!-- 页脚 -->
   <text x="120" y="1020" font-size="16" fill="#A6B5A0"
         font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="4">蹲到了 · 履约型内容</text>
   <text x="1800" y="1020" text-anchor="end" font-size="16" fill="#A6B5A0"
-        font-family="'Noto Sans SC',sans-serif" font-weight="500" letter-spacing="3">02 / 08</text>
+        font-family="'Inter',sans-serif" font-weight="500" letter-spacing="3">02 / 08</text>
 </svg>
