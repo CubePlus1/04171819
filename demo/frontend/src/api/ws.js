@@ -5,7 +5,16 @@
 // 永远连不上 · "自动接" 永远启不来。直连解决得一劳永逸 · backend 的
 // CORS allowlist 已含 localhost:5173。
 // Prod（同域部署）仍按当前 host 拼。
+//
+// Mock 模式（VITE_MOCK=1 · GitHub Pages 部署用）下直接接浏览器端 mock pipeline 的 bus
+// ——没有真 WS · 但 onMessage 形状完全一致 · 上层代码零修改
+import { connectMockWs } from '../mock/index.js';
+
+const IS_MOCK = import.meta.env.VITE_MOCK === '1';
+
 export function connectWs({ onMessage, onOpen, onClose, onError } = {}) {
+  if (IS_MOCK) return connectMockWs({ onMessage, onOpen, onClose });
+
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   const isLocalDev = location.port === '5173' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   const host = isLocalDev ? 'localhost:4000' : location.host;

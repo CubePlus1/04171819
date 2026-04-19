@@ -1,3 +1,9 @@
+import { mockBootstrap, mockAmbientTick, mockResetDemo } from '../mock/index.js';
+
+// 部署到 GitHub Pages 时跑 mock 模式（VITE_MOCK=1 或 build 时静态注入）
+// 开发 / 有后端的场景下 VITE_MOCK 不设 · 走原来的 fetch
+const IS_MOCK = import.meta.env.VITE_MOCK === '1';
+
 const CLIENT_ID_KEY = 'dundao:clientId';
 
 export function getClientId() {
@@ -26,16 +32,15 @@ async function handle(res) {
 }
 
 export async function bootstrap() {
+  if (IS_MOCK) return mockBootstrap();
   return handle(await fetch('/api/bootstrap'));
 }
 
 /**
  * Ambient tick · 让 AI 后台挑下一条可履约信号（可选精确到 topic / signalId）
- * - 不带参 → 选最旧的未履约 × 有匹配动作的那条
- * - 带 topic → 从该主题下未履约里挑
- * - 带 signalId → 精确指定某条
  */
 export async function ambientTick({ topic, signalId } = {}) {
+  if (IS_MOCK) return mockAmbientTick({ topic, signalId, clientId: getClientId() });
   return handle(
     await fetch('/api/ambient/tick', {
       method: 'POST',
@@ -51,5 +56,6 @@ export async function ambientTick({ topic, signalId } = {}) {
 }
 
 export async function resetDemo() {
+  if (IS_MOCK) return mockResetDemo();
   return handle(await fetch('/api/reset', { method: 'POST' }));
 }
