@@ -1,6 +1,6 @@
 {
   "name": "dundao-demo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "蹲到了 · 字节 Hackathon 赛道三双面板展台 Demo",
   "scripts": {
