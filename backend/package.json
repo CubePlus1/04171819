@@ -1,6 +1,6 @@
 {
   "name": "dundao-backend",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "蹲到了 Demo 后端：评论入栈 → 意图识别 → 匹配历史 → 入库 → 生成卡片",
