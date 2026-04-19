@@ -85,6 +85,9 @@ function ProductPearl({ product }) {
   );
 }
 
+// 我的头像 · 图床随机肖像（pravatar.cc）· img=47 与"红豆"气质相符
+const MY_AVATAR = 'https://i.pravatar.cc/80?img=47';
+
 const OPEN_FEEDBACK = {
   A: '链接已为你打开 · 同款已备好',
   B: 'Day1-Day5 的后续已按顺序接上',
@@ -144,7 +147,7 @@ export default function CardPageP1({ page, scriptId, onAction }) {
         transition={{ duration: 0.45, delay: 0.05 }}
         className="fig-card relative w-[342px] max-w-full self-center"
       >
-        <AvatarRow label={myLabel} />
+        <AvatarRow label={myLabel} avatar={MY_AVATAR} />
         {myComment && <CommentBody text={myComment} />}
         {videoTitle && (
           <div className="relative">
