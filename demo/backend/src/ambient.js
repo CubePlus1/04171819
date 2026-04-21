@@ -323,9 +323,9 @@ export async function runAmbient({
   );
   const insertCardStmt = db.prepare(
     `INSERT INTO cards
-       (id, user_id, script_id, intent_signal_id, creator_action_id, pages_json)
+       (id, user_id, script_id, intent_signal_id, creator_action_id, topic, pages_json)
      VALUES
-       (@id, @user_id, @script_id, @intent_signal_id, @creator_action_id, @pages_json)`,
+       (@id, @user_id, @script_id, @intent_signal_id, @creator_action_id, @topic, @pages_json)`,
   );
 
   const persistTx = db.transaction(() => {
@@ -341,6 +341,7 @@ export async function runAmbient({
       script_id: card.script_id,
       intent_signal_id: card.intent_signal_id,
       creator_action_id: card.creator_action_id,
+      topic: signal.topic,
       pages_json: JSON.stringify(card.pages),
     });
   });
@@ -348,7 +349,10 @@ export async function runAmbient({
   try {
     persistTx();
   } catch (err) {
-    if (err.code === 'SIGNAL_ALREADY_FULFILLED') {
+    const topicAlreadyClaimed = typeof err?.code === 'string'
+      && err.code.startsWith('SQLITE_CONSTRAINT')
+      && /cards\.user_id, cards\.topic|idx_cards_user_topic/u.test(err.message);
+    if (err.code === 'SIGNAL_ALREADY_FULFILLED' || topicAlreadyClaimed) {
       onStep?.(stepFrame(runId, 4, '记到她的履约里', {
         ok: false,
         reason: '这条刚刚被抢先接走了',

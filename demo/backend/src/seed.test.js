@@ -30,11 +30,11 @@ async function withDb(run) {
   }
 }
 
-await runCase('seed migrates fixtures to v2 and keeps mock ambient pending', async () => {
+await runCase('seed migrates fixtures to v3 and keeps mock ambient pending', async () => {
   await withDb(async (db) => {
     seed({ db });
 
-    assert.equal(db.pragma('user_version', { simple: true }), 2);
+    assert.equal(db.pragma('user_version', { simple: true }), 3);
     const action = db.prepare(`
       SELECT is_answer, source, replying_to_rpid
         FROM creator_actions

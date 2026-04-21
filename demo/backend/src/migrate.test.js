@@ -37,23 +37,23 @@ function runCase(label, fn) {
   }
 }
 
-runCase('listMigrationFiles sorts 001 -> 002', () => {
+runCase('listMigrationFiles sorts 001 -> 003', () => {
   const files = listMigrationFiles(MIGRATIONS_DIR);
   assert.deepEqual(
     files.map((item) => item.filename),
-    ['001_initial.sql', '002_bilibili_fields.sql'],
+    ['001_initial.sql', '002_bilibili_fields.sql', '003_topic_unique.sql'],
   );
 });
 
-runCase('applyMigrations upgrades a fresh db to user_version 2', () => {
+runCase('applyMigrations upgrades a fresh db to user_version 3', () => {
   withTempDb((dbPath) => {
     const result = applyMigrations({ dbPath, migrationsDir: MIGRATIONS_DIR });
     assert.equal(result.currentVersion, 0);
-    assert.deepEqual(result.applied, ['001_initial.sql', '002_bilibili_fields.sql']);
+    assert.deepEqual(result.applied, ['001_initial.sql', '002_bilibili_fields.sql', '003_topic_unique.sql']);
 
     const db = new Database(dbPath, { readonly: true });
     try {
-      assert.equal(db.pragma('user_version', { simple: true }), 2);
+      assert.equal(db.pragma('user_version', { simple: true }), 3);
 
       const intentColumns = tableColumns(db, 'intent_signals');
       assert.ok(intentColumns.includes('aid'));
@@ -71,17 +71,19 @@ runCase('applyMigrations upgrades a fresh db to user_version 2', () => {
 
       assert.ok(indexNames(db, 'intent_signals').includes('idx_intent_rpid'));
       assert.ok(indexNames(db, 'creator_actions').includes('idx_action_rpid'));
+      assert.ok(tableColumns(db, 'cards').includes('topic'));
+      assert.ok(indexNames(db, 'cards').includes('idx_cards_user_topic'));
     } finally {
       db.close();
     }
   });
 });
 
-runCase('applyMigrations is idempotent after user_version 2', () => {
+runCase('applyMigrations is idempotent after user_version 3', () => {
   withTempDb((dbPath) => {
     applyMigrations({ dbPath, migrationsDir: MIGRATIONS_DIR });
     const rerun = applyMigrations({ dbPath, migrationsDir: MIGRATIONS_DIR });
-    assert.equal(rerun.currentVersion, 2);
+    assert.equal(rerun.currentVersion, 3);
     assert.deepEqual(rerun.applied, []);
   });
 });
