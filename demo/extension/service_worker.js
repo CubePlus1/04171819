@@ -1,4 +1,5 @@
 import { DWSClient } from './ws_client.js';
+import { normalizeMsgfeedItem as normalizeSharedMsgfeedItem } from '../shared/bilibili-normalize.js';
 
 const BACKEND_URL = 'http://127.0.0.1:4000';
 const FRONTEND_URL = 'http://127.0.0.1:5173';
@@ -171,61 +172,21 @@ async function catchUpNotifications() {
 }
 
 function normalizeMsgfeedItem(item) {
-  const row = item && typeof item === 'object' ? item : {};
-  const inner = row.item && typeof row.item === 'object' ? row.item : {};
-  const user = row.user && typeof row.user === 'object' ? row.user : {};
-
-  const replyingToRpid = toInteger(
-    row.source_id ??
-    inner.source_id ??
-    inner.root_reply_id ??
-    inner.reply_to_reply_id,
-  );
-  const rpid = toInteger(
-    row.rpid ??
-    inner.target_id ??
-    inner.id ??
-    inner.reply_id,
-  );
-  const aid = toInteger(
-    row.business_id ??
-    inner.business_id ??
-    inner.oid ??
-    inner.item_id,
-  );
-  const replierMid = toInteger(
-    row.mid_replier ??
-    row.mid ??
-    user.mid ??
-    row.user_id,
-  );
-  const replierName = toStringOr(
-    row.replier_name ??
-    user.nickname ??
-    user.uname ??
-    row.user_name,
-    replierMid ? String(replierMid) : '',
-  );
-  const content = toStringOr(
-    row.reply_content ??
-    inner.target_reply_content ??
-    inner.detail_text ??
-    inner.title,
-    '(待补)',
-  );
+  const row = normalizeSharedMsgfeedItem(item);
 
   return {
     source: 'L1',
-    replying_to_rpid: replyingToRpid,
-    rpid,
-    replier_mid: replierMid,
-    replier_name: replierName,
-    content,
-    like_count: Number(row.like ?? row.like_count ?? inner.like ?? 0) || 0,
-    is_up: Boolean(row.is_up ?? inner.is_up),
-    is_top: Boolean(row.is_top ?? inner.is_top),
-    aid,
-    occurred_at: toIsoString(row.occurred_at ?? row.reply_time ?? row.ctime ?? inner.ctime),
+    replying_to_rpid: row.source_id,
+    rpid: row.rpid,
+    replier_mid: row.mid_replier,
+    replier_name: row.replier_name,
+    content: toStringOr(row.reply_content, '(待补)'),
+    like_count: row.like_count,
+    is_up: row.is_up,
+    is_top: row.is_top,
+    aid: row.business_id,
+    occurred_at: row.occurred_at,
+    debug: row.debug,
   };
 }
 

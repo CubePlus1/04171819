@@ -1,9 +1,11 @@
 import { createLogger } from './logger.js';
+import { normalizeMsgfeedItem } from '../../shared/bilibili-normalize.js';
 
 const log = createLogger('bilibili');
 
 export const RATE_LIMIT_MS = 1000;
-export const MAX_RETRIES = 3;
+export const MAX_RETRIES = 4;
+export const REQUEST_TIMEOUT_MS = 30_000;
 
 function defaultSleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -20,26 +22,6 @@ function toStringOr(value, fallback = '') {
 
 function isoAt(now) {
   return new Date(now()).toISOString();
-}
-
-function normalizeMsgfeedItem(item, now) {
-  const row = item && typeof item === 'object' ? item : {};
-  const midReplier = toNumber(row.mid_replier);
-
-  return {
-    source_id: toNumber(row.source_id),
-    source_content: row.source_content ?? null,
-    business_id: toNumber(row.business_id),
-    title: toStringOr(row.title),
-    reply_content: toStringOr(row.reply_content),
-    mid_replier: midReplier,
-    replier_name: toStringOr(row.replier_name, midReplier ? String(midReplier) : ''),
-    like_count: toNumber(row.like ?? row.like_count),
-    is_up: Boolean(row.is_up),
-    is_top: Boolean(row.is_top),
-    rpid: toNumber(row.rpid),
-    occurred_at: typeof row.occurred_at === 'string' ? row.occurred_at : isoAt(now),
-  };
 }
 
 function normalizeVideoReply(item, now) {
@@ -88,6 +70,7 @@ export function createBilibiliClient({
   sleepImpl = defaultSleep,
   rateLimitMs = RATE_LIMIT_MS,
   maxRetries = MAX_RETRIES,
+  requestTimeoutMs = REQUEST_TIMEOUT_MS,
 } = {}) {
   if (typeof fetchImpl !== 'function') {
     throw new TypeError('createBilibiliClient: fetchImpl must be a function');
@@ -112,6 +95,8 @@ export function createBilibiliClient({
 
     while (attempt < maxRetries) {
       await waitForRateLimit(endpointKey);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), requestTimeoutMs);
 
       try {
         const headers = { Accept: 'application/json' };
@@ -119,7 +104,10 @@ export function createBilibiliClient({
           headers.Cookie = `SESSDATA=${sessdata}`;
         }
 
-        const response = await fetchImpl(String(url), { headers });
+        const response = await fetchImpl(String(url), {
+          headers,
+          signal: controller.signal,
+        });
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
@@ -128,8 +116,11 @@ export function createBilibiliClient({
         return assertBilibiliJson(json, url);
       } catch (err) {
         attempt += 1;
+        const nextError = controller.signal.aborted
+          ? new Error(`request timeout after ${requestTimeoutMs}ms`)
+          : err;
         if (attempt >= maxRetries) {
-          throw err;
+          throw nextError;
         }
 
         const backoff = rateLimitMs * (2 ** (attempt - 1));
@@ -137,9 +128,11 @@ export function createBilibiliClient({
           endpoint: endpointKey,
           attempt,
           backoff,
-          err: err.message,
+          err: nextError.message,
         });
         await sleepImpl(backoff);
+      } finally {
+        clearTimeout(timeoutId);
       }
     }
 
@@ -159,7 +152,7 @@ export function createBilibiliClient({
 
     return {
       replies: Array.isArray(data.items)
-        ? data.items.map((item) => normalizeMsgfeedItem(item, now))
+        ? data.items.map((item) => normalizeMsgfeedItem(item, { now }))
         : [],
       hasMore: !Boolean(cursorInfo.is_end),
       nextCursor: cursorInfo.next === undefined || cursorInfo.next === null

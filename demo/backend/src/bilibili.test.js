@@ -133,7 +133,7 @@ await runCase('client retries 3x with exponential backoff', async () => {
   const client = createBilibiliClient({
     fetchImpl: async () => {
       attempts += 1;
-      if (attempts < 3) {
+      if (attempts < MAX_RETRIES) {
         return createResponse({ code: -1, message: 'temporary error' }, { ok: false, status: 503 });
       }
       return createResponse({
@@ -151,9 +151,9 @@ await runCase('client retries 3x with exponential backoff', async () => {
   });
 
   const result = await client.fetchVideoView({ aid: 9988 });
-  assert.equal(MAX_RETRIES, 3);
-  assert.equal(attempts, 3);
-  assert.deepEqual(clock.sleeps, [RATE_LIMIT_MS, RATE_LIMIT_MS * 2]);
+  assert.equal(MAX_RETRIES, 4);
+  assert.equal(attempts, 4);
+  assert.deepEqual(clock.sleeps, [RATE_LIMIT_MS, RATE_LIMIT_MS * 2, RATE_LIMIT_MS * 4]);
   assert.equal(result.owner.name, 'UP');
 });
 
@@ -174,7 +174,7 @@ await runCase('persistent failures stop after MAX_RETRIES attempts', async () =>
     /HTTP 503/,
   );
   assert.equal(attempts, MAX_RETRIES);
-  assert.deepEqual(clock.sleeps, [RATE_LIMIT_MS, RATE_LIMIT_MS * 2]);
+  assert.deepEqual(clock.sleeps, [RATE_LIMIT_MS, RATE_LIMIT_MS * 2, RATE_LIMIT_MS * 4]);
 });
 
 await runCase('SESSDATA header is isolated to msgfeed and omitted on public endpoints', async () => {
@@ -285,6 +285,7 @@ await runCase('normalize helpers tolerate empty or missing fields without crashi
     is_top: false,
     rpid: 0,
     occurred_at: msgfeed.replies[0].occurred_at,
+    debug: msgfeed.replies[0].debug,
   });
   assert.equal(typeof msgfeed.replies[0].occurred_at, 'string');
   assert.equal(msgfeed.nextCursor, null);
@@ -316,6 +317,58 @@ await runCase('normalize helpers tolerate empty or missing fields without crashi
     },
     pinned_reply: null,
   });
+});
+
+await runCase('fetchMsgfeedReply normalizes nested msgfeed items and prefers reply_to_reply_id inside thread replies', async () => {
+  const client = createBilibiliClient({
+    fetchImpl: async () => createResponse({
+      code: 0,
+      data: {
+        cursor: { is_end: true, next: null },
+        items: [{
+          item: {
+            root_reply_id: 7001,
+            reply_to_reply_id: 7002,
+            business_id: 112233,
+            target_id: 900001,
+            target_reply_content: '链接在这条楼中楼',
+            ctime: 1713782400,
+          },
+          user: {
+            mid: '654321',
+            nickname: '路人甲',
+          },
+        }],
+      },
+    }),
+  });
+
+  const result = await client.fetchMsgfeedReply({ sessdata: 'COOKIE_VALUE' });
+  assert.equal(result.replies[0].source_id, 7002);
+  assert.equal(result.replies[0].business_id, 112233);
+  assert.equal(result.replies[0].rpid, 900001);
+  assert.equal(result.replies[0].reply_content, '链接在这条楼中楼');
+  assert.equal(result.replies[0].mid_replier, 654321);
+  assert.equal(result.replies[0].replier_name, '路人甲');
+  assert.equal(result.replies[0].debug.replying_to_rpid_source, 'reply_to_reply_id');
+});
+
+await runCase('requestJson aborts stalled bilibili fetches after timeout', async () => {
+  const client = createBilibiliClient({
+    fetchImpl: async (_url, init) => new Promise((_resolve, reject) => {
+      init.signal.addEventListener('abort', () => {
+        reject(new Error('aborted by signal'));
+      }, { once: true });
+    }),
+    rateLimitMs: 0,
+    maxRetries: 1,
+    requestTimeoutMs: 5,
+  });
+
+  await assert.rejects(
+    () => client.fetchMsgfeedReply({ sessdata: 'COOKIE_VALUE' }),
+    /request timeout/i,
+  );
 });
 
 if (process.exitCode) {
