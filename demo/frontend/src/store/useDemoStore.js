@@ -11,6 +11,7 @@ const STEP_TEMPLATE = [
 // 展台循环模式下刷过的卡需要腾走 · 只保留最近 6 张
 // （MAX_CARDS_IN_UI 既约束渲染又约束内存 · 超过会从末尾自然淘汰）
 const MAX_CARDS_IN_UI = 6;
+const EMPTY_MY_COMMENTS = { total: 0, fulfilled: 0, pending: 0, items: [] };
 
 const initialState = {
   connected: false,
@@ -41,6 +42,9 @@ const initialState = {
   steps: STEP_TEMPLATE.map((s) => ({ ...s })),
   lastCompleted: null,
   lastReason: null,
+
+  myComments: null,
+  fetchingMyComments: false,
 };
 
 // 把 card / filler 包成统一的 item shape
@@ -212,6 +216,34 @@ export const useDemoStore = create((set) => ({
   trackInteraction: () => set((state) => ({ interactionCount: state.interactionCount + 1 })),
 
   clearSpotlight: () => set({ spotlightCardId: null }),
+
+  fetchMyComments: async (filter = 'all') => {
+    const { getMyComments } = await import('../api/client.js');
+    set({ fetchingMyComments: true });
+    try {
+      const data = await getMyComments(filter);
+      set({ myComments: data, fetchingMyComments: false });
+    } catch (err) {
+      console.warn('fetchMyComments failed', err);
+      set({ myComments: EMPTY_MY_COMMENTS, fetchingMyComments: false });
+    }
+  },
+
+  focusCard: (cardId) =>
+    set((state) => {
+      const card = state.cards.find((entry) => entry.id === cardId);
+      if (!card) {
+        console.warn('focusCard: unknown cardId', cardId);
+        return state;
+      }
+      const item = cardItem(card);
+      const queueWithout = state.queue.filter((entry) => !(entry.kind === 'card' && entry.id === card.id));
+      return {
+        currentItem: item,
+        queue: queueWithout,
+        spotlightCardId: card.id,
+      };
+    }),
 
   reset: () =>
     set((state) => ({

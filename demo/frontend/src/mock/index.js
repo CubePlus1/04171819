@@ -100,6 +100,56 @@ export async function mockResetDemo() {
   return { ok: true, epoch: state.epoch };
 }
 
+export function mockMyComments(filter = 'all') {
+  const items = [
+    {
+      signal_id: 1,
+      aid: 112233445566,
+      video_title: '焦糖褐色外套开箱（MOCK）',
+      content: '蹲链接',
+      occurred_at: new Date(Date.now() - 21 * 86400_000).toISOString(),
+      fulfilled: 1,
+      card_id: 'mock-card-A',
+      creator: { mid: '1', name: '大山', avatar: null },
+      top_answer: { content: '链接上了！¥329 旗舰店', is_up: true },
+    },
+    {
+      signal_id: 2,
+      aid: 112233445567,
+      video_title: 'XXX BGM 合集 Part1（MOCK）',
+      content: '蹲 BGM',
+      occurred_at: new Date(Date.now() - 7 * 86400_000).toISOString(),
+      fulfilled: 0,
+      card_id: null,
+      creator: { mid: '2', name: '音乐怪', avatar: null },
+      top_answer: null,
+    },
+    {
+      signal_id: 3,
+      aid: 112233445568,
+      video_title: '下一集什么时候（MOCK）',
+      content: '蹲下集',
+      occurred_at: new Date(Date.now() - 3 * 86400_000).toISOString(),
+      fulfilled: 0,
+      card_id: null,
+      creator: { mid: '3', name: '更新鸽子', avatar: null },
+      top_answer: null,
+    },
+  ];
+
+  const filtered =
+    filter === 'fulfilled' ? items.filter((item) => item.fulfilled)
+      : filter === 'pending' ? items.filter((item) => !item.fulfilled)
+        : items;
+
+  return Promise.resolve({
+    total: items.length,
+    fulfilled: items.filter((item) => item.fulfilled).length,
+    pending: items.filter((item) => !item.fulfilled).length,
+    items: filtered,
+  });
+}
+
 // 对齐 api/ws.js 的 connectWs 返回形状
 export function connectMockWs({ onMessage, onOpen, onClose } = {}) {
   const handler = (msg) => onMessage?.(msg);

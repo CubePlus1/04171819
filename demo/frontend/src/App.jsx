@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
 import ProductPanel from './panels/ProductPanel.jsx';
-import AgentPanel from './panels/AgentPanel.jsx';
 import Toast from './components/Toast.jsx';
 import ThemeSwitcher from './themes/ThemeSwitcher.jsx';
 import { THEMES } from './themes/tokens.js';
@@ -25,16 +24,6 @@ function usePrefersReducedMotion() {
   }, []);
   return reduced;
 }
-
-// Mobile（<md）下单列展示 · 右侧 AgentPanel 驱动 pipeline 所以不能 unmount
-// 用 hidden md:block 让它继续跑 · 视口里看不到
-// 完整枚举每个 variant · Tailwind JIT 只扫源代码里字面量出现过的 class
-const SPLIT_TO_GRID = {
-  '7-5': { left: 'col-span-12 md:col-span-7', right: 'hidden md:block md:col-span-5' },
-  '6-6': { left: 'col-span-12 md:col-span-6', right: 'hidden md:block md:col-span-6' },
-  '8-4': { left: 'col-span-12 md:col-span-8', right: 'hidden md:block md:col-span-4' },
-  '5-7': { left: 'col-span-12 md:col-span-5', right: 'hidden md:block md:col-span-7' },
-};
 
 export default function App() {
   const hydrate = useDemoStore((s) => s.hydrate);
@@ -153,8 +142,6 @@ export default function App() {
 
   const handleRetryBoot = useCallback(() => bootRef.current?.(), []);
 
-  const split = SPLIT_TO_GRID[theme.layout?.split_ratio ?? '7-5'];
-
   return (
     <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
       <div className="flex h-full w-full flex-col">
@@ -171,23 +158,14 @@ export default function App() {
           <ErrorBanner message={bootState.error} onRetry={handleRetryBoot} />
         )}
 
-        <main className="relative grid flex-1 min-h-0 grid-cols-12 gap-4 px-3 pb-3 md:px-5 md:pb-5">
+        <main className="relative flex flex-1 min-h-0 flex-col gap-4 px-3 pb-3 md:px-5 md:pb-5">
           <motion.section
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
-            className={`${split.left} min-h-0`}
+            className="flex-1 min-h-0"
           >
             <ProductPanel bootStatus={bootState.status} onAction={(label) => setToast(label)} />
-          </motion.section>
-
-          <motion.section
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
-            className={`${split.right} min-h-0`}
-          >
-            <AgentPanel onToast={setToast} />
           </motion.section>
         </main>
 

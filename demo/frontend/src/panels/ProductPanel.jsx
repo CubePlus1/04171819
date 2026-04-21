@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Feed from '../components/Feed.jsx';
+import MyCommentsPanel from '../components/MyCommentsPanel.jsx';
 import { useDemoStore } from '../store/useDemoStore.js';
 import { asset } from '../utils/asset.js';
 
@@ -15,6 +16,7 @@ function pickCoverUrl(item) {
 }
 
 export default function ProductPanel({ bootStatus, onAction }) {
+  const [tab, setTab] = useState('feed');
   const user = useDemoStore((s) => s.user);
   const cards = useDemoStore((s) => s.cards);
   const spotlightCardId = useDemoStore((s) => s.spotlightCardId);
@@ -39,36 +41,61 @@ export default function ProductPanel({ bootStatus, onAction }) {
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        {/* 展台标签组 · 向评委说明这里是什么 · 手机扫码不需要 */}
         <div className="hidden items-center gap-2 shrink-0 md:flex">
           <span className="pill bg-kiss/15 text-kiss">产品面板</span>
           <span className="text-[12px] text-stone-200">
-            用户视角 · 抖音信息流模拟
+            {tab === 'feed' ? '信息流视图' : '我的评论历史'}
           </span>
         </div>
 
-        {/* 进度条 + 统计 · md 以下只保留 "队列+N · 已蹲 N · 新卡片浮现中" */}
+        <div className="flex items-center gap-1 rounded-full bg-black/30 p-1 text-[12px]">
+          <button
+            className={`focus-ring rounded-full px-3 py-1 transition ${
+              tab === 'feed'
+                ? 'bg-white/15 text-[color:var(--color-text)]'
+                : 'text-[color:var(--color-text-muted)] hover:bg-white/5'
+            }`}
+            onClick={() => setTab('feed')}
+          >
+            信息流
+          </button>
+          <button
+            className={`focus-ring rounded-full px-3 py-1 transition ${
+              tab === 'my-comments'
+                ? 'bg-white/15 text-[color:var(--color-text)]'
+                : 'text-[color:var(--color-text-muted)] hover:bg-white/5'
+            }`}
+            onClick={() => setTab('my-comments')}
+          >
+            我的评论
+          </button>
+        </div>
+
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 text-[11px] text-stone-200">
-          <div className="hidden md:block">
-            <ProgressDots advanced={advanceCount} />
-          </div>
-          <span className="hidden whitespace-nowrap font-medium text-[color:var(--color-text)] md:inline">
-            刷 {advanceCount}
-          </span>
-          <span className="hidden opacity-40 md:inline">·</span>
-          <span className="hidden whitespace-nowrap text-[color:var(--color-text-muted)] md:inline">
-            互动 {interactionCount}
-          </span>
-          {queueLen > 0 && (
+          {tab === 'feed' && (
             <>
-              <span className="hidden opacity-40 md:inline">·</span>
-              <span className="whitespace-nowrap font-bold text-[color:var(--color-warmth)]">
-                队列+{queueLen}
+              <div className="hidden md:block">
+                <ProgressDots advanced={advanceCount} />
+              </div>
+              <span className="hidden whitespace-nowrap font-medium text-[color:var(--color-text)] md:inline">
+                刷 {advanceCount}
               </span>
+              <span className="hidden opacity-40 md:inline">·</span>
+              <span className="hidden whitespace-nowrap text-[color:var(--color-text-muted)] md:inline">
+                互动 {interactionCount}
+              </span>
+              {queueLen > 0 && (
+                <>
+                  <span className="hidden opacity-40 md:inline">·</span>
+                  <span className="whitespace-nowrap font-bold text-[color:var(--color-warmth)]">
+                    队列+{queueLen}
+                  </span>
+                </>
+              )}
             </>
           )}
           <span className="whitespace-nowrap">已蹲 {cards.length}</span>
-          {spotlightCardId && (
+          {tab === 'feed' && spotlightCardId && (
             <span className="pill whitespace-nowrap bg-ember/15 text-kiss animate-pulse-soft">新卡片浮现中</span>
           )}
         </div>
@@ -79,8 +106,7 @@ export default function ProductPanel({ bootStatus, onAction }) {
       </span>
 
       <div className="relative flex-1 min-h-0 overflow-hidden rounded-3xl border border-white/5 bg-[color:var(--color-panel)]">
-        {/* 液态玻璃氛围底：当前 cover 图模糊放大 · 玻璃卡就吃这个色彩 */}
-        {coverUrl && (
+        {tab === 'feed' && coverUrl && (
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 z-0 transition-[background-image] duration-700"
@@ -95,27 +121,37 @@ export default function ProductPanel({ bootStatus, onAction }) {
         )}
         <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-black/10 via-transparent to-black/25" />
 
-        <div className="h-full px-4 py-6">
+        <div className="relative z-10 h-full px-4 py-6">
           <div className="mx-auto h-full w-full max-w-[380px]">
-            {bootStatus === 'error' ? (
-              <EmptyState
-                title="信息流暂不可用"
-                tip="后端断了连 · 点顶部「重试」或「重置演示」"
-              />
-            ) : bootStatus === 'loading' && cards.length === 0 && !user ? (
-              <EmptyState title="信息流加载中..." tip="正在为你召回过去的念头" />
+            {tab === 'feed' ? (
+              bootStatus === 'error' ? (
+                <EmptyState
+                  title="信息流暂不可用"
+                  tip="后端断了连 · 点顶部「重试」或「重置演示」"
+                />
+              ) : bootStatus === 'loading' && cards.length === 0 && !user ? (
+                <EmptyState title="信息流加载中..." tip="正在为你召回过去的念头" />
+              ) : (
+                <Feed onAction={onAction} />
+              )
             ) : (
-              <Feed onAction={onAction} />
+              <MyCommentsPanel
+                onOpenCard={(cardId) => {
+                  setTab('feed');
+                  useDemoStore.getState().focusCard(cardId);
+                }}
+              />
             )}
           </div>
         </div>
 
-        {/* 浮在视频封面上的左上角状态条 · 必须白色 · 不受浅色主题 override 影响 */}
         <div
           className="pointer-events-none absolute left-4 top-4 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-medium tracking-[0.2em] backdrop-blur"
           style={{ color: '#ffffff' }}
         >
-          {user?.nickname ? `${user.nickname} · 闲刷空窗` : '闲刷空窗'}
+          {tab === 'feed'
+            ? (user?.nickname ? `${user.nickname} · 闲刷空窗` : '闲刷空窗')
+            : '我的评论'}
         </div>
       </div>
     </div>

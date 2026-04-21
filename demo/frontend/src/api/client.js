@@ -1,4 +1,4 @@
-import { mockBootstrap, mockAmbientTick, mockResetDemo } from '../mock/index.js';
+import { mockBootstrap, mockAmbientTick, mockResetDemo, mockMyComments } from '../mock/index.js';
 
 // 部署到 GitHub Pages 时跑 mock 模式（VITE_MOCK=1 或 build 时静态注入）
 // 开发 / 有后端的场景下 VITE_MOCK 不设 · 走原来的 fetch
@@ -58,4 +58,9 @@ export async function ambientTick({ topic, signalId } = {}) {
 export async function resetDemo() {
   if (IS_MOCK) return mockResetDemo();
   return handle(await fetch('/api/reset', { method: 'POST' }));
+}
+
+export async function getMyComments(filter = 'all') {
+  if (IS_MOCK) return mockMyComments(filter);
+  return handle(await fetch(`/api/my-comments?filter=${encodeURIComponent(filter)}`));
 }
