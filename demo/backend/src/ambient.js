@@ -103,6 +103,23 @@ function stepFrame(runId, step, name, detail, mind) {
   return { run_id: runId, step, name, detail, mind };
 }
 
+function buildPublicSignalRef(signal) {
+  return {
+    id: signal.id,
+    signal_type: signal.signal_type,
+    video_title: signal.video_title,
+    occurred_at: signal.occurred_at,
+  };
+}
+
+function buildRecallText(signal) {
+  const scene = signal.video_title ? `《${signal.video_title}》` : '那条内容';
+  if (signal.signal_type === 'comment_intent') {
+    return `她之前在${scene}下留过一条评论`;
+  }
+  return `她之前对${scene}${SIGNAL_VERB_CN[signal.signal_type] ?? '留过记号'}`;
+}
+
 /**
  * 为一次 runAmbient 快照 mind 的完整节点集合。
  * - signals：该用户未/已履约信号
@@ -248,11 +265,10 @@ export async function runAmbient({
   const focusActionId = `action:${pick.action_id}`;
   onStep?.(stepFrame(runId, 2, '挑中这一条', {
     hit: true,
-    signal: { id: signal.id, text: signal.raw_text, video_title: signal.video_title, occurred_at: signal.occurred_at },
+    signal_id: signal.id,
+    signal: buildPublicSignalRef(signal),
     creator: creator.display,
-    recall: signal.raw_text
-      ? `她在「${creator.display}」下${SIGNAL_VERB_CN[signal.signal_type] ?? '留下过一条'}「${signal.raw_text}」`
-      : `她${SIGNAL_VERB_CN[signal.signal_type] ?? '看过'}《${signal.video_title}》`,
+    recall: buildRecallText(signal),
   }, {
     phase: MIND_PHASES.RECALL,
     focus_signal_id: focusSignalId,
@@ -264,6 +280,8 @@ export async function runAmbient({
   const actionPayload = JSON.parse(pick.payload_json);
   const scriptId = ACTION_TO_SCRIPT[pick.action_type] ?? 'A';
   onStep?.(stepFrame(runId, 3, '博主今天的新动作', {
+    signal_id: signal.id,
+    action_id: pick.action_id,
     creator: creator.display,
     action_type: pick.action_type,
     action_summary: actionPayload.summary ?? actionPayload.title ?? '博主有了新动作',

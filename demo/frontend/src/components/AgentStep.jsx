@@ -33,9 +33,11 @@ function DetailStep1({ detail }) {
     );
   }
   // comment 形态（遗留）：{ text, length }
+  const hasText = typeof detail.text === 'string' && detail.text.trim();
   return (
     <div className="mt-2 text-[12px] leading-relaxed text-stone-300">
-      <span className="text-stone-200">她说：</span>「{detail.text}」
+      <span className="text-stone-200">她说：</span>
+      {hasText ? `「${detail.text}」` : '已收到一条评论输入'}
       <span className="ml-2 text-stone-200">字符数 {detail.length}</span>
     </div>
   );

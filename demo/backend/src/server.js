@@ -58,6 +58,16 @@ export function isOriginAllowed(origin) {
   return DEFAULT_ALLOWED_ORIGINS.some((re) => re.test(origin));
 }
 
+// WS 是无鉴权 fan-out：workflow.begin / step 只广播最小标识，
+// 避免把用户原始评论、历史 raw_text 等内容推给所有监听者。
+// 需要完整渲染的数据只保留在 card.generated。
+export function buildWorkflowBeginPayload({ runId, userId }) {
+  return {
+    run_id: runId,
+    user_id: userId,
+  };
+}
+
 function ensureDb() {
   mkdirSync(dirname(DB_PATH), { recursive: true });
   const fresh = !existsSync(DB_PATH);
@@ -80,7 +90,7 @@ function createApp(broadcast, state) {
   function triggerAmbient({ userId = DEMO_USER_ID, topic }) {
     const runId = newRunId();
     state.inFlight.add(runId);
-    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, ambient: true, auto: true, userId });
+    broadcast(WS_EVENTS.WORKFLOW_BEGIN, buildWorkflowBeginPayload({ runId, userId }));
 
     void Promise.resolve()
       .then(() => runAmbient({
@@ -222,7 +232,7 @@ function createApp(broadcast, state) {
 
     const runId = newRunId();
     state.inFlight.add(runId);
-    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, client_id: clientId, text, userId });
+    broadcast(WS_EVENTS.WORKFLOW_BEGIN, buildWorkflowBeginPayload({ runId, userId }));
     try {
       const result = await runWorkflow({
         comment: text,
@@ -232,9 +242,9 @@ function createApp(broadcast, state) {
       });
       if (result.ok) {
         broadcast(WS_EVENTS.CARD_GENERATED, { run_id: runId, client_id: clientId, card: result.card });
-        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ok: true, cardId: result.card.id });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: true, cardId: result.card.id });
       } else {
-        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ok: false, reason: result.reason });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: false, reason: result.reason });
       }
       res.json({
         ok: result.ok,
@@ -243,7 +253,7 @@ function createApp(broadcast, state) {
       });
     } catch (err) {
       log.error('workflow failed', { run_id: runId, err: err.message, stack: err.stack });
-      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ok: false, reason: REASON_CODES.SERVER_ERROR });
+      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ok: false, reason: REASON_CODES.SERVER_ERROR });
       res.status(500).json({ ok: false, runId, error: 'internal' });
     } finally {
       state.inFlight.delete(runId);
@@ -269,7 +279,7 @@ function createApp(broadcast, state) {
 
     const runId = newRunId();
     state.inFlight.add(runId);
-    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, client_id: clientId, ambient: true, userId });
+    broadcast(WS_EVENTS.WORKFLOW_BEGIN, buildWorkflowBeginPayload({ runId, userId }));
     try {
       const result = await runAmbient({
         userId, runId, topic, signalId,
@@ -278,9 +288,9 @@ function createApp(broadcast, state) {
       });
       if (result.ok) {
         broadcast(WS_EVENTS.CARD_GENERATED, { run_id: runId, client_id: clientId, card: result.card });
-        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ambient: true, ok: true, cardId: result.card.id });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ambient: true, ok: true, cardId: result.card.id });
       } else {
-        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ambient: true, ok: false, reason: result.reason });
+        broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ambient: true, ok: false, reason: result.reason });
       }
       res.json({
         ok: result.ok,
@@ -290,7 +300,7 @@ function createApp(broadcast, state) {
       });
     } catch (err) {
       log.error('ambient failed', { run_id: runId, err: err.message, stack: err.stack });
-      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, client_id: clientId, ambient: true, ok: false, reason: REASON_CODES.SERVER_ERROR });
+      broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ambient: true, ok: false, reason: REASON_CODES.SERVER_ERROR });
       res.status(500).json({ ok: false, runId, error: 'internal' });
     } finally {
       state.inFlight.delete(runId);

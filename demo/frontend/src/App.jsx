@@ -32,12 +32,16 @@ export default function App() {
   const applyStep = useDemoStore((s) => s.applyStep);
   const endWorkflow = useDemoStore((s) => s.endWorkflow);
   const onCardGenerated = useDemoStore((s) => s.onCardGenerated);
+  const focusCard = useDemoStore((s) => s.focusCard);
   const resetStore = useDemoStore((s) => s.reset);
   const connected = useDemoStore((s) => s.connected);
   const user = useDemoStore((s) => s.user);
 
   const [bootState, setBootState] = useState({ status: 'loading', error: null });
   const [toast, setToast] = useState(null);
+  const [pendingCardId, setPendingCardId] = useState(() => (
+    new URLSearchParams(window.location.search).get('card_id')
+  ));
   const reducedMotion = usePrefersReducedMotion();
 
   const { current: theme, switchTheme, cycleTheme } = useTheme(THEMES);
@@ -129,6 +133,19 @@ export default function App() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [theme.id, cycleTheme]);
+
+  useEffect(() => {
+    if (!pendingCardId || bootState.status !== 'ready') {
+      return;
+    }
+
+    focusCard(pendingCardId);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('card_id');
+    const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(window.history.state, '', nextUrl);
+    setPendingCardId(null);
+  }, [bootState.status, focusCard, pendingCardId]);
 
   const handleReset = useCallback(async () => {
     try {

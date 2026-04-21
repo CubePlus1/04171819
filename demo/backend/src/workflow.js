@@ -29,6 +29,15 @@ function stepFrame(runId, step, name, detail) {
   return { run_id: runId, step, name, detail };
 }
 
+function buildPublicSignalRef(signal) {
+  return {
+    id: signal.id,
+    signal_type: signal.signal_type,
+    video_title: signal.video_title,
+    occurred_at: signal.occurred_at,
+  };
+}
+
 /**
  * @param {object} params
  * @param {string} params.comment 评论原文
@@ -56,7 +65,6 @@ export async function runWorkflow({
 
   // Step 1 评论入栈
   onStep?.(stepFrame(runId, 1, '评论入栈', {
-    text: comment,
     user_id: userId,
     length: comment.length,
     enqueued_at: new Date().toISOString(),
@@ -84,12 +92,9 @@ export async function runWorkflow({
   }
   onStep?.(stepFrame(runId, 3, '匹配用户历史', {
     hit: true,
-    signal: {
-      id: match.signal.id,
-      text: match.signal.raw_text,
-      video_title: match.signal.video_title,
-      occurred_at: match.signal.occurred_at,
-    },
+    signal_id: match.signal.id,
+    signal: buildPublicSignalRef(match.signal),
+    action_id: match.action.id,
     creator: match.creator.display,
     action_type: match.action.action_type,
     script: `${match.scriptId} · ${SCRIPT_LABEL[match.scriptId] ?? ''}`.trim(),
