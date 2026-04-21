@@ -505,9 +505,20 @@ npm run dev               # 监听 127.0.0.1:5173
 
 ## 11 · v0.3.1+ 后续规划
 
+**Runtime 决策 · 全程 Node.js 不引入 Python**
+
+- 所有大模型相关（R2 Deepseek API / R2-local Ollama / 未来 embedding / RAG）都走 HTTP，Node.js `fetch` 够用
+- 不需要 langchain / instructor / pydantic 等 Python 生态：R2 判真是**单轮 classification**（prompt ~300 tokens，输出 `{is_answer, confidence, reason}` JSON），超出 REST 调用的复杂度有限
+- v0.3.2 Ollama 本地推理：Ollama 自身就是 HTTP 服务（`http://localhost:11434/api/generate`），Node 直接调，和调 Deepseek 没区别
+- 真要 Python 才划算的场景：重度 agent orchestration、fine-tuning、模型训练 —— **v0.3 / v0.4 范围内都不涉及**，v0.5+ 再重新评估
+- 收益：
+  - 单一 runtime · 一份 `package.json` · 启停一条命令（`npm run dev`）
+  - 部署路径清晰：一个 Node 进程 + 一个 SQLite 文件 + 一个 Chrome 扩展目录
+  - 避免 Node ↔ Python 进程间 HTTP 通信的额外时延和故障面
+
 **v0.3.1**
-- R2 · LLM 二审（Deepseek API · ~0.0005 元/条）
-- UI：`frontend/components/AnswerReject.jsx` · 误报否决按钮 + 样本收集
+- R2 · LLM 二审（Deepseek API · ~0.0005 元/条）· Node 原生 fetch 实现
+- UI：`frontend/components/AnswerReject.jsx` · 误报否决按钮 + 样本收集（给 v0.3.2 微调做标注数据）
 - C3 · 首页/推荐视频缩略图挂角标
 
 **v0.3.2**
