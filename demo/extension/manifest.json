@@ -6,7 +6,7 @@
   "permissions": ["cookies", "storage", "notifications", "alarms"],
   "host_permissions": [
     "*://*.bilibili.com/*",
-    "http://localhost:4000/*"
+    "http://127.0.0.1:4000/*"
   ],
   "background": {
     "service_worker": "service_worker.js",

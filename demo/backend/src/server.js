@@ -24,6 +24,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_PATH = resolve(__dirname, '../data/fixtures.json');
 
 const PORT = Number(process.env.PORT ?? 4000);
+export const LISTEN_HOST = '127.0.0.1';
 const DEMO_USER_ID = 'demo-user';
 const BOOTSTRAP_CARDS_LIMIT = Number(process.env.BOOTSTRAP_CARDS_LIMIT ?? 30);
 
@@ -45,9 +46,6 @@ const DEFAULT_ALLOWED_ORIGINS = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
   /^https?:\/\/\[::1\](:\d+)?$/,
-  /^https?:\/\/192\.168\.\d+\.\d+(:\d+)?$/,
-  /^https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/,
-  /^https?:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+(:\d+)?$/,
 ];
 const EXTRA_ORIGINS = (process.env.ALLOWED_ORIGINS ?? '')
   .split(',')
@@ -55,7 +53,7 @@ const EXTRA_ORIGINS = (process.env.ALLOWED_ORIGINS ?? '')
   .filter(Boolean);
 
 export function isOriginAllowed(origin) {
-  if (!origin) return true; // curl / smoke / server-to-server
+  if (!origin) return false;
   if (EXTRA_ORIGINS.includes(origin) || EXTRA_ORIGINS.includes('*')) return true;
   return DEFAULT_ALLOWED_ORIGINS.some((re) => re.test(origin));
 }
@@ -125,6 +123,7 @@ function createApp(broadcast, state) {
   app.use(
     cors({
       origin(origin, cb) {
+        if (!origin) return cb(null, true);
         if (isOriginAllowed(origin)) cb(null, true);
         else cb(new Error(`origin not allowed: ${origin}`));
       },
@@ -339,9 +338,9 @@ function main() {
   const app = createApp(broadcast, state);
   httpServer.on('request', app);
 
-  httpServer.listen(PORT, () => {
-    log.info(`listening on http://localhost:${PORT}`);
-    log.info(`ws endpoint    ws://localhost:${PORT}/ws`);
+  httpServer.listen(PORT, LISTEN_HOST, () => {
+    log.info(`listening on http://${LISTEN_HOST}:${PORT}`);
+    log.info(`ws endpoint    ws://${LISTEN_HOST}:${PORT}/ws`);
   });
 
   let shuttingDown = false;
@@ -376,4 +375,9 @@ function main() {
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
 
-main();
+const isMain = process.argv[1]
+  && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isMain) {
+  main();
+}

@@ -1,5 +1,5 @@
-const FRONTEND_URL = 'http://localhost:5173';
-const BACKEND_URL = 'http://localhost:4000';
+const FRONTEND_URL = 'http://127.0.0.1:5173';
+const BACKEND_URL = 'http://127.0.0.1:4000';
 
 const statusEl = document.getElementById('status');
 const openButton = document.getElementById('btnOpen');

@@ -11,7 +11,8 @@ export function createBroadcaster(httpServer, { path = '/ws', isOriginAllowed } 
     path,
     verifyClient(info, cb) {
       const origin = info.origin || info.req.headers['origin'] || null;
-      if (!isOriginAllowed || isOriginAllowed(origin)) return cb(true);
+      if (!isOriginAllowed) return cb(true);
+      if (isOriginAllowed(origin)) return cb(true);
       log.warn('ws rejected (origin)', { origin });
       return cb(false, 403, 'origin not allowed');
     },

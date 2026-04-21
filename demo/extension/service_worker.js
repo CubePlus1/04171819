@@ -1,12 +1,12 @@
 import { DWSClient } from './ws_client.js';
 
-const BACKEND_URL = 'http://localhost:4000';
-const FRONTEND_URL = 'http://localhost:5173';
+const BACKEND_URL = 'http://127.0.0.1:4000';
+const FRONTEND_URL = 'http://127.0.0.1:5173';
 const BILI_API = 'https://api.bilibili.com';
 const RATE_LIMIT_MS = 1000;
 const MSGFEED_ALARM = 'msgfeed-poll';
 const TOP_REPLY_ALARM = 'top-reply-poll';
-const WS_URL = 'ws://localhost:4000/ws';
+const WS_URL = 'ws://127.0.0.1:4000/ws';
 const DEFAULT_NOTIFICATION_MESSAGE = '点击查看详情';
 
 let lastBiliRequestAt = 0;
