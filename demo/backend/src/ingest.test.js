@@ -192,6 +192,47 @@ await runCase('POST /api/ingest/comment returns 409 on duplicate rpid', async ()
   });
 });
 
+await runCase('POST /api/ingest/comment upgrades backfill placeholder raw_text instead of 409 duplicate', async () => {
+  await withServer(async ({ baseUrl, db, events }) => {
+    db.prepare(`
+      INSERT INTO creators (id, handle, display, avatar, bio)
+      VALUES (?, ?, ?, ?, ?)
+    `).run('123456', '大山', '大山', 'https://example.com/avatar.png', null);
+    const existing = db.prepare(`
+      INSERT INTO intent_signals (
+        user_id, creator_id, video_id, video_title, signal_type,
+        raw_text, topic, occurred_at, fulfilled, aid, rpid, parent_rpid, source
+      ) VALUES (?, ?, ?, ?, 'comment_intent', ?, ?, ?, 0, ?, ?, NULL, 'backfill')
+    `).run(
+      DEMO_USER_ID,
+      '123456',
+      '112233445566',
+      '焦糖褐色外套开箱',
+      '(待补)',
+      'bilibili:aid:112233445566',
+      '2026-04-21T10:20:00+08:00',
+      112233445566,
+      99887766,
+    );
+
+    const response = await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload({
+      content: '真实评论补回来了',
+    }));
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      ok: true,
+      signal_id: existing.lastInsertRowid,
+      updated: true,
+    });
+    assert.equal(
+      db.prepare('SELECT raw_text FROM intent_signals WHERE rpid = ?').get(99887766).raw_text,
+      '真实评论补回来了',
+    );
+    assert.equal(events.length, 0);
+  });
+});
+
 await runCase('POST /api/ingest/reply inserts action, judges it, and emits ws event', async () => {
   await withServer(async ({ baseUrl, db, events }) => {
     await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload());

@@ -247,6 +247,27 @@ export function buildIngestRouter({ db = getDb(), broadcast = () => {}, triggerA
         avatar: targetCreatorAvatar,
       });
 
+      const existingSignal = db.prepare(`
+        SELECT id, raw_text
+          FROM intent_signals
+         WHERE rpid = ?
+         LIMIT 1
+      `).get(rpid);
+      if (existingSignal) {
+        if (existingSignal.raw_text === '(待补)' && content !== '(待补)') {
+          const updated = db.prepare(`
+            UPDATE intent_signals
+               SET raw_text = ?
+             WHERE id = ?
+               AND raw_text = '(待补)'
+          `).run(content, existingSignal.id);
+          if (updated.changes === 1) {
+            return res.json({ ok: true, signal_id: existingSignal.id, updated: true });
+          }
+        }
+        return duplicateResponse(res);
+      }
+
       const result = db.prepare(`
         INSERT OR IGNORE INTO intent_signals (
           user_id, creator_id, video_id, video_title, signal_type,
