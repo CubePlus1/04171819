@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "蹲到了 · Bilibili Tracker",
+  "version": "0.3.0",
+  "description": "监控 B 站评论与回复，自动生成履约卡片",
+  "permissions": ["cookies", "storage", "notifications", "alarms"],
+  "host_permissions": [
+    "*://*.bilibili.com/*",
+    "http://localhost:4000/*"
+  ],
+  "background": {
+    "service_worker": "service_worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.bilibili.com/*"],
+      "js": ["content_script.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

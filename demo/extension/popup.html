@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>蹲到了 · Tracker</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      width: 232px;
+      margin: 0;
+      padding: 12px;
+      background: #f6f7fb;
+      color: #1f2329;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    button {
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: #00a1d6;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:last-of-type {
+      margin-bottom: 10px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    #status {
+      min-height: 64px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #fff;
+      color: #4e5969;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h3>蹲到了 · Tracker</h3>
+  <button id="btnOpen" type="button">打开主视图</button>
+  <button id="btnBackfill" type="button">历史倒推</button>
+  <button id="btnStatus" type="button">状态</button>
+  <div id="status">Ready.</div>
+  <script src="popup.js"></script>
+</body>
+</html>
