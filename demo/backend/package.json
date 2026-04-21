@@ -10,6 +10,7 @@
     "start": "node src/server.js",
     "start:loop": "DEMO_LOOP=1 node src/server.js",
     "db:seed": "node src/seed.js",
+    "migrate": "node src/migrate.js",
     "smoke": "node src/smoke.js",
     "test": "node src/cardBuilder.test.js"
   },
