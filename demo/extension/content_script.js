@@ -353,3 +353,244 @@
   script.remove();
 })();
 // ===== T9: MutationObserver =====
+(function () {
+  const MARKS_URL = 'http://localhost:4000/api/marks';
+  const FRONTEND_URL = 'http://localhost:5173';
+  const BADGE_STYLE_ID = 'dundao-badge-style';
+  const ROOT_SELECTORS = ['.reply-warp', '.reply-list', '#comment'];
+  const ROOT_POLL_MS = 1000;
+  const ROOT_POLL_TIMEOUT_MS = 60000;
+  const MARKS_DEBOUNCE_MS = 500;
+  const MARKS_CACHE = new Map();
+
+  if (window.__DUNDAO_BADGE_INJECTOR__) {
+    return;
+  }
+  window.__DUNDAO_BADGE_INJECTOR__ = true;
+
+  let pendingRpids = new Set();
+  let debounceTimer = null;
+  let replyObserver = null;
+
+  function ensureBadgeStyle() {
+    if (!document.head || document.getElementById(BADGE_STYLE_ID)) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = BADGE_STYLE_ID;
+    style.textContent = `
+      .dundao-badge {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #cce4ff;
+        border-radius: 4px;
+        background: #f0f7ff;
+        color: #008ac5;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 8px;
+        padding: 2px 6px;
+        vertical-align: middle;
+      }
+
+      .dundao-badge:hover {
+        background: #e0efff;
+      }
+
+      .dundao-badge.pending {
+        border-color: #ffe4b5;
+        background: #fffaf0;
+        color: #ffa500;
+      }
+    `;
+    document.head.prepend(style);
+  }
+
+  function getReplyRoot() {
+    for (const selector of ROOT_SELECTORS) {
+      const root = document.querySelector(selector);
+      if (root) {
+        return root;
+      }
+    }
+
+    return null;
+  }
+
+  function getReplyRpid(replyItem) {
+    if (!replyItem || replyItem.nodeType !== 1) {
+      return null;
+    }
+
+    const rpid = replyItem.getAttribute('data-id') || replyItem.getAttribute('data-rpid');
+    return typeof rpid === 'string' && rpid.trim() ? rpid.trim() : null;
+  }
+
+  function findReplyItems(node) {
+    if (!node || node.nodeType !== 1) {
+      return [];
+    }
+
+    if (node.matches?.('.reply-item')) {
+      return [node];
+    }
+
+    return Array.from(node.querySelectorAll?.('.reply-item') || []);
+  }
+
+  function injectBadge(rpid, info, replyItem = null) {
+    if (!info?.has_my_comment) {
+      return;
+    }
+
+    const selector = `.reply-item[data-id="${rpid}"], .reply-item[data-rpid="${rpid}"]`;
+    const item = replyItem || document.querySelector(selector);
+    if (!item) {
+      return;
+    }
+
+    ensureBadgeStyle();
+
+    const infoArea = item.querySelector('.info') || item.querySelector('.reply-info');
+    if (!infoArea) {
+      return;
+    }
+
+    const parentElement = infoArea;
+    if (parentElement.querySelector('.dundao-badge')) {
+      return;
+    }
+
+    const badge = document.createElement('span');
+    badge.className = `dundao-badge${info.fulfilled ? '' : ' pending'}`;
+    badge.textContent = info.fulfilled ? '✅ 已答' : '⏳ 等待中';
+    badge.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const url = info.card_id
+        ? `${FRONTEND_URL}?card_id=${encodeURIComponent(String(info.card_id))}`
+        : FRONTEND_URL;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+
+    parentElement.appendChild(badge);
+  }
+
+  function queueReplyItems(node) {
+    let queued = false;
+
+    for (const item of findReplyItems(node)) {
+      const rpid = getReplyRpid(item);
+      if (!rpid) {
+        continue;
+      }
+
+      if (MARKS_CACHE.has(rpid)) {
+        injectBadge(rpid, MARKS_CACHE.get(rpid), item);
+        continue;
+      }
+
+      pendingRpids.add(rpid);
+      queued = true;
+    }
+
+    return queued;
+  }
+
+  function scheduleFetchMarks() {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    debounceTimer = setTimeout(() => {
+      debounceTimer = null;
+      fetchMarks();
+    }, MARKS_DEBOUNCE_MS);
+  }
+
+  async function fetchMarks() {
+    const rpids = Array.from(pendingRpids).filter((rpid) => !MARKS_CACHE.has(rpid));
+    pendingRpids.clear();
+
+    if (rpids.length === 0) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${MARKS_URL}?rpids=${rpids.join(',')}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      const marks = data?.marks && typeof data.marks === 'object' ? data.marks : {};
+
+      for (const rpid of rpids) {
+        const info = marks[rpid] || { has_my_comment: false };
+        MARKS_CACHE.set(rpid, info);
+        injectBadge(rpid, info);
+      }
+    } catch (error) {
+      console.warn('[Dundao] marks fetch failed', error);
+    }
+  }
+
+  function attachReplyObserver() {
+    const root = getReplyRoot();
+    if (!root) {
+      return false;
+    }
+
+    if (replyObserver) {
+      return true;
+    }
+
+    replyObserver = new MutationObserver((mutations) => {
+      let hasQueuedRpid = false;
+
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (queueReplyItems(node)) {
+            hasQueuedRpid = true;
+          }
+        }
+      }
+
+      if (hasQueuedRpid) {
+        scheduleFetchMarks();
+      }
+    });
+
+    replyObserver.observe(root, { childList: true, subtree: true });
+
+    if (queueReplyItems(root)) {
+      scheduleFetchMarks();
+    }
+
+    console.log('[Dundao] reply observer attached on', root.className || root.id || root.tagName);
+    return true;
+  }
+
+  function bootReplyObserver() {
+    if (attachReplyObserver()) {
+      return;
+    }
+
+    const pollId = setInterval(() => {
+      if (attachReplyObserver()) {
+        clearInterval(pollId);
+      }
+    }, ROOT_POLL_MS);
+
+    setTimeout(() => {
+      clearInterval(pollId);
+    }, ROOT_POLL_TIMEOUT_MS);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootReplyObserver, { once: true });
+  } else {
+    bootReplyObserver();
+  }
+})();
