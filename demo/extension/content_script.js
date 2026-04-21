@@ -1,5 +1,5 @@
 (function () {
-  const INGEST_URL = 'http://localhost:4000/api/ingest/comment';
+  const INGEST_URL = 'http://127.0.0.1:4000/api/ingest/comment';
   const BRIDGE_EVENT = 'dundao:bilibili-comment-add';
   const HOOK_FLAG = '__DUNDAO_BILIBILI_REPLY_HOOK__';
   const RESPONSE_PATH_RE = /\/x\/v2\/reply\/(?:reply\/)?add(?:[/?#]|$)/;
@@ -354,14 +354,23 @@
 })();
 // ===== T9: MutationObserver =====
 (function () {
-  const MARKS_URL = 'http://localhost:4000/api/marks';
-  const FRONTEND_URL = 'http://localhost:5173';
+  const MARKS_URL = 'http://127.0.0.1:4000/api/marks';
+  const FRONTEND_URL = 'http://127.0.0.1:5173';
   const BADGE_STYLE_ID = 'dundao-badge-style';
-  const ROOT_SELECTORS = ['.reply-warp', '.reply-list', '#comment'];
+  const ROOT_SELECTORS = ['#commentapp', '.reply-warp', '.reply-list', '#comment'];
+  const REPLY_ITEM_SELECTORS = [
+    '[data-rpid]',
+    '[data-id]',
+    '.reply-item',
+    '.reply-wrap',
+    '.sub-reply-item',
+    '.reply-list-item',
+  ];
   const ROOT_POLL_MS = 1000;
   const ROOT_POLL_TIMEOUT_MS = 60000;
   const MARKS_DEBOUNCE_MS = 500;
   const MARKS_CACHE = new Map();
+  const WARNED_SHADOW_HOSTS = new WeakSet();
 
   if (window.__DUNDAO_BADGE_INJECTOR__) {
     return;
@@ -407,11 +416,51 @@
     document.head.prepend(style);
   }
 
+  function describeRoot(root) {
+    if (!root) {
+      return 'unknown';
+    }
+
+    if (root instanceof ShadowRoot) {
+      const host = root.host;
+      return `shadowRoot(${host?.id || host?.className || host?.tagName || 'host'})`;
+    }
+
+    return root.id || root.className || root.tagName;
+  }
+
+  function collectQueryRoots() {
+    const roots = [document];
+    const walker = document.createTreeWalker(document.documentElement || document.body, NodeFilter.SHOW_ELEMENT);
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (node?.shadowRoot instanceof ShadowRoot) {
+        if (!WARNED_SHADOW_HOSTS.has(node)) {
+          WARNED_SHADOW_HOSTS.add(node);
+          console.warn('[Dundao] detected open shadowRoot near comment tree', node);
+        }
+        roots.push(node.shadowRoot);
+      }
+    }
+
+    return roots;
+  }
+
   function getReplyRoot() {
-    for (const selector of ROOT_SELECTORS) {
-      const root = document.querySelector(selector);
-      if (root) {
-        return root;
+    for (const queryRoot of collectQueryRoots()) {
+      for (const selector of ROOT_SELECTORS) {
+        const root = queryRoot.querySelector(selector);
+        if (root?.shadowRoot instanceof ShadowRoot) {
+          if (!WARNED_SHADOW_HOSTS.has(root)) {
+            WARNED_SHADOW_HOSTS.add(root);
+            console.warn('[Dundao] comment host uses open shadowRoot', root);
+          }
+          return root.shadowRoot;
+        }
+        if (root) {
+          return root;
+        }
       }
     }
 
@@ -423,20 +472,61 @@
       return null;
     }
 
-    const rpid = replyItem.getAttribute('data-id') || replyItem.getAttribute('data-rpid');
+    const source = replyItem.matches?.('[data-rpid], [data-id]')
+      ? replyItem
+      : replyItem.querySelector?.('[data-rpid], [data-id]');
+    const rpid = source?.getAttribute('data-rpid') || source?.getAttribute('data-id');
     return typeof rpid === 'string' && rpid.trim() ? rpid.trim() : null;
   }
 
   function findReplyItems(node) {
-    if (!node || node.nodeType !== 1) {
+    if (!node || ![1, 11].includes(node.nodeType)) {
       return [];
     }
 
-    if (node.matches?.('.reply-item')) {
-      return [node];
+    const seen = new Set();
+    const items = [];
+    const add = (item) => {
+      if (!item || seen.has(item)) {
+        return;
+      }
+      seen.add(item);
+      items.push(item);
+    };
+
+    if (node.nodeType === 1 && REPLY_ITEM_SELECTORS.some((selector) => node.matches?.(selector))) {
+      add(node);
     }
 
-    return Array.from(node.querySelectorAll?.('.reply-item') || []);
+    for (const selector of REPLY_ITEM_SELECTORS) {
+      for (const item of Array.from(node.querySelectorAll?.(selector) || [])) {
+        add(item);
+      }
+    }
+
+    return items;
+  }
+
+  function findReplyItemByRpid(rpid) {
+    if (!rpid) {
+      return null;
+    }
+
+    for (const queryRoot of collectQueryRoots()) {
+      for (const selector of [
+        `[data-rpid="${rpid}"]`,
+        `[data-id="${rpid}"]`,
+        `.reply-item[data-rpid="${rpid}"]`,
+        `.reply-item[data-id="${rpid}"]`,
+      ]) {
+        const item = queryRoot.querySelector(selector);
+        if (item) {
+          return item;
+        }
+      }
+    }
+
+    return null;
   }
 
   function injectBadge(rpid, info, replyItem = null) {
@@ -444,8 +534,7 @@
       return;
     }
 
-    const selector = `.reply-item[data-id="${rpid}"], .reply-item[data-rpid="${rpid}"]`;
-    const item = replyItem || document.querySelector(selector);
+    const item = replyItem || findReplyItemByRpid(rpid);
     if (!item) {
       return;
     }
@@ -568,7 +657,7 @@
       scheduleFetchMarks();
     }
 
-    console.log('[Dundao] reply observer attached on', root.className || root.id || root.tagName);
+    console.log('[Dundao] reply observer attached on', describeRoot(root));
     return true;
   }
 
