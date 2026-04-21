@@ -7,11 +7,17 @@
 export const WS_EVENTS = Object.freeze({
   HELLO:             'ws.hello',
   WORKFLOW_BEGIN:    'workflow.begin',
-  WORKFLOW_STEP:     'workflow.step',
+  WORKFLOW_STEP:     'step',
+  WORKFLOW_STEP_LEGACY: 'workflow.step',
   WORKFLOW_END:      'workflow.end',
   CARD_GENERATED:    'card.generated',
   DEMO_RESET:        'demo.reset',
   SERVER_SHUTDOWN:   'server.shutdown',
+});
+
+export const BACKFILL_EVENTS = Object.freeze({
+  PROGRESS: 'backfill.progress',
+  DONE: 'backfill.done',
 });
 
 export const REASON_CODES = Object.freeze({

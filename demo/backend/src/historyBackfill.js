@@ -5,15 +5,13 @@ import { createBilibiliClient } from './bilibili.js';
 import { getDb } from './db.js';
 import { judgeAnswer } from './answerJudge.js';
 import { createLogger } from './logger.js';
+import { BACKFILL_EVENTS } from '../../shared/contracts.js';
 
 const log = createLogger('historyBackfill');
 const DEMO_USER_ID = 'demo-user';
 const DUPLICATE_PAGE_LIMIT = 2;
 
-export const BACKFILL_EVENTS = Object.freeze({
-  PROGRESS: 'backfill.progress',
-  DONE: 'backfill.done',
-});
+export { BACKFILL_EVENTS };
 
 function fireAmbientTrigger(triggerAmbient, payload) {
   if (typeof triggerAmbient !== 'function' || !payload?.topic) {

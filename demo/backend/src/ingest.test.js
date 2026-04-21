@@ -134,6 +134,52 @@ await runCase('POST /api/ingest/comment inserts signal and round-trips via /api/
   });
 });
 
+await runCase('GET /api/my-comments excludes mock and non-comment signals', async () => {
+  await withServer(async ({ baseUrl, db }) => {
+    await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload());
+
+    db.prepare(`
+      INSERT INTO intent_signals (
+        user_id, creator_id, video_id, video_title, signal_type,
+        raw_text, topic, occurred_at, fulfilled, source
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+    `).run(
+      DEMO_USER_ID,
+      '123456',
+      'video-mock',
+      'Mock 视频',
+      'comment_intent',
+      '旧 mock 信号',
+      'bilibili:aid:9988',
+      '2026-04-01T00:00:00.000Z',
+      'mock',
+    );
+    db.prepare(`
+      INSERT INTO intent_signals (
+        user_id, creator_id, video_id, video_title, signal_type,
+        raw_text, topic, occurred_at, fulfilled, source
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+    `).run(
+      DEMO_USER_ID,
+      '123456',
+      'video-watch',
+      '稍后再看视频',
+      'watch_later',
+      '回头看',
+      'bilibili:aid:9989',
+      '2026-04-01T00:00:00.000Z',
+      'hook',
+    );
+
+    const response = await fetch(`${baseUrl}/api/my-comments`);
+    assert.equal(response.status, 200);
+    const json = await response.json();
+    assert.equal(json.total, 1);
+    assert.equal(json.items.length, 1);
+    assert.equal(json.items[0].content, '蹲链接');
+  });
+});
+
 await runCase('POST /api/ingest/comment returns 409 on duplicate rpid', async () => {
   await withServer(async ({ baseUrl, db }) => {
     await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload());
@@ -163,6 +209,24 @@ await runCase('POST /api/ingest/reply inserts action, judges it, and emits ws ev
     assert.equal(row.is_answer, 1);
     assert.equal(row.confidence, json.confidence);
     assert.equal(events.at(-1).type, INGEST_EVENTS.ACTION_INGESTED);
+  });
+});
+
+await runCase('GET /api/my-comments marks fulfilled by answer state and keeps card_id separate', async () => {
+  await withServer(async ({ baseUrl }) => {
+    await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload());
+    await postJson(baseUrl, '/api/ingest/reply', buildReplyPayload());
+
+    const response = await fetch(`${baseUrl}/api/my-comments?filter=fulfilled`);
+    assert.equal(response.status, 200);
+    const json = await response.json();
+    assert.equal(json.total, 1);
+    assert.equal(json.fulfilled, 1);
+    assert.equal(json.pending, 0);
+    assert.equal(json.items.length, 1);
+    assert.equal(json.items[0].fulfilled, 1);
+    assert.equal(json.items[0].card_id, null);
+    assert.match(json.items[0].top_answer.content, /链接上了/u);
   });
 });
 

@@ -150,6 +150,11 @@ function buildMyComments(db, filter) {
       FROM intent_signals s
       JOIN creators c ON c.id = s.creator_id
      WHERE s.user_id = ?
+       AND s.signal_type = 'comment_intent'
+       AND (
+         COALESCE(s.source, 'mock') IN ('hook', 'backfill')
+         OR s.rpid IS NOT NULL
+       )
      ORDER BY s.occurred_at DESC
   `).all(DEMO_USER_ID);
 
@@ -157,7 +162,7 @@ function buildMyComments(db, filter) {
     const action = findTopAnswerForSignal(db, row);
     const payload = action ? parsePayloadJson(action.payload_json) : null;
     const cardRow = db.prepare('SELECT id FROM cards WHERE intent_signal_id = ? LIMIT 1').get(row.id);
-    const fulfilled = Boolean(cardRow);
+    const fulfilled = Boolean(action);
 
     return {
       signal_id: row.id,
