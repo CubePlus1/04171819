@@ -10,6 +10,7 @@ import { createBroadcaster } from './events.js';
 import { runWorkflow, newRunId } from './workflow.js';
 import { runAmbient, hasPendingAmbient } from './ambient.js';
 import { buildIngestRouter } from './ingest.js';
+import { buildHistoryBackfillRouter } from './historyBackfill.js';
 import { createRateLimiter } from './rateLimit.js';
 import { createLogger } from './logger.js';
 import { seed } from './seed.js';
@@ -100,6 +101,7 @@ function createApp(broadcast, state) {
   });
 
   app.use('/api', buildIngestRouter({ broadcast }));
+  app.use('/api', buildHistoryBackfillRouter({ broadcast }));
 
   const commentLimiter = createRateLimiter({
     capacity: Number(process.env.RATE_LIMIT_CAPACITY ?? 12),
