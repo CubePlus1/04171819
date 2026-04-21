@@ -9,6 +9,7 @@ import { DB_PATH, getDb, runSchema, closeDb } from './db.js';
 import { createBroadcaster } from './events.js';
 import { runWorkflow, newRunId } from './workflow.js';
 import { runAmbient, hasPendingAmbient } from './ambient.js';
+import { buildIngestRouter } from './ingest.js';
 import { createRateLimiter } from './rateLimit.js';
 import { createLogger } from './logger.js';
 import { seed } from './seed.js';
@@ -97,6 +98,8 @@ function createApp(broadcast, state) {
     }
     return next(err);
   });
+
+  app.use('/api', buildIngestRouter({ broadcast }));
 
   const commentLimiter = createRateLimiter({
     capacity: Number(process.env.RATE_LIMIT_CAPACITY ?? 12),
