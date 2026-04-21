@@ -203,7 +203,24 @@ function duplicateResponse(res) {
   return res.status(409).json({ ok: false, reason: 'duplicate_rpid' });
 }
 
-export function buildIngestRouter({ db = getDb(), broadcast = () => {} } = {}) {
+function fireAmbientTrigger(triggerAmbient, payload) {
+  if (typeof triggerAmbient !== 'function' || !payload?.topic) {
+    return;
+  }
+
+  try {
+    const pending = triggerAmbient(payload);
+    if (pending && typeof pending.catch === 'function') {
+      pending.catch((err) => {
+        log.warn('ambient trigger failed', { topic: payload.topic, err: err.message });
+      });
+    }
+  } catch (err) {
+    log.warn('ambient trigger failed', { topic: payload.topic, err: err.message });
+  }
+}
+
+export function buildIngestRouter({ db = getDb(), broadcast = () => {}, triggerAmbient = null } = {}) {
   const router = express.Router();
 
   router.post('/ingest/comment', (req, res) => {
@@ -341,6 +358,13 @@ export function buildIngestRouter({ db = getDb(), broadcast = () => {} } = {}) {
         is_answer: verdict.is_answer,
       });
 
+      if (verdict.is_answer) {
+        fireAmbientTrigger(triggerAmbient, {
+          userId: DEMO_USER_ID,
+          topic,
+        });
+      }
+
       return res.json({
         ok: true,
         action_id: result.lastInsertRowid,
@@ -370,6 +394,7 @@ export function buildIngestRouter({ db = getDb(), broadcast = () => {} } = {}) {
 
       let ingested = 0;
       let answers = 0;
+      const answerTopics = new Set();
 
       for (const item of batch) {
         const rpid = toNumber(item?.rpid, 'batch.rpid');
@@ -430,6 +455,7 @@ export function buildIngestRouter({ db = getDb(), broadcast = () => {} } = {}) {
           ingested += 1;
           if (verdict.is_answer) {
             answers += 1;
+            answerTopics.add(topic);
           }
           broadcast(INGEST_EVENTS.ACTION_INGESTED, {
             action_id: result.lastInsertRowid,
@@ -439,6 +465,13 @@ export function buildIngestRouter({ db = getDb(), broadcast = () => {} } = {}) {
             is_answer: verdict.is_answer,
           });
         }
+      }
+
+      for (const answerTopic of answerTopics) {
+        fireAmbientTrigger(triggerAmbient, {
+          userId: DEMO_USER_ID,
+          topic: answerTopic,
+        });
       }
 
       return res.json({ ok: true, ingested, answers });

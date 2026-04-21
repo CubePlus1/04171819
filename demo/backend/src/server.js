@@ -79,6 +79,49 @@ function createApp(broadcast, state) {
   const app = express();
   app.set('trust proxy', 'loopback');
 
+  function triggerAmbient({ userId = DEMO_USER_ID, topic }) {
+    const runId = newRunId();
+    state.inFlight.add(runId);
+    broadcast(WS_EVENTS.WORKFLOW_BEGIN, { run_id: runId, ambient: true, auto: true, userId });
+
+    void Promise.resolve()
+      .then(() => runAmbient({
+        userId,
+        runId,
+        topic,
+        loopMode: LOOP_MODE,
+        onStep: (frame) => broadcast(WS_EVENTS.WORKFLOW_STEP, { ...frame, ambient: true, auto: true }),
+      }))
+      .then((result) => {
+        if (result.ok) {
+          broadcast(WS_EVENTS.CARD_GENERATED, { run_id: runId, ambient: true, auto: true, card: result.card });
+          broadcast(WS_EVENTS.WORKFLOW_END, { run_id: runId, ambient: true, auto: true, ok: true, cardId: result.card.id });
+          return;
+        }
+
+        broadcast(WS_EVENTS.WORKFLOW_END, {
+          run_id: runId,
+          ambient: true,
+          auto: true,
+          ok: false,
+          reason: result.reason,
+        });
+      })
+      .catch((err) => {
+        log.error('ambient auto-trigger failed', { run_id: runId, topic, err: err.message, stack: err.stack });
+        broadcast(WS_EVENTS.WORKFLOW_END, {
+          run_id: runId,
+          ambient: true,
+          auto: true,
+          ok: false,
+          reason: REASON_CODES.SERVER_ERROR,
+        });
+      })
+      .finally(() => {
+        state.inFlight.delete(runId);
+      });
+  }
+
   app.use(
     cors({
       origin(origin, cb) {
@@ -100,8 +143,8 @@ function createApp(broadcast, state) {
     return next(err);
   });
 
-  app.use('/api', buildIngestRouter({ broadcast }));
-  app.use('/api', buildHistoryBackfillRouter({ broadcast }));
+  app.use('/api', buildIngestRouter({ broadcast, triggerAmbient }));
+  app.use('/api', buildHistoryBackfillRouter({ broadcast, triggerAmbient }));
 
   const commentLimiter = createRateLimiter({
     capacity: Number(process.env.RATE_LIMIT_CAPACITY ?? 12),

@@ -20,7 +20,7 @@ function runCase(label, fn) {
     });
 }
 
-async function withServer(run) {
+async function withServer(run, routerOptions = {}) {
   const tempDir = mkdtempSync(join(tmpdir(), 'dundao-ingest-'));
   const dbPath = join(tempDir, 'test.db');
   const db = new Database(dbPath);
@@ -42,9 +42,14 @@ async function withServer(run) {
     }
     return next(err);
   });
+  const resolvedRouterOptions = typeof routerOptions === 'function'
+    ? routerOptions({ db, events })
+    : routerOptions;
+
   app.use('/api', buildIngestRouter({
     db,
     broadcast: (type, payload) => events.push({ type, payload }),
+    ...resolvedRouterOptions,
   }));
 
   const server = createServer(app);
@@ -161,6 +166,28 @@ await runCase('POST /api/ingest/reply inserts action, judges it, and emits ws ev
   });
 });
 
+await runCase('POST /api/ingest/reply fires ambient for answers and surfaces workflow/card broadcasts', async () => {
+  const ambientCalls = [];
+  await withServer(async ({ baseUrl, events }) => {
+    await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload());
+
+    const response = await postJson(baseUrl, '/api/ingest/reply', buildReplyPayload());
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(ambientCalls, [
+      { userId: DEMO_USER_ID, topic: 'bilibili:aid:112233445566' },
+    ]);
+    assert.ok(events.some((event) => event.type === 'workflow.begin'));
+    assert.ok(events.some((event) => event.type === 'card.generated'));
+  }, ({ events }) => ({
+    triggerAmbient: ({ userId, topic }) => {
+      ambientCalls.push({ userId, topic });
+      events.push({ type: 'workflow.begin', payload: { ambient: true, topic } });
+      events.push({ type: 'card.generated', payload: { card: { id: 'card-auto-1' } } });
+    },
+  }));
+});
+
 await runCase('POST /api/ingest/top-reply ingests batch and counts answers', async () => {
   await withServer(async ({ baseUrl, db }) => {
     await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload({ content: '蹲 BGM' }));
@@ -195,6 +222,49 @@ await runCase('POST /api/ingest/top-reply ingests batch and counts answers', asy
     assert.equal(response.status, 200);
     assert.deepEqual(await response.json(), { ok: true, ingested: 2, answers: 1 });
     assert.equal(db.prepare('SELECT COUNT(*) AS c FROM creator_actions').get().c, 2);
+  });
+});
+
+await runCase('POST /api/ingest/top-reply triggers ambient once per answer topic', async () => {
+  const ambientCalls = [];
+  await withServer(async ({ baseUrl }) => {
+    await postJson(baseUrl, '/api/ingest/comment', buildCommentPayload({ content: '蹲 BGM' }));
+
+    const response = await postJson(baseUrl, '/api/ingest/top-reply', {
+      source: 'L2',
+      aid: 112233445566,
+      batch: [
+        {
+          rpid: 99887801,
+          replier_mid: 654321,
+          replier_name: '网友A',
+          content: 'BGM 是陈粒 - 芳草地',
+          like_count: 520,
+          is_up: false,
+          is_top: false,
+          occurred_at: '2026-04-21T11:05:00+08:00',
+        },
+        {
+          rpid: 99887803,
+          replier_mid: 654323,
+          replier_name: '网友C',
+          content: '这里也有完整歌单',
+          like_count: 88,
+          is_up: false,
+          is_top: false,
+          occurred_at: '2026-04-21T11:07:00+08:00',
+        },
+      ],
+    });
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(ambientCalls, [
+      { userId: DEMO_USER_ID, topic: 'bilibili:aid:112233445566' },
+    ]);
+  }, {
+    triggerAmbient: ({ userId, topic }) => {
+      ambientCalls.push({ userId, topic });
+    },
   });
 });
 

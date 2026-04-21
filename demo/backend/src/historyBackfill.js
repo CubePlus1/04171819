@@ -15,6 +15,23 @@ export const BACKFILL_EVENTS = Object.freeze({
   DONE: 'backfill.done',
 });
 
+function fireAmbientTrigger(triggerAmbient, payload) {
+  if (typeof triggerAmbient !== 'function' || !payload?.topic) {
+    return;
+  }
+
+  try {
+    const pending = triggerAmbient(payload);
+    if (pending && typeof pending.catch === 'function') {
+      pending.catch((err) => {
+        log.warn('backfill ambient trigger failed', { topic: payload.topic, err: err.message });
+      });
+    }
+  } catch (err) {
+    log.warn('backfill ambient trigger failed', { topic: payload.topic, err: err.message });
+  }
+}
+
 function topicFromAid(aid) {
   return `bilibili:aid:${aid}`;
 }
@@ -129,6 +146,7 @@ export async function backfillOnce({
   db = getDb(),
   client = createBilibiliClient(),
   broadcast = () => {},
+  triggerAmbient = null,
 } = {}) {
   if (typeof sessdata !== 'string' || !sessdata.trim()) {
     throw new TypeError('backfillOnce: sessdata is required');
@@ -163,6 +181,7 @@ export async function backfillOnce({
   let totalSignals = 0;
   let totalActions = 0;
   let duplicateOnlyPages = 0;
+  const ambientTopics = new Set();
 
   while (true) {
     const batch = await client.fetchMsgfeedReply({ sessdata, cursor, ps: 20 });
@@ -220,6 +239,7 @@ export async function backfillOnce({
       if (signalInsert.changes === 1) {
         totalSignals += 1;
         insertsThisPage += 1;
+        ambientTopics.add(topicFromAid(aid));
       }
 
       const replierMid = Number(item.mid_replier);
@@ -268,6 +288,9 @@ export async function backfillOnce({
       if (actionInsert.changes === 1) {
         totalActions += 1;
         insertsThisPage += 1;
+        if (verdict.is_answer) {
+          ambientTopics.add(topicFromAid(aid));
+        }
       }
     }
 
@@ -299,6 +322,13 @@ export async function backfillOnce({
     total_cards: totalCards,
   };
 
+  for (const topic of ambientTopics) {
+    fireAmbientTrigger(triggerAmbient, {
+      userId: DEMO_USER_ID,
+      topic,
+    });
+  }
+
   broadcast(BACKFILL_EVENTS.DONE, donePayload);
   log.info('backfill done', { totalSignals, totalActions, totalCards });
 
@@ -314,6 +344,7 @@ export function buildHistoryBackfillRouter({
   db = getDb(),
   createClient = () => createBilibiliClient(),
   broadcast = () => {},
+  triggerAmbient = null,
   runBackfill = backfillOnce,
   createRunId: createId = createRunId,
   now = () => new Date().toISOString(),
@@ -353,6 +384,7 @@ export function buildHistoryBackfillRouter({
           db,
           client: createClient(),
           broadcast: forwardEvent,
+          triggerAmbient,
         });
 
         lastRun = {

@@ -335,6 +335,65 @@ await runCase('backfillOnce reruns without new rows, progress is monotonic, and 
   });
 });
 
+await runCase('backfillOnce triggers ambient for newly discovered topics before backfill.done', async () => {
+  await withDb(async (db) => {
+    const timeline = [];
+    const client = createMsgfeedClient({
+      pages: [
+        {
+          cursor: null,
+          replies: [
+            {
+              source_id: 1001,
+              source_content: '蹲链接',
+              business_id: 2001,
+              title: '焦糖褐色外套开箱',
+              reply_content: '链接上了！https://shop.example/1',
+              mid_replier: 123456,
+              replier_name: '大山',
+              like_count: 42,
+              is_up: true,
+              is_top: false,
+              rpid: 5001,
+              occurred_at: '2026-04-21T11:00:00+08:00',
+            },
+          ],
+          hasMore: false,
+          nextCursor: null,
+        },
+      ],
+      views: new Map([
+        [2001, {
+          title: '焦糖褐色外套开箱',
+          desc: 'desc-1',
+          owner: { mid: 123456, name: '大山', face: 'https://example.com/1.png' },
+          pinned_reply: null,
+        }],
+      ]),
+      viewCalls: [],
+      fetchCalls: [],
+    });
+
+    const result = await backfillOnce({
+      sessdata: 'SESSDATA_VALUE',
+      db,
+      client,
+      broadcast: (type, payload) => timeline.push({ kind: 'broadcast', type, payload }),
+      triggerAmbient: ({ userId, topic }) => timeline.push({ kind: 'ambient', userId, topic }),
+    });
+
+    assert.equal(result.ok, true);
+    const ambientEvent = timeline.find((entry) => entry.kind === 'ambient');
+    const doneEvent = timeline.findLast((entry) => entry.kind === 'broadcast' && entry.type === BACKFILL_EVENTS.DONE);
+    assert.deepEqual(ambientEvent, {
+      kind: 'ambient',
+      userId: 'demo-user',
+      topic: 'bilibili:aid:2001',
+    });
+    assert.ok(timeline.indexOf(ambientEvent) < timeline.indexOf(doneEvent));
+  });
+});
+
 await runCase('POST /api/backfill/start is async, /status reports progress, and concurrent start returns 409', async () => {
   const deferred = createDeferred();
   const events = [];
