@@ -1,9 +1,10 @@
 // 端到端冒烟：走 primary ambient 路径 + 保留 /api/comment 遗留路径回归
 import WebSocket from 'ws';
+import { WS_EVENTS } from '../../shared/contracts.js';
 
-const BASE = process.env.BASE ?? 'http://localhost:4000';
+const BASE = process.env.BASE ?? 'http://127.0.0.1:4000';
 const WS_URL = BASE.replace(/^http/, 'ws') + '/ws';
-const ORIGIN = process.env.SMOKE_ORIGIN ?? 'http://localhost:5173';
+const ORIGIN = process.env.SMOKE_ORIGIN ?? 'http://127.0.0.1:5173';
 
 function assert(cond, msg) {
   if (!cond) {
@@ -101,7 +102,7 @@ async function main() {
     assert(typeof r.runId === 'string' && r.runId.startsWith('run_'), `ambient 响应含 runId`);
 
     const frames = await waitFrames;
-    const run = frames.filter((f) => f.type === 'workflow.step' && f.payload.run_id === r.runId);
+    const run = frames.filter((f) => f.type === WS_EVENTS.WORKFLOW_STEP && f.payload.run_id === r.runId);
     const steps = run.map((f) => f.payload.step);
     assert(JSON.stringify(steps) === JSON.stringify([1, 2, 3, 4, 5]),
       `收到 5 步（实际 ${JSON.stringify(steps)}）`);
