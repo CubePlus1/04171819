@@ -2,6 +2,7 @@ import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DB_PATH, getDb, runSchema, closeDb } from './db.js';
+import { applyMigrations } from './migrate.js';
 import { createLogger } from './logger.js';
 
 const log = createLogger('seed');
@@ -18,12 +19,12 @@ function hoursAgoIso(hours) {
   return d.toISOString();
 }
 
-export function seed() {
+export function seed({ db = getDb(), fixturesPath = FIXTURES_PATH } = {}) {
   mkdirSync(dirname(DB_PATH), { recursive: true });
-  const db = getDb();
   runSchema(db);
+  applyMigrations({ db });
 
-  const fixtures = JSON.parse(readFileSync(FIXTURES_PATH, 'utf8'));
+  const fixtures = JSON.parse(readFileSync(fixturesPath, 'utf8'));
 
   const tx = db.transaction(() => {
     db.exec(`
@@ -63,9 +64,9 @@ export function seed() {
 
     const insertAction = db.prepare(`
       INSERT INTO creator_actions
-        (creator_id, action_type, payload_json, topic, occurred_at)
+        (creator_id, action_type, payload_json, topic, occurred_at, replying_to_rpid, is_answer, source)
       VALUES
-        (@creator_id, @action_type, @payload_json, @topic, @occurred_at)
+        (@creator_id, @action_type, @payload_json, @topic, @occurred_at, @replying_to_rpid, @is_answer, @source)
     `);
     for (const a of fixtures.creator_actions) {
       insertAction.run({
@@ -74,6 +75,9 @@ export function seed() {
         payload_json: JSON.stringify(a.payload),
         topic: a.topic,
         occurred_at: hoursAgoIso(a.hours_ago),
+        replying_to_rpid: a.replying_to_rpid ?? null,
+        is_answer: a.is_answer ?? 1,
+        source: a.source ?? 'mock',
       });
     }
   });

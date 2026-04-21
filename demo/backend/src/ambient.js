@@ -61,7 +61,7 @@ function pickNextCandidate(db, { userId, topic = null, signalId = null }) {
          ca.replying_to_rpid = s.rpid
          OR (
            ca.replying_to_rpid IS NULL
-           AND ca.source = 'L2'
+           AND ca.source IN ('L2', 'mock')
            AND ca.topic = s.topic
          )
        )
@@ -174,12 +174,11 @@ export async function runAmbient({
   onStep,
   stepDelayMs = DEFAULT_STEP_DELAY_MS,
   loopMode = false,
+  db = getDb(),
 }) {
   if (typeof userId !== 'string' || !userId) {
     throw new TypeError('runAmbient: userId must be a non-empty string');
   }
-  const db = getDb();
-
   // Step 1 · 后台扫描她还惦记着的 · mind.phase=scan，下发完整 nodes 快照
   const scan = db.prepare(
     `SELECT COUNT(*) AS total,
@@ -402,8 +401,7 @@ export async function runAmbient({
  * loopMode 下只要 fixtures 里还有可匹配的 (signal × action) 对就视为 pending：
  * 真正跑 runAmbient 时若取不到会软 reset 再取，前端观感是永远有得接。
  */
-export function hasPendingAmbient(userId, { loopMode = false } = {}) {
-  const db = getDb();
+export function hasPendingAmbient(userId, { loopMode = false, db = getDb() } = {}) {
   const useLoopReplay = loopMode && !hasRealSignalRows(db, userId);
 
   if (useLoopReplay) {
@@ -428,7 +426,7 @@ export function hasPendingAmbient(userId, { loopMode = false } = {}) {
               ca.replying_to_rpid = s.rpid
               OR (
                 ca.replying_to_rpid IS NULL
-                AND ca.source = 'L2'
+                AND ca.source IN ('L2', 'mock')
                 AND ca.topic = s.topic
               )
             )

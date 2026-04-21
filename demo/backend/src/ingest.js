@@ -135,7 +135,7 @@ function findTopAnswerForSignal(db, signal) {
          ca.replying_to_rpid = ?
          OR (
            ca.replying_to_rpid IS NULL
-           AND ca.source = 'L2'
+           AND ca.source IN ('L2', 'mock')
            AND ca.topic = ?
          )
        )

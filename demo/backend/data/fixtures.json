@@ -67,6 +67,9 @@
       "action_type": "post_link",
       "topic": "storage-haul",
       "hours_ago": 2,
+      "replying_to_rpid": null,
+      "is_answer": 1,
+      "source": "mock",
       "payload": {
         "video_id": "v-storage-launch",
         "title": "姐妹们蹲到了！那个露营收纳箱的链接今天能放了",
@@ -87,6 +90,9 @@
       "action_type": "series_completed",
       "topic": "missing-bf",
       "hours_ago": 6,
+      "replying_to_rpid": null,
+      "is_answer": 1,
+      "source": "mock",
       "payload": {
         "video_id": "v-gay-d5",
         "title": "Day5 更新 · 他终于回信息了 · 姐妹们先别急着冲",
@@ -128,6 +134,9 @@
       "action_type": "post_sequel",
       "topic": "editing-transition",
       "hours_ago": 3,
+      "replying_to_rpid": null,
+      "is_answer": 1,
+      "source": "mock",
       "payload": {
         "video_id": "v-editor-tutorial",
         "title": "教程来了 · 这招电影感转场 · 只用剪映就行",
