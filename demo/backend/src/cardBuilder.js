@@ -13,12 +13,19 @@ import { relativeTimeCn as RELATIVE_TIME_CN } from '../../shared/contracts.js';
 
 const SCRIPT_TO_PAGES = { A: ['P1', 'P2'], B: ['P1', 'P3'], C: ['P1', 'P2', 'P3'] };
 
+function getSignalRawText(signal) {
+  const text = typeof signal.raw_text === 'string' ? signal.raw_text.trim() : '';
+  if (!text || text === '(待补)') return '';
+  return text;
+}
+
 function buildContextLine({ signal, creator }) {
   const relative = RELATIVE_TIME_CN(signal.occurred_at);
   const verb = ACTION_VERB_BY_SIGNAL[signal.signal_type] ?? '关注过';
   // 从 "log 行" 重构成 "想起来了" 的句式：主语前置 + 创作者收束
-  const tail = signal.raw_text
-    ? `「${signal.raw_text}」`
+  const rawText = getSignalRawText(signal);
+  const tail = rawText
+    ? `「${rawText}」`
     : `《${signal.video_title}》`;
   return `你 ${relative} 在「${creator.display}」那儿${verb} ${tail}`;
 }
@@ -71,8 +78,9 @@ function buildActionsStrip(scriptId, action) {
 }
 
 function buildP2({ intentResult, signal, creator, action }) {
-  const triggerSignal = signal.raw_text
-    ? `你在《${signal.video_title}》下评论「${signal.raw_text}」`
+  const rawText = getSignalRawText(signal);
+  const triggerSignal = rawText
+    ? `你在《${signal.video_title}》下评论「${rawText}」`
     : `你${ACTION_VERB_BY_SIGNAL[signal.signal_type] ?? '关注过'}《${signal.video_title}》`;
   const matchedBasis = {
     post_link:        '她把你蹲的款式放出了平替链接',
@@ -129,6 +137,7 @@ export function buildCard({ match, intentResult, userId }) {
   }[scriptId] ?? '你念念不忘的 · 接回来了';
 
   const occurredRelative = RELATIVE_TIME_CN(signal.occurred_at);
+  const rawText = getSignalRawText(signal);
   // Figma 顶端大标题：action.payload.headline 里的 {time} 用相对时间替换
   const headlineTpl = action?.payload?.headline
     ?? `我 {time} 蹲的那件事 · 它来了`;
@@ -138,7 +147,7 @@ export function buildCard({ match, intentResult, userId }) {
     id: 'P1',
     name: '情景 + 答案',
     // Figma 轻卡：我原评论 + 相对时间 + 原视频行 + 作者标签
-    my_comment: signal.raw_text ?? '',
+    my_comment: rawText || signal.video_title,
     occurred_relative: occurredRelative,
     headline,
     context_line: buildContextLine({ signal, creator }),
@@ -161,4 +170,3 @@ export function buildCard({ match, intentResult, userId }) {
     pages,
   };
 }
-

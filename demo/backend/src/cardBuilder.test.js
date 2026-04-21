@@ -127,6 +127,27 @@ runCase('buildCard 在 match 缺失时抛错', () => {
     /buildCard: match\.signal/);
 });
 
+runCase('raw_text 为空字符串时 P1 my_comment 回退到 video_title', () => {
+  const card = buildCard({
+    match: mkMatch({ scriptId: 'A', raw_text: '' }),
+    intentResult: { intent: 'link_request', label: '蹲链接', confidence: 0.9, rationale: 'r' },
+    userId: 'demo-user',
+  });
+  assert.equal(card.pages[0].my_comment, '磨毛圆领打底');
+  assert.match(card.pages[0].context_line, /《磨毛圆领打底》/);
+});
+
+runCase('raw_text 为 (待补) 时 P1/P2 都回退到 video_title', () => {
+  const card = buildCard({
+    match: mkMatch({ scriptId: 'A', raw_text: '(待补)' }),
+    intentResult: { intent: 'link_request', label: '蹲链接', confidence: 0.9, rationale: 'r' },
+    userId: 'demo-user',
+  });
+  assert.equal(card.pages[0].my_comment, '磨毛圆领打底');
+  assert.match(card.pages[0].context_line, /《磨毛圆领打底》/);
+  assert.equal(card.pages[1].trigger_signal, '你评论了《磨毛圆领打底》');
+});
+
 if (process.exitCode) {
   console.error('\n🔥 cardBuilder tests failed');
   process.exit(process.exitCode);

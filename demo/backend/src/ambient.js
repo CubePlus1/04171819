@@ -38,52 +38,63 @@ const SIGNAL_VERB_CN = {
  *   这个排除条件重要——履约是按"主题"聚合的，同一个念头被 AI 记住一次就够了，
  *   不会把 5 条同主题信号接回来 5 张卡片。
  */
+function hasRealSignalRows(db, userId) {
+  const row = db.prepare(`
+    SELECT COUNT(*) AS c
+      FROM intent_signals
+     WHERE user_id = ?
+       AND COALESCE(source, 'mock') != 'mock'
+  `).get(userId);
+  return row.c > 0;
+}
+
 function pickNextCandidate(db, { userId, topic = null, signalId = null }) {
-  const NOT_FULFILLED_TOPIC = `
-    AND NOT EXISTS (
-      SELECT 1 FROM cards cd
-        JOIN intent_signals si ON si.id = cd.intent_signal_id
-       WHERE cd.user_id = s.user_id AND si.topic = s.topic
-    )
-  `;
-  if (signalId) {
-    return db.prepare(`
-      SELECT s.*, ca.id AS action_id, ca.action_type, ca.payload_json,
-             ca.occurred_at AS action_occurred, c.handle, c.display AS creator_display,
-             c.avatar AS creator_avatar, c.bio AS creator_bio
-        FROM intent_signals s
-        JOIN creator_actions ca ON ca.topic = s.topic
-        JOIN creators c ON c.id = s.creator_id
-       WHERE s.id = ? AND s.user_id = ? AND s.fulfilled = 0
-         ${NOT_FULFILLED_TOPIC}
-       ORDER BY ca.occurred_at DESC
-       LIMIT 1
-    `).get(signalId, userId);
-  }
-  if (topic) {
-    return db.prepare(`
-      SELECT s.*, ca.id AS action_id, ca.action_type, ca.payload_json,
-             ca.occurred_at AS action_occurred, c.handle, c.display AS creator_display,
-             c.avatar AS creator_avatar, c.bio AS creator_bio
-        FROM intent_signals s
-        JOIN creator_actions ca ON ca.topic = s.topic
-        JOIN creators c ON c.id = s.creator_id
-       WHERE s.topic = ? AND s.user_id = ? AND s.fulfilled = 0
-         ${NOT_FULFILLED_TOPIC}
-       ORDER BY s.occurred_at ASC, ca.occurred_at DESC
-       LIMIT 1
-    `).get(topic, userId);
-  }
-  return db.prepare(`
+  const BASE_SQL = `
     SELECT s.*, ca.id AS action_id, ca.action_type, ca.payload_json,
            ca.occurred_at AS action_occurred, c.handle, c.display AS creator_display,
            c.avatar AS creator_avatar, c.bio AS creator_bio
       FROM intent_signals s
-      JOIN creator_actions ca ON ca.topic = s.topic
       JOIN creators c ON c.id = s.creator_id
-     WHERE s.user_id = ? AND s.fulfilled = 0
-       ${NOT_FULFILLED_TOPIC}
-     ORDER BY s.occurred_at ASC, ca.occurred_at DESC
+      JOIN creator_actions ca
+        ON ca.is_answer = 1
+       AND (
+         ca.replying_to_rpid = s.rpid
+         OR (
+           ca.replying_to_rpid IS NULL
+           AND ca.source = 'L2'
+           AND ca.topic = s.topic
+         )
+       )
+     WHERE s.user_id = ?
+       AND s.fulfilled = 0
+       AND NOT EXISTS (
+         SELECT 1
+           FROM cards cd
+           JOIN intent_signals si ON si.id = cd.intent_signal_id
+          WHERE cd.user_id = s.user_id
+            AND si.topic = s.topic
+       )
+  `;
+
+  if (signalId) {
+    return db.prepare(`
+      ${BASE_SQL}
+        AND s.id = ?
+      ORDER BY ca.confidence DESC, ca.occurred_at DESC
+      LIMIT 1
+    `).get(userId, signalId);
+  }
+  if (topic) {
+    return db.prepare(`
+      ${BASE_SQL}
+        AND s.topic = ?
+      ORDER BY s.occurred_at ASC, ca.confidence DESC, ca.occurred_at DESC
+      LIMIT 1
+    `).get(userId, topic);
+  }
+  return db.prepare(`
+    ${BASE_SQL}
+     ORDER BY s.occurred_at ASC, ca.confidence DESC, ca.occurred_at DESC
      LIMIT 1
   `).get(userId);
 }
@@ -190,14 +201,12 @@ export async function runAmbient({
   await sleep(stepDelayMs);
 
   // Step 2 · 挑中这一条（未履约 × 刚好有匹配动作）· mind.phase=recall
+  const useLoopReplay = loopMode && !hasRealSignalRows(db, userId);
   let pick = pickNextCandidate(db, { userId, topic, signalId });
 
-  // 展台循环：若一轮剧本接完（含手动指定 topic/signalId 的情况），软 reset 重演
-  // 这样前端永远看不到 pending=false，卡片持续浮入，重复剧本对观众是"下一波履约"
-  let didLoopReset = false;
-  if (!pick && loopMode) {
+  // 展台循环只保留给 mock 数据；真实 B 站数据 pending=false 就是真的没有可履约项了。
+  if (!pick && useLoopReplay) {
     softResetForLoop(db);
-    didLoopReset = true;
     pick = pickNextCandidate(db, { userId, topic, signalId });
   }
 
@@ -224,6 +233,10 @@ export async function runAmbient({
     id: pick.id,
     user_id: pick.user_id,
     creator_id: pick.creator_id,
+    aid: pick.aid ?? null,
+    rpid: pick.rpid ?? null,
+    parent_rpid: pick.parent_rpid ?? null,
+    source: pick.source ?? 'mock',
     video_id: pick.video_id,
     video_title: pick.video_title,
     signal_type: pick.signal_type,
@@ -269,10 +282,17 @@ export async function runAmbient({
   const footprints = db
     .prepare(
       `SELECT * FROM intent_signals
-        WHERE user_id = ? AND topic = ?
+        WHERE user_id = ?
+          AND (
+            rpid = ?
+            OR (
+              aid IS NOT NULL
+              AND aid = ?
+            )
+          )
         ORDER BY occurred_at DESC LIMIT 6`,
     )
-    .all(userId, signal.topic);
+    .all(userId, signal.rpid ?? -1, signal.aid ?? -1);
 
   const match = {
     signal,
@@ -384,7 +404,9 @@ export async function runAmbient({
  */
 export function hasPendingAmbient(userId, { loopMode = false } = {}) {
   const db = getDb();
-  if (loopMode) {
+  const useLoopReplay = loopMode && !hasRealSignalRows(db, userId);
+
+  if (useLoopReplay) {
     const row = db.prepare(`
       SELECT COUNT(*) AS c
         FROM intent_signals s
@@ -396,9 +418,21 @@ export function hasPendingAmbient(userId, { loopMode = false } = {}) {
   const row = db.prepare(`
     SELECT COUNT(DISTINCT s.topic) AS c
       FROM intent_signals s
-      JOIN creator_actions ca ON ca.topic = s.topic
      WHERE s.user_id = ?
        AND s.fulfilled = 0
+       AND EXISTS (
+         SELECT 1
+           FROM creator_actions ca
+          WHERE ca.is_answer = 1
+            AND (
+              ca.replying_to_rpid = s.rpid
+              OR (
+                ca.replying_to_rpid IS NULL
+                AND ca.source = 'L2'
+                AND ca.topic = s.topic
+              )
+            )
+       )
        AND NOT EXISTS (
          SELECT 1 FROM cards cd
            JOIN intent_signals si ON si.id = cd.intent_signal_id
