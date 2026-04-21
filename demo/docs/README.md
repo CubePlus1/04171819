@@ -18,6 +18,8 @@
 | [07-testing-matrix.md](./07-testing-matrix.md) | smoke + unit + integration 测试 |
 | [08-config-env.md](./08-config-env.md) | 环境变量 · 配置项 |
 | [09-ops-runbook.md](./09-ops-runbook.md) | 启停 · 重置 · 常见问题排查 |
+| [superpowers/specs/2026-04-21-bilibili-tracker-design.md](./superpowers/specs/2026-04-21-bilibili-tracker-design.md) | v0.3.0 真实 B 站抓取 · 设计提案 |
+| [superpowers/plans/2026-04-21-bilibili-tracker.md](./superpowers/plans/2026-04-21-bilibili-tracker.md) | v0.3.0 实施计划 · 多文件索引 (T1-T10) |
 
 ## 快速入口
 
@@ -35,6 +37,10 @@
 
 ### 我想跑全部测试
 → [07-testing-matrix.md](./07-testing-matrix.md)
+
+### 我想把 demo 升级到真实 B 站抓取
+→ [09-ops-runbook.md · v0.3.0 Bilibili Tracker 启停](./09-ops-runbook.md#v030--bilibili-tracker-启停)
+→ [plans/2026-04-21-bilibili-tracker.md](./superpowers/plans/2026-04-21-bilibili-tracker.md) · 跟着 T1-T10 实施
 
 ## 关键约束
 

@@ -247,3 +247,82 @@ fi
 
 → [../studydocs/](../studydocs/) 怎么讲清后端逻辑
 → [../report/](../report/) 赛道三评审结论
+
+---
+
+## v0.3.0 · Bilibili Tracker 启停
+
+### 1. 首次安装（三端一起起）
+
+```bash
+# Terminal 1 · backend
+cd /Users/sevencolor/code/0BKHDD/.worktrees/dundao-bilibili/demo/backend
+npm install
+npm run migrate            # T1 产物 · 执行 002_bilibili_fields.sql
+npm run dev                # 127.0.0.1:4000
+
+# Terminal 2 · frontend
+cd /Users/sevencolor/code/0BKHDD/.worktrees/dundao-bilibili/demo/frontend
+npm install
+npm run dev                # 127.0.0.1:5173
+
+# 3. Chrome 插件
+# → 打开 chrome://extensions
+# → 右上角开"开发者模式"
+# → "加载已解压的扩展程序"
+# → 选 /Users/sevencolor/code/0BKHDD/.worktrees/dundao-bilibili/demo/extension
+# → 看到 "蹲到了 · Bilibili Tracker v0.3.0" 已激活
+```
+
+### 2. 首次使用 · 历史倒推
+
+**前置**：确保你已经在 Chrome 里**登录** `www.bilibili.com`
+
+1. 点击地址栏右侧的 🧩 插件图标 → 选「蹲到了」
+2. popup 弹出 · 点 **「开始历史倒推」** 按钮
+3. popup 会显示进度："fetching page 3/~30 · signals 47"
+4. 通常 1-3 分钟跑完；右下角弹桌面通知：「历史倒推完成 · N 条评论已记」
+5. 打开 `localhost:5173` 切到"我的评论" tab · 能看到历史评论列表
+6. 信息流 tab 里会浮出一堆"已答"的履约卡（之前未接回来的）
+
+### 3. 日常使用
+
+- **发评论** · 在任何 B 站视频下正常评论；插件 content_script 会自动 hook
+- **被答** · 插件每 15 分钟自动拉 `msgfeed/reply`，每 30 分钟拉视频 `sort=2` 高赞；判真后生成履约卡
+- **桌面通知** · `chrome.notifications` 弹卡片摘要；点击 → `localhost:5173?card_id=xxx`
+- **视频页徽章** · 进 B 站视频，评论区自己那条旁边有 ✅ 已答 / ⏳ 等待中
+- **筛选查看** · `localhost:5173` → 我的评论 tab → 全部 / 已答 / 等待中
+
+### 4. 常见故障
+
+| 症状 | 诊断 | 解决 |
+|---|---|---|
+| popup 点倒推 · 报 `SESSDATA not found` | 未登录 B 站 | 去 `www.bilibili.com` 登录后重试 |
+| 视频页无徽章 | content_script 没注入 | chrome://extensions 查插件 ERROR log；若 B 站改 DOM class，改 `demo/extension/content_script.js` 的 selector |
+| `localhost:5173` "我的评论" 一直空 | backend migrate 没跑 | `cd demo/backend && npm run migrate` 后重启 dev |
+| 桌面通知未弹 | 系统/Chrome 通知权限 | 系统设置 → 通知 → Chrome 允许；chrome://settings/content/notifications 里本地 localhost:5173 允许 |
+| `ingest/comment` 返回 409 | rpid 已存在（重复 hook） | 正常 · 插件会去重 |
+
+### 5. 重置 / 清库
+
+```bash
+# 清真实数据 · 保留 fixtures mock
+cd /Users/sevencolor/code/0BKHDD/.worktrees/dundao-bilibili/demo/backend
+sqlite3 data/dundao.db <<'SQL'
+DELETE FROM cards WHERE user_id='demo-user' AND id NOT LIKE 'mock-%';
+DELETE FROM intent_signals WHERE source != 'mock';
+DELETE FROM creator_actions WHERE source != 'mock';
+DELETE FROM creators WHERE id NOT IN (SELECT DISTINCT creator_id FROM creator_actions);
+SQL
+
+# 完全重置（回到空库 + fixtures）
+rm data/dundao.db
+npm run migrate
+npm run db:seed
+```
+
+### 6. 升级插件（代码变更后）
+
+1. chrome://extensions → 找到插件卡片 → 点 **↻ 刷新**
+2. 关掉已开的 B 站 tab · 重开（content_script 在页面加载时注入）
+3. service_worker 变更需要插件完全禁用 → 重新启用 · 或手动 kill service worker（devtools → Service Worker → 停止）
