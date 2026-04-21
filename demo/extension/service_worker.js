@@ -8,6 +8,7 @@ const MSGFEED_ALARM = 'msgfeed-poll';
 const TOP_REPLY_ALARM = 'top-reply-poll';
 const WS_URL = 'ws://127.0.0.1:4000/ws';
 const DEFAULT_NOTIFICATION_MESSAGE = '点击查看详情';
+const LAST_NOTIFIED_CARD_ID_KEY = 'lastNotifiedCardId';
 
 let lastBiliRequestAt = 0;
 let biliRequestQueue = Promise.resolve();
@@ -100,6 +101,73 @@ async function getSessData() {
   });
 
   return cookie?.value ?? null;
+}
+
+async function getLastNotifiedCardId() {
+  const stored = await chrome.storage.local.get(LAST_NOTIFIED_CARD_ID_KEY);
+  return toStringOr(stored?.[LAST_NOTIFIED_CARD_ID_KEY], '') || null;
+}
+
+async function setLastNotifiedCardId(cardId) {
+  if (!cardId) {
+    return;
+  }
+  await chrome.storage.local.set({
+    [LAST_NOTIFIED_CARD_ID_KEY]: String(cardId),
+  });
+}
+
+async function notifyCard({ cardId, message }) {
+  if (!cardId) {
+    return false;
+  }
+
+  await chrome.notifications.create(`card-${cardId}`, {
+    type: 'basic',
+    iconUrl: 'icon.png',
+    title: '蹲到了新卡',
+    message: toStringOr(message, DEFAULT_NOTIFICATION_MESSAGE),
+    priority: 2,
+  });
+  await setLastNotifiedCardId(cardId);
+  return true;
+}
+
+async function catchUpNotifications() {
+  const response = await fetch(`${BACKEND_URL}/api/my-comments?filter=fulfilled`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} for fulfilled comments`);
+  }
+
+  const data = await response.json();
+  const items = Array.isArray(data?.items) ? data.items : [];
+  const lastNotifiedCardId = await getLastNotifiedCardId();
+  const unseen = [];
+  const seenCardIds = new Set();
+
+  for (const item of items) {
+    const cardId = toStringOr(item?.card_id, '');
+    if (!cardId) {
+      continue;
+    }
+    if (cardId === lastNotifiedCardId) {
+      break;
+    }
+    if (seenCardIds.has(cardId)) {
+      continue;
+    }
+    seenCardIds.add(cardId);
+    unseen.push(item);
+  }
+
+  for (const item of unseen.reverse()) {
+    await notifyCard({
+      cardId: item.card_id,
+      message: item?.top_answer?.content || item?.content,
+    });
+  }
+
+  return { ok: true, notified: unseen.length };
 }
 
 function normalizeMsgfeedItem(item) {
@@ -288,12 +356,9 @@ wsClient.onCardGenerated = (payload) => {
     return;
   }
 
-  chrome.notifications.create(`card-${card.id}`, {
-    type: 'basic',
-    iconUrl: 'icon.png',
-    title: '蹲到了新卡',
-    message: toStringOr(card.pages?.[0]?.context_line, DEFAULT_NOTIFICATION_MESSAGE),
-    priority: 2,
+  void notifyCard({
+    cardId: card.id,
+    message: card.pages?.[0]?.context_line,
   });
 };
 
@@ -316,11 +381,21 @@ chrome.runtime.onStartup.addListener(() => {
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === MSGFEED_ALARM) {
-    void pollMsgfeed();
+    void (async () => {
+      await pollMsgfeed();
+      await catchUpNotifications();
+    })().catch((error) => {
+      console.warn('[Dundao] msgfeed wake catch-up failed', error);
+    });
   }
 
   if (alarm.name === TOP_REPLY_ALARM) {
-    void pollTopReplies();
+    void (async () => {
+      await pollTopReplies();
+      await catchUpNotifications();
+    })().catch((error) => {
+      console.warn('[Dundao] top-reply wake catch-up failed', error);
+    });
   }
 });
 
